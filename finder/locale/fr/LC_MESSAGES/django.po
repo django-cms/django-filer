@@ -1,0 +1,416 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-finder\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-03 10:51+0200\n"
+"PO-Revision-Date: 2026-09-03 11:01+0200\n"
+"Last-Translator: Django CMS Association and contributors <info@django-cms.org>\n"
+"Language-Team: French <info@django-cms.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: admin/file.py:55
+msgid "Details"
+msgstr "Détails"
+
+#: admin/folder.py:280 admin/folder.py:539
+#, python-brace-format
+msgid "A folder named “{name}” already exists."
+msgstr "Un dossier nommé « {name} » existe déjà."
+
+#: admin/folder.py:328
+#, python-brace-format
+msgid ""
+"You do not have permission to move items out of the folder named “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de déplacer des éléments hors du dossier « "
+"{folder} »."
+
+#: admin/folder.py:344
+#, python-brace-format
+msgid "Folder named “{folder}” not found."
+msgstr "Dossier nommé « {folder} » introuvable."
+
+#: admin/folder.py:369
+#, python-brace-format
+msgid "You do not have permission to reorder items in folder “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de réordonner les éléments du dossier « "
+"{folder} »."
+
+#: admin/folder.py:395
+msgid "Cannot move inodes from the trash folder into itself."
+msgstr "Impossible de déplacer des éléments de la corbeille vers elle-même."
+
+#: admin/folder.py:398
+#, python-brace-format
+msgid ""
+"You do not have permission to delete items from the folder named “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de supprimer des éléments du dossier « "
+"{folder} »."
+
+#: admin/folder.py:434
+msgid "You do not have permission to edit tags."
+msgstr "Vous n'avez pas la permission de modifier les étiquettes."
+
+#: admin/folder.py:482
+#, python-brace-format
+msgid ""
+"You do not have permission to restore item “{item}” to folder “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de restaurer l'élément « {item} » dans le "
+"dossier « {folder} »."
+
+#: admin/inode.py:94 models/permission.py:86
+msgid "Everyone"
+msgstr "Tout le monde"
+
+#: admin/inode.py:323
+#, python-brace-format
+msgid "The {name} “{obj}” was deleted successfully."
+msgstr "{name} « {obj} » a été supprimé avec succès."
+
+#: browser/views.py:294
+msgid "At least one of width or height must be given."
+msgstr "Une largeur ou une hauteur au moins doit être indiquée."
+
+#: contrib/archive/admin.py:126
+#, python-brace-format
+msgid "Cannot extract archive. A folder named “{name}” already exists."
+msgstr ""
+"Impossible d'extraire l'archive. Un dossier nommé « {name} » existe déjà."
+
+#: contrib/archive/admin.py:167
+#, python-brace-format
+msgid "Failed to extract archive “{name}”. Reason: {error}."
+msgstr "Échec de l'extraction de l'archive « {name} ». Raison : {error}."
+
+#: contrib/archive/admin.py:171
+#, python-brace-format
+msgid "Successfully extracted ZIP archive “{name}” to folder “{folder}”."
+msgstr "L'archive ZIP « {name} » a été extraite dans le dossier « {folder} »."
+
+#: contrib/image/admin.py:27
+#, python-brace-format
+msgid "{field} ({language})"
+msgstr "{field} ({language})"
+
+#: contrib/image/forms.py:27
+msgid "Alternative Text"
+msgstr "Texte alternatif"
+
+#: contrib/image/forms.py:32
+msgid "Image Credit"
+msgstr "Crédit photo"
+
+#: contrib/image/models.py:17
+msgid "Center"
+msgstr "Centre"
+
+#: contrib/image/models.py:18
+msgid "North"
+msgstr "Nord"
+
+#: contrib/image/models.py:19
+msgid "Northeast"
+msgstr "Nord-est"
+
+#: contrib/image/models.py:20
+msgid "East"
+msgstr "Est"
+
+#: contrib/image/models.py:21
+msgid "Southeast"
+msgstr "Sud-est"
+
+#: contrib/image/models.py:22
+msgid "South"
+msgstr "Sud"
+
+#: contrib/image/models.py:23
+msgid "Southwest"
+msgstr "Sud-ouest"
+
+#: contrib/image/models.py:24
+msgid "West"
+msgstr "Ouest"
+
+#: contrib/image/models.py:25
+msgid "Northwest"
+msgstr "Nord-ouest"
+
+#: contrib/image/pil/admin.py:17
+msgid "EXIF-headers"
+msgstr "En-têtes EXIF"
+
+#: contrib/image/pil/admin.py:22 models/filetag.py:25
+msgid "Tag"
+msgstr "Tag"
+
+#: contrib/image/pil/admin.py:23
+msgid "Value"
+msgstr "Valeur"
+
+#: contrib/image/pil/models.py:27
+msgid "Web Image"
+msgstr "Image web"
+
+#: contrib/image/pil/models.py:28
+msgid "Web Images"
+msgstr "Images web"
+
+#: contrib/image/svg/models.py:19
+msgid "SVG Image"
+msgstr "Image SVG"
+
+#: contrib/image/svg/models.py:20
+msgid "SVG Images"
+msgstr "Images SVG"
+
+#: contrib/image/svg/models.py:40
+#, python-brace-format
+msgid "File \"{path}\": SVG format not recognized"
+msgstr "Fichier « {path} » : format SVG non reconnu"
+
+#: contrib/video/forms.py:13
+msgid "Poster timestamp"
+msgstr "Horodatage de l'image d'aperçu"
+
+#: models/fields.py:74
+msgid "Reference to a file in the finder app."
+msgstr "Référence à un fichier dans l'application finder."
+
+#: models/fields.py:99
+msgid "Reference to a folder in the finder app."
+msgstr "Référence à un dossier dans l'application finder."
+
+#: models/file.py:24
+#, python-brace-format
+msgid "‘{mimetype}’ is not a recognized MIME-Type."
+msgstr "« {mimetype} » n'est pas un type MIME reconnu."
+
+#: models/file.py:52
+#, python-brace-format
+msgid "You don't have permission to upload a file to the folder “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de téléverser un fichier dans le dossier « "
+"{folder} »."
+
+#: models/file.py:95
+msgid "File name"
+msgstr "Nom du fichier"
+
+#: models/file.py:100
+msgid "Size"
+msgstr "Taille"
+
+#: models/file.py:104
+msgid "SHA1-hash"
+msgstr "Empreinte SHA1"
+
+#: models/file.py:112
+msgid "MIME-type"
+msgstr "Type MIME"
+
+#: models/file.py:113
+msgid "MIME-type of uploaded content"
+msgstr "Type MIME du contenu téléversé"
+
+#: models/file.py:123 models/filetag.py:26
+msgid "Tags"
+msgstr "Étiquettes"
+
+#: models/file.py:129
+msgid "File"
+msgstr "Fichier"
+
+#: models/file.py:130
+msgid "Files"
+msgstr "Fichiers"
+
+#: models/file.py:238
+#, python-brace-format
+msgid ""
+"You do not have permission to copy file “{source}” to folder “{target}”."
+msgstr ""
+"Vous n'avez pas la permission de copier le fichier « {source} » dans le "
+"dossier « {target} »."
+
+#: models/filetag.py:15
+msgid "Label"
+msgstr "Libellé"
+
+#: models/filetag.py:19
+msgid "Color"
+msgstr "Couleur"
+
+#: models/folder.py:41 models/inode.py:274
+msgid "Folder"
+msgstr "Dossier"
+
+#: models/folder.py:42
+msgid "Folders"
+msgstr "Dossiers"
+
+#: models/folder.py:50
+msgid "Root"
+msgstr "Racine"
+
+#: models/folder.py:52
+msgid "Trash"
+msgstr "Corbeille"
+
+#: models/folder.py:171
+#, python-brace-format
+msgid "{} Folder"
+msgid_plural "{} Folders"
+msgstr[0] "{} dossier"
+msgstr[1] "{} dossiers"
+
+#: models/folder.py:172
+#, python-brace-format
+msgid "{} File"
+msgid_plural "{} Files"
+msgstr[0] "{} fichier"
+msgstr[1] "{} fichiers"
+
+#: models/folder.py:228
+#, python-brace-format
+msgid "You do not have permission to move these items to folder “{folder}”."
+msgstr ""
+"Vous n'avez pas la permission de déplacer ces éléments vers le dossier « "
+"{folder} »."
+
+#: models/folder.py:284
+#, python-brace-format
+msgid ""
+"You do not have permission to copy folder “{source}” to folder “{target}”."
+msgstr ""
+"Vous n'avez pas la permission de copier le dossier « {source} » dans le "
+"dossier « {target} »."
+
+#: models/folder.py:290
+#, python-brace-format
+msgid ""
+"Folder named “{source}” cannot become the descendant of destination folder "
+"“{target}”."
+msgstr ""
+"Le dossier « {source} » ne peut pas devenir un descendant du dossier de "
+"destination « {target} »."
+
+#: models/folder.py:305 models/folder.py:311
+msgid "A parent folder cannot become the descendant of a destination folder."
+msgstr ""
+"Un dossier parent ne peut pas devenir un descendant d'un dossier de "
+"destination."
+
+#: models/folder.py:315
+#, python-brace-format
+msgid "Folder named “{name}” already exists in destination folder."
+msgstr ""
+"Un dossier nommé « {name} » existe déjà dans le dossier de destination."
+
+#: models/folder.py:318
+#, python-brace-format
+msgid "Folder name “{name}” is reserved."
+msgstr "Le nom de dossier « {name} » est réservé."
+
+#: models/folder.py:469 models/inode.py:297
+msgid "Created at"
+msgstr "Créé le"
+
+#: models/folder.py:475
+msgid "Pinned Folder"
+msgstr "Dossier épinglé"
+
+#: models/folder.py:476
+msgid "Pinned Folders"
+msgstr "Dossiers épinglés"
+
+#: models/inode.py:288
+msgid "Owner"
+msgstr "Propriétaire"
+
+#: models/inode.py:292
+msgid "Name"
+msgstr "Nom"
+
+#: models/inode.py:302
+msgid "Modified at"
+msgstr "Modifié le"
+
+#: models/inode.py:307
+msgid "Ordering index"
+msgstr "Index de tri"
+
+#: models/inode.py:442
+msgid "Deleted at"
+msgstr "Supprimé le"
+
+#: models/permission.py:10
+msgid "Read"
+msgstr "Lecture"
+
+#: models/permission.py:11
+msgid "Write (Dropbox)"
+msgstr "Écriture (Dropbox)"
+
+#: models/permission.py:12
+msgid "Read & Write"
+msgstr "Lecture et écriture"
+
+#: models/permission.py:13
+msgid "Administrator"
+msgstr "Administrateur"
+
+#: models/permission.py:14
+msgid "Full Control"
+msgstr "Contrôle total"
+
+#: models/permission.py:123
+msgid "Access Control Entry"
+msgstr "Entrée de contrôle d'accès"
+
+#: models/permission.py:124
+msgid "Access Control Entries"
+msgstr "Entrées de contrôle d'accès"
+
+#: models/permission.py:167
+msgid "Default Access Control Entry"
+msgstr "Entrée de contrôle d'accès par défaut"
+
+#: models/permission.py:168
+msgid "Default Access Control Entries"
+msgstr "Entrées de contrôle d'accès par défaut"
+
+#: templates/finder/admin/base_site.html:6
+#: templates/finder/admin/base_site.html:7
+msgid "Go back to"
+msgstr "Retourner à"
+
+#: templates/finder/admin/base_site.html:6
+msgid "admin homepage"
+msgstr "la page d'accueil d'administration"
+
+#: templates/finder/admin/base_site.html:6
+msgid "Home"
+msgstr "Accueil"
+
+#: templates/finder/admin/base_site.html:7
+msgid "Finder"
+msgstr "Finder"
+
+#: templates/finder/admin/change_file_form.html:19
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Veuillez corriger l'erreur ci-dessous."
+msgstr[1] "Veuillez corriger les erreurs ci-dessous."
