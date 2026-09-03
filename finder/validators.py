@@ -50,7 +50,7 @@ def deny_html(file_name, file, owner, mime_type):
     )
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def payload_validator(validator):
     """
     Resolve a configured validator to the callable to invoke: a dotted path is
