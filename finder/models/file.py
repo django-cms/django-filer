@@ -1,7 +1,7 @@
 import hashlib
 import mimetypes
+import os
 from functools import lru_cache, reduce
-from inspect import isclass
 from operator import or_
 
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -17,22 +17,13 @@ from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 from finder.storages import delete_directory
+from finder.validators import validate_payload
 
 
 def mimetype_validator(value):
     if not mimetypes.guess_extension(value):
         msg = gettext("‘{mimetype}’ is not a recognized MIME-Type.")
         raise ValidationError(msg.format(mimetype=value))
-
-
-@lru_cache
-def payload_validator(validator):
-    if isinstance(validator, str):
-        return payload_validator(import_string(validator))
-    if isclass(validator):
-        return payload_validator(validator())
-    if callable(validator):
-        return validator
 
 
 def digest_sha1(readhandle):
@@ -43,6 +34,17 @@ def digest_sha1(readhandle):
     for chunk in readhandle.chunks():
         sha1.update(chunk)
     return sha1.hexdigest()
+
+
+def get_file_size(uploaded_file):
+    """
+    Measure an uploaded file. Its `size` attribute is fixed when the upload handler creates
+    it, so it is stale once a sanitizing validator has rewritten the content.
+    """
+    uploaded_file.seek(0, os.SEEK_END)
+    size = uploaded_file.tell()
+    uploaded_file.seek(0)
+    return size
 
 
 class FileModelManager(InodeManager):
@@ -223,6 +225,11 @@ class AbstractFileModel(InodeModel):
         return self.mime_type.split('/')[1]
 
     def receive_file(self, ambit, uploaded_file):
+        # Validate before storing: a rejected payload must not leave a file behind, and a
+        # sanitizing validator rewrites `uploaded_file` in place, so it has to run on the
+        # uploaded file rather than on a read-only handle on the stored one.
+        validate_payload(self.name, uploaded_file, self.owner, self.mime_type)
+        self.file_size = get_file_size(uploaded_file)
         ambit.original_storage.save(self.file_path, uploaded_file)
         if ambit.original_storage.size(self.file_path) != self.file_size:
             raise IOError("File size mismatch between uploaded file and destination file")
@@ -260,7 +267,6 @@ class AbstractFileModel(InodeModel):
         return obj
 
     def store_and_save(self, ambit, **kwargs):
-        self.validate_payload(ambit)
         return self.save(**kwargs)
 
     def erase_and_delete(self, ambit, using=None, keep_parents=False):
@@ -269,16 +275,6 @@ class AbstractFileModel(InodeModel):
             delete_directory(ambit.original_storage, dir_path)
             delete_directory(ambit.sample_storage, dir_path)
         self.delete(using, keep_parents)
-
-    def validate_payload(self, ambit):
-        for mime_type, validator in settings.FINDER_PAYLOAD_VALIDATORS:
-            if (
-                self.mime_type == mime_type
-                or '{0}/*'.format(self.mime_type.split('/')) == mime_type
-                or mime_type == '*/*'
-            ):
-                with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
-                    payload_validator(validator)(self.name, readhandle, self.owner, self.mime_type)
 
 
 class FileModel(AbstractFileModel):

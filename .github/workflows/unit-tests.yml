@@ -10,6 +10,7 @@ on:
   pull_request:
     branches:
       - develop
+      - finder
     paths:
       - 'finder/**'
       - 'unittests/**'
@@ -63,6 +64,7 @@ jobs:
         python -m pip install --upgrade setuptools wheel
         python -m pip install "Django==${{ matrix.django-version }}.*"
         python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
+        python -m pip install py-svg-hush defusedxml
         python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
     - name: Install Django-CTE
       if: ${{ matrix.with_cte == '1' }}

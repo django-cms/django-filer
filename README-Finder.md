@@ -387,6 +387,55 @@ consideration. For instance, if a user uploads a portrait image, the focal point
 head of the person in that image.
 
 
+## Validating Uploads
+
+Every uploaded payload is validated before it is written to storage. A validator is a callable
+
+```python
+def my_validator(file_name, file, owner, mime_type):
+    ...
+```
+
+that raises `finder.exceptions.FileValidationError` to reject the upload. It is handed the uploaded
+file rewound and opened for writing, so it may also **rewrite the content in place** rather than
+reject it — that is how the bundled SVG sanitizer works. Rejecting a payload leaves nothing behind:
+validation runs before the file reaches the storage backend.
+
+This is deliberately the same contract django-filer uses for `FILER_ADD_FILE_VALIDATORS`, so
+validators written for filer — including third-party ones — work here unchanged. A validator
+signalling rejection with a plain `ValueError` is accepted too.
+
+By default finder rejects the formats a browser executes in the media origin, and sanitizes SVG
+uploads (which needs `py-svg-hush`, part of the `svg` extra):
+
+| MIME-type | Validator |
+|---|---|
+| `text/html` | `finder.validators.deny_html` |
+| `application/xhtml+xml`, `application/xml`, `text/xml`, `application/xslt+xml` | `finder.validators.deny` |
+| `image/svg+xml` | `finder.contrib.image.svg.validators.sanitize_svg` |
+
+Unlike django-filer, finder does **not** deny `application/octet-stream`: `FileModel` is the
+documented fallback for everything that matches no other model, and browsers report that MIME-type
+for plenty of harmless files. Add `{'application/octet-stream': ['finder.validators.deny']}` for
+filer's behaviour.
+
+Add your own validators with `FINDER_PAYLOAD_VALIDATORS`, a dict mapping a MIME-type to a list of
+validators. The MIME-type may be exact, a subtype wildcard (`image/*`) or `*/*`; more general
+matches run first. Values are dotted paths, callables or classes.
+
+```python
+FINDER_PAYLOAD_VALIDATORS = {
+    'image/*': ['myapp.validators.strip_exif'],
+}
+```
+
+Drop a default with `FINDER_REMOVE_PAYLOAD_VALIDATORS`, a list of MIME-types:
+
+```python
+FINDER_REMOVE_PAYLOAD_VALIDATORS = ['image/svg+xml']
+```
+
+
 ## Further Steps
 
 * A quota system, which allows to limit the amount of disk space a user can use.
