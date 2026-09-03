@@ -14,6 +14,9 @@ from finder.models.ambit import AmbitModel
 from finder.models.permission import Privilege
 
 
+FINDER_APP_LABEL = AmbitModel._meta.app_label
+
+
 def get_ambit_queryset(admin_name, current_site):
     return AmbitModel.objects.filter(
         Q(site=current_site) | Q(site__isnull=True),
@@ -77,13 +80,16 @@ def get_app_list(self, request, app_label=None):
     current_site = get_current_site(request)
     ambit_models = get_ambit_queryset(self.name, current_site)
     register_ambit_admins(ambit_models)
-    app_dict = self._build_app_dict(request)
+    app_dict = self._build_app_dict(request, app_label)
+    if app_label not in [None, FINDER_APP_LABEL]:
+        # `app_index()` for another application: leave its list of models alone
+        return sorted(app_dict.values(), key=lambda x: x['name'].lower())
 
     # override the 'Finder' app to only show the ambit proxy models
-    app_dict['finder'] = {
+    app_dict[FINDER_APP_LABEL] = {
         'name': 'Finder',
-        'app_label': 'finder',
-        'app_url': reverse('admin:app_list', kwargs={'app_label': 'finder'}, current_app=self.name),
+        'app_label': FINDER_APP_LABEL,
+        'app_url': reverse('admin:app_list', kwargs={'app_label': FINDER_APP_LABEL}, current_app=self.name),
         'has_module_perms': True,
         'models': [],
     }

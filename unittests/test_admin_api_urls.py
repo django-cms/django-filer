@@ -43,3 +43,38 @@ def test_a_project_mount_is_preferred_over_the_admin_one():
     from finder.browser.urls import reverse_api
 
     assert reverse_api('base-url') == '/finder-api/'
+
+
+class TestFinderAppIndex:
+    """
+    `/admin/finder/` lists the configured ambits, each linking into its root folder.
+
+    It is what the “Finder” breadcrumb of `finder/admin/base_site.html` points at.
+    """
+
+    def test_it_lists_the_ambits(self, admin_client, ambit):
+        response = admin_client.get(reverse('admin:app_list', kwargs={'app_label': 'finder'}))
+        assert response.status_code == 200
+        assert [app['name'] for app in response.context_data['app_list']] == ['Finder']
+        assert response.context_data['title'] == "Finder administration"
+        models = response.context_data['app_list'][0]['models']
+        assert [model['name'] for model in models] == [ambit.verbose_name]
+        assert models[0]['admin_url'] == f'/admin/finder/{ambit.slug}/'
+
+    def test_the_breadcrumb_names_the_app(self, admin_client, ambit):
+        html = admin_client.get(reverse('admin:app_list', kwargs={'app_label': 'finder'})).content.decode()
+        start = html.index('<div class="breadcrumbs">')
+        breadcrumb = ' '.join(html[start:html.index('</div>', start)].split())
+        assert breadcrumb == '<div class="breadcrumbs"> <a href="/admin/">Home</a> &rsaquo; Finder'
+
+    def test_another_app_index_is_left_alone(self, admin_client, ambit):
+        """The Finder entry must not leak into the index of an unrelated application."""
+        response = admin_client.get(reverse('admin:app_list', kwargs={'app_label': 'auth'}))
+        assert [app['name'] for app in response.context_data['app_list']] == ["Authentication and Authorization"]
+
+    def test_an_unknown_app_is_still_a_404(self, admin_client, ambit):
+        assert admin_client.get('/admin/nosuchapp/').status_code == 404
+
+    def test_the_admin_index_still_lists_finder(self, admin_client, ambit):
+        response = admin_client.get(reverse('admin:index'))
+        assert 'Finder' in [app['name'] for app in response.context_data['app_list']]
