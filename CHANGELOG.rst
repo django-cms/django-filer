@@ -10,6 +10,9 @@ CHANGELOG
   element-qualified CSS selectors expect, and keep the legacy
   ``<div class="breadcrumbs">`` markup on older versions.
 * ci: Test against Django 6.0 and 6.1.
+* fix: Send the CSRF token with uploads started from the "Upload Files" button in the
+  folder view. Since 3.5.1 the upload endpoint enforces CSRF, but this uploader had not
+  been updated and every upload from it failed with "CSRF token missing" (#1617).
 
 .. note::
 
