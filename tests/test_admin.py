@@ -1,5 +1,6 @@
 import json
 import os
+import unittest
 
 import django
 import django.core.files
@@ -34,6 +35,7 @@ from filer.templatetags.filer_admin_tags import (
     get_aspect_ratio_and_download_url,
 )
 from filer.thumbnail_processors import normalize_subject_location
+from filer.utils.compatibility import PILImage
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 from tests.utils.extended_app.models import ExtImage, Video
@@ -627,6 +629,41 @@ class FilerClipboardAdminUrlsTests(TestCase):
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    @unittest.skipUnless(
+        ".avif" in PILImage.registered_extensions(),
+        "Pillow does not support AVIF",
+    )
+    def test_filer_ajax_upload_avif_file(self):
+        """AVIF uploads are recognized as images (and thumbnailed) if Pillow can
+        decode them, see https://github.com/django-cms/django-filer/issues/1560"""
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        avif_name = 'test_file.avif'
+        avif_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, avif_name)
+        self.img.save(avif_filename, 'AVIF')
+        try:
+            with open(avif_filename, 'rb') as fh:
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % avif_name
+                self.client.post(
+                    url,
+                    data=fh.read(),
+                    content_type='image/avif',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+        finally:
+            os.remove(avif_filename)
+
+        self.assertEqual(Image.objects.count(), 1)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, avif_name)
+        self.assertEqual(stored_image.mime_type, 'image/avif')
+        self.assertEqual((stored_image.width, stored_image.height), self.img.size)
+        # Thumbnails are generated from the avif original
+        self.assertTrue(stored_image.icons)
 
     def test_filer_ajax_decompression_bomb(self):
         DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
