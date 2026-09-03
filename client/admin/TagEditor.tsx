@@ -9,6 +9,9 @@ import Dialog from './Dialog';
 import AddEntryIcon from '../icons/add-entry.svg';
 import TrashIcon from '../icons/trash.svg';
 
+/** Change handler of the text and colour inputs of the tag table. */
+type ChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => void;
+
 
 const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 	const {settings} = props;
@@ -66,26 +69,26 @@ const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 		}
 	}
 
-	function updateLabel(index?: number) : Function {
+	function updateLabel(index?: number) : ChangeHandler {
 		if (index === undefined) {
-			return (event: Event) => {
-				setNewTag({...newTag, label: (event.target as HTMLInputElement).value});
+			return event => {
+				setNewTag({...newTag, label: event.target.value});
 			};
 		}
-		return (event: Event) => {
-			const tag = {...tags[index], label: (event.target as HTMLInputElement).value};
+		return event => {
+			const tag = {...tags[index], label: event.target.value};
 			setTags(tags.toSpliced(index, 1, tag));
 		};
 	}
 
-	function updateColor(index?: number) : Function {
+	function updateColor(index?: number) : ChangeHandler {
 		if (index === undefined) {
-			return (event: Event) => {
-				setNewTag({...newTag, color: (event.target as HTMLInputElement).value});
+			return event => {
+				setNewTag({...newTag, color: event.target.value});
 			};
 		}
-		return (event: Event) => {
-			const tag = {...tags[index], color: (event.target as HTMLInputElement).value};
+		return event => {
+			const tag = {...tags[index], color: event.target.value};
 			setTags(tags.toSpliced(index, 1, tag));
 		};
 	}

@@ -91,3 +91,28 @@ def test_get_inode(ambit):
     assert pdf_file.pretty_path == "Root / Sub Folder / sample.pdf"
     sub_folder_id = ambit.root_folder.listdir(is_folder=True)[0]['id']
     assert len(FolderModel.objects.get_inode(id=sub_folder_id).listdir()) == 1
+
+
+def test_retrieve_by_path(ambit):
+    root_folder = ambit.root_folder
+    assert root_folder.retrieve([]) is root_folder
+    assert root_folder.retrieve('') is None
+
+    sub_folder = root_folder.retrieve('Sub Folder')
+    assert isinstance(sub_folder, FolderModel)
+    assert sub_folder.name == "Sub Folder"
+    assert root_folder.retrieve(['Sub Folder']).id == sub_folder.id
+
+    pdf_file = root_folder.retrieve('Sub Folder/sample.pdf')
+    assert isinstance(pdf_file, PDFFileModel)
+    assert pdf_file.name == 'sample.pdf'
+    assert sub_folder.retrieve('sample.pdf').id == pdf_file.id
+
+
+def test_retrieve_unknown_path(ambit):
+    root_folder = ambit.root_folder
+    assert root_folder.retrieve('No Such Folder') is None
+    assert root_folder.retrieve('Sub Folder/no-such-file.pdf') is None
+    assert root_folder.retrieve('No Such Folder/sample.pdf') is None
+    # a file is never traversed as if it were a folder
+    assert root_folder.retrieve('Sub Folder/sample.pdf/deeper') is None

@@ -29,6 +29,18 @@ def uploaded_svg(ambit, admin_user):
     )
 
 
+@pytest.fixture
+def without_svg_sanitizer(settings):
+    """
+    Drop `sanitize_svg`, the validator registered for `image/svg+xml` by default.
+
+    It rejects a malformed document while it is being uploaded, which is what it is there
+    for, but it also makes it impossible to put one into storage — which the tests for the
+    error handling further down the line have to do.
+    """
+    settings.FINDER_REMOVE_PAYLOAD_VALIDATORS = ['image/svg+xml']
+
+
 class TestParseLength:
     @pytest.mark.parametrize('value, expected', [
         ('12', 12.0),
@@ -230,7 +242,7 @@ class TestSVGImageModel:
         assert thumbnail.viewbox[0] == pytest.approx(0.0)
         assert thumbnail.viewbox[2] == pytest.approx(24.0)
 
-    def test_crop_reports_unparseable_documents(self, ambit, admin_user):
+    def test_crop_reports_unparseable_documents(self, ambit, admin_user, without_svg_sanitizer):
         image = SVGImageModel.objects.create_from_upload(
             ambit,
             make_svg('<svg><rect></svg>', name='broken.svg'),
@@ -240,7 +252,7 @@ class TestSVGImageModel:
         with pytest.raises(FileValidationError):
             image.crop(ambit, f'{image.id}/broken__180x180.svg', 180, 180)
 
-    def test_broken_document_falls_back_to_the_icon(self, ambit, admin_user):
+    def test_broken_document_falls_back_to_the_icon(self, ambit, admin_user, without_svg_sanitizer):
         image = SVGImageModel.objects.create_from_upload(
             ambit,
             make_svg('<svg><rect></svg>', name='broken2.svg'),

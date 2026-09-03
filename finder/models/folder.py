@@ -104,8 +104,11 @@ class FolderModel(InodeModel):
             from django_cte import CTE, with_cte
         except ImportError:  # pragma: without django-cte
             # traversing the tree folder by folder (slow)
-            folder, ancestors = self, []
-            while folder:
+            # `validate_constraints()` reads this property to detect a cyclic parent
+            # chain, so it must terminate on one rather than walk it forever.
+            folder, ancestors, visited = self, [], set()
+            while folder and folder.id not in visited:
+                visited.add(folder.id)
                 ancestors.append(folder)
                 folder = folder.parent
             return ancestors
@@ -321,7 +324,7 @@ class FolderModel(InodeModel):
 
     def reorder(self, target_id=None, inode_ids=[], insert_after=True):
         """
-        Set `ordering` index based on their natural ordering index.
+        Set `ordering` index based on their natural ordering index. Returns the number of reordered inodes.
         """
 
         def insert(new_order):
@@ -358,6 +361,7 @@ class FolderModel(InodeModel):
 
         for folder in former_parents:
             folder.reorder()
+        return len({inode.id for inode in update_inodes})
 
     def get_max_ordering(self):
         """
@@ -371,17 +375,19 @@ class FolderModel(InodeModel):
 
     def retrieve(self, path):
         """
-        Retrieve an inode specified by the given path object.
+        Retrieve the inode specified by the given path object, or None if there is no such inode.
         """
         if isinstance(path, str):
             path = path.split('/')
-        for part in path:
-            if entry := self.listdir(name=part).first():
-                proxy_obj = InodeManager.get_proxy_object(entry)
-                return proxy_obj.retrieve(path[1:])
-            return None
-        else:
+        if not path:
             return self
+        if entry := self.listdir(name=path[0]).first():
+            proxy_obj = InodeManager.get_proxy_object(entry)
+            if proxy_obj.is_folder:
+                return proxy_obj.retrieve(path[1:])
+            # a file can only be the last part of a path
+            return proxy_obj if len(path) == 1 else None
+        return None
 
     def apply_default_access_control_list(self, next_acl, user=None, recursive=False):
         if user and not self.has_permission(user, Privilege.ADMIN):

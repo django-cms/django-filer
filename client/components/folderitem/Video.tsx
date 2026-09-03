@@ -13,7 +13,9 @@ export default function Video(props) {
 		let timeout = null;
 
 		const play = () => {
-			timeout && clearTimeout(timeout);
+			if (timeout) {
+				clearTimeout(timeout);
+			}
 			if (props.webAudio.context.state === 'suspended') {
 				props.webAudio.context.resume();
 			}
@@ -36,7 +38,9 @@ export default function Video(props) {
 
 		return () => {
 			videoRef.current?.pause();
-			timeout && clearTimeout(timeout);
+			if (timeout) {
+				clearTimeout(timeout);
+			}
 			wrapper.removeEventListener('mouseenter', play);
 			wrapper.removeEventListener('mouseleave', pause);
 		}

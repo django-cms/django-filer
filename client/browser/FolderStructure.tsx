@@ -11,15 +11,16 @@ function FolderEntry(props) {
 	const {folder, toggleOpen, selectFolder, openRecursive, isCurrent, isSelected, isListed, setCurrentFolderElement} = props;
 	const ref = useRef(null);
 
-	if (folder.is_root) {
-		return (<i onClick={() => selectFolder(folder)}><RootIcon/></i>);
-	}
-
 	useEffect(() => {
-		if (isCurrent) {
+		// the root folder renders as a plain icon below and never carries `ref`
+		if (isCurrent && !folder.is_root) {
 			setCurrentFolderElement(ref.current);
 		}
 	}, []);
+
+	if (folder.is_root) {
+		return (<i onClick={() => selectFolder(folder)}><RootIcon/></i>);
+	}
 
 	return (<>{
 		folder.has_subfolders ? <i onClick={toggleOpen}>{

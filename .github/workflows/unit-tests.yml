@@ -1,4 +1,4 @@
-name: Test django-filer (finder branch)
+name: django Finder Unit Tests
 
 on:
   push:
@@ -64,7 +64,7 @@ jobs:
         python -m pip install --upgrade setuptools wheel
         python -m pip install "Django==${{ matrix.django-version }}.*"
         python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
-        python -m pip install py-svg-hush defusedxml
+        python -m pip install defusedxml py_svg_hush
         python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
     - name: Install Django-CTE
       if: ${{ matrix.with_cte == '1' }}
@@ -95,4 +95,14 @@ jobs:
       run: |
         export USE_POSTGRES="${{ matrix.use_postgres }}"
         export USE_S3="${{ matrix.use_s3 }}"
-        python -m pytest -v unittests
+        python -m pytest -v --cov --cov-report=xml unittests
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v6
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: py${{ matrix.python-version }}-django${{ matrix.django-version }}${{ matrix.with_cte == '1' && '-cte' || '' }}${{ matrix.use_postgres == '1' && '-postgres' || '-sqlite' }}${{ matrix.use_s3 == '1' && '-s3' || '' }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        # every matrix leg uploads its own report; Codecov merges them, which is what the
+        # `pragma: with[out] django-cte` exclusions in pyproject.toml rely on
+        fail_ci_if_error: false

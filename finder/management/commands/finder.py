@@ -63,7 +63,7 @@ class Command(BaseCommand):
         else:
             self.stderr.write(f"Unknown subcommand ‘{subcommand}’")
 
-    def reorganize(self):
+    def reorganize(self, **options):
         self.stdout.write("Reorganize files in django-filer (finder branch)")
         for inode_model in InodeModel.get_models():
             for file in inode_model.objects.all():
@@ -85,9 +85,10 @@ class Command(BaseCommand):
         sum_reorders = 0
         for folder in FinderFolderModel.objects.all():
             num_reorders = folder.reorder()
-            if self.verbosity > 1 and num_reorders > 0:
+            if num_reorders > 0:
                 sum_reorders += num_reorders
-                self.stdout.write(f"Reordered {num_reorders} items in folder ‘{folder}’.")
+                if self.verbosity > 1:
+                    self.stdout.write(f"Reordered {num_reorders} items in folder ‘{folder}’.")
         if sum_reorders == 0:
             self.stdout.write("No folder required any reordering.")
 
