@@ -1,0 +1,399 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-finder\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-03 03:53-0500\n"
+"PO-Revision-Date: 2026-09-03 11:01+0200\n"
+"Last-Translator: Django CMS Association and contributors <info@django-cms.org>\n"
+"Language-Team: Albanian <info@django-cms.org>\n"
+"Language: sq\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin/file.py:55
+msgid "Details"
+msgstr "Detaje"
+
+#: admin/folder.py:280 admin/folder.py:539
+#, python-brace-format
+msgid "A folder named “{name}” already exists."
+msgstr "Një dosje me emrin “{name}” ekziston tashmë."
+
+#: admin/folder.py:328
+#, python-brace-format
+msgid ""
+"You do not have permission to move items out of the folder named “{folder}”."
+msgstr "Nuk keni leje të zhvendosni elemente jashtë dosjes “{folder}”."
+
+#: admin/folder.py:344
+#, python-brace-format
+msgid "Folder named “{folder}” not found."
+msgstr "Dosja me emrin “{folder}” nuk u gjet."
+
+#: admin/folder.py:369
+#, python-brace-format
+msgid "You do not have permission to reorder items in folder “{folder}”."
+msgstr "Nuk keni leje të risistemoni elementet në dosjen “{folder}”."
+
+#: admin/folder.py:395
+msgid "Cannot move inodes from the trash folder into itself."
+msgstr "Elementet nuk mund të zhvendosen nga koshi në vetë koshin."
+
+#: admin/folder.py:398
+#, python-brace-format
+msgid ""
+"You do not have permission to delete items from the folder named “{folder}”."
+msgstr "Nuk keni leje të fshini elemente nga dosja “{folder}”."
+
+#: admin/folder.py:434
+msgid "You do not have permission to edit tags."
+msgstr "Nuk keni leje të përpunoni etiketat."
+
+#: admin/folder.py:482
+#, python-brace-format
+msgid ""
+"You do not have permission to restore item “{item}” to folder “{folder}”."
+msgstr "Nuk keni leje ta riktheni elementin “{item}” në dosjen “{folder}”."
+
+#: admin/inode.py:94 models/permission.py:86
+msgid "Everyone"
+msgstr "Të gjithë"
+
+#: admin/inode.py:323
+#, python-brace-format
+msgid "The {name} “{obj}” was deleted successfully."
+msgstr "{name} “{obj}” u fshi me sukses."
+
+#: browser/views.py:294
+msgid "At least one of width or height must be given."
+msgstr "Duhet dhënë të paktën gjerësia ose lartësia."
+
+#: contrib/archive/admin.py:126
+#, python-brace-format
+msgid "Cannot extract archive. A folder named “{name}” already exists."
+msgstr ""
+"Arkivi nuk mund të shpaketohet. Një dosje me emrin “{name}” ekziston tashmë."
+
+#: contrib/archive/admin.py:167
+#, python-brace-format
+msgid "Failed to extract archive “{name}”. Reason: {error}."
+msgstr "Shpaketimi i arkivit “{name}” dështoi. Arsyeja: {error}."
+
+#: contrib/archive/admin.py:171
+#, python-brace-format
+msgid "Successfully extracted ZIP archive “{name}” to folder “{folder}”."
+msgstr "Arkivi ZIP “{name}” u shpaketua me sukses në dosjen “{folder}”."
+
+#: contrib/image/admin.py:27
+#, python-brace-format
+msgid "{field} ({language})"
+msgstr "{field} ({language})"
+
+#: contrib/image/forms.py:27
+msgid "Alternative Text"
+msgstr "Tekst alternativ"
+
+#: contrib/image/forms.py:32
+msgid "Image Credit"
+msgstr "Kredite e figurës"
+
+#: contrib/image/models.py:17
+msgid "Center"
+msgstr "Në qendër"
+
+#: contrib/image/models.py:18
+msgid "North"
+msgstr "Veri"
+
+#: contrib/image/models.py:19
+msgid "Northeast"
+msgstr "Verilindje"
+
+#: contrib/image/models.py:20
+msgid "East"
+msgstr "Lindje"
+
+#: contrib/image/models.py:21
+msgid "Southeast"
+msgstr "Juglindje"
+
+#: contrib/image/models.py:22
+msgid "South"
+msgstr "Jug"
+
+#: contrib/image/models.py:23
+msgid "Southwest"
+msgstr "Jugperëndim"
+
+#: contrib/image/models.py:24
+msgid "West"
+msgstr "Perëndim"
+
+#: contrib/image/models.py:25
+msgid "Northwest"
+msgstr "Veriperëndim"
+
+#: contrib/image/pil/admin.py:17
+msgid "EXIF-headers"
+msgstr "Kokëzat EXIF"
+
+#: contrib/image/pil/admin.py:22 models/filetag.py:25
+msgid "Tag"
+msgstr "Etiketë"
+
+#: contrib/image/pil/admin.py:23
+msgid "Value"
+msgstr "Vlerë"
+
+#: contrib/image/pil/models.py:27
+msgid "Web Image"
+msgstr "Figurë web"
+
+#: contrib/image/pil/models.py:28
+msgid "Web Images"
+msgstr "Figura web"
+
+#: contrib/image/svg/models.py:19
+msgid "SVG Image"
+msgstr "Figurë SVG"
+
+#: contrib/image/svg/models.py:20
+msgid "SVG Images"
+msgstr "Figura SVG"
+
+#: contrib/image/svg/models.py:40
+#, python-brace-format
+msgid "File \"{path}\": SVG format not recognized"
+msgstr "Skedari “{path}”: formati SVG nuk u njoh"
+
+#: contrib/video/forms.py:13
+msgid "Poster timestamp"
+msgstr "Vula kohore e posterit"
+
+#: models/fields.py:74
+msgid "Reference to a file in the finder app."
+msgstr "Referencë te një skedar në aplikacionin finder."
+
+#: models/fields.py:99
+msgid "Reference to a folder in the finder app."
+msgstr "Referencë te një dosje në aplikacionin finder."
+
+#: models/file.py:24
+#, python-brace-format
+msgid "‘{mimetype}’ is not a recognized MIME-Type."
+msgstr "“{mimetype}” nuk është një lloj MIME i njohur."
+
+#: models/file.py:52
+#, python-brace-format
+msgid "You don't have permission to upload a file to the folder “{folder}”."
+msgstr "Nuk keni leje të ngarkoni një skedar në dosjen “{folder}”."
+
+#: models/file.py:95
+msgid "File name"
+msgstr "Emri i skedarit"
+
+#: models/file.py:100
+msgid "Size"
+msgstr "Madhësia"
+
+#: models/file.py:104
+msgid "SHA1-hash"
+msgstr "Hash SHA1"
+
+#: models/file.py:112
+msgid "MIME-type"
+msgstr "Lloji MIME"
+
+#: models/file.py:113
+msgid "MIME-type of uploaded content"
+msgstr "Lloji MIME i përmbajtjes së ngarkuar"
+
+#: models/file.py:123 models/filetag.py:26
+msgid "Tags"
+msgstr "Etiketa"
+
+#: models/file.py:129
+msgid "File"
+msgstr "Skedar"
+
+#: models/file.py:130
+msgid "Files"
+msgstr "Skedarë"
+
+#: models/file.py:238
+#, python-brace-format
+msgid ""
+"You do not have permission to copy file “{source}” to folder “{target}”."
+msgstr "Nuk keni leje të kopjoni skedarin “{source}” në dosjen “{target}”."
+
+#: models/filetag.py:15
+msgid "Label"
+msgstr "Etiketë"
+
+#: models/filetag.py:19
+msgid "Color"
+msgstr "Ngjyrë"
+
+#: models/folder.py:41 models/inode.py:274
+msgid "Folder"
+msgstr "Dosje"
+
+#: models/folder.py:42
+msgid "Folders"
+msgstr "Dosje"
+
+#: models/folder.py:50
+msgid "Root"
+msgstr "Rrënjë"
+
+#: models/folder.py:52
+msgid "Trash"
+msgstr "Kosh"
+
+#: models/folder.py:171
+#, python-brace-format
+msgid "{} Folder"
+msgid_plural "{} Folders"
+msgstr[0] "{} dosje"
+msgstr[1] "{} dosje"
+
+#: models/folder.py:172
+#, python-brace-format
+msgid "{} File"
+msgid_plural "{} Files"
+msgstr[0] "{} skedar"
+msgstr[1] "{} skedarë"
+
+#: models/folder.py:228
+#, python-brace-format
+msgid "You do not have permission to move these items to folder “{folder}”."
+msgstr "Nuk keni leje t'i zhvendosni këto elemente në dosjen “{folder}”."
+
+#: models/folder.py:284
+#, python-brace-format
+msgid ""
+"You do not have permission to copy folder “{source}” to folder “{target}”."
+msgstr "Nuk keni leje të kopjoni dosjen “{source}” në dosjen “{target}”."
+
+#: models/folder.py:290
+#, python-brace-format
+msgid ""
+"Folder named “{source}” cannot become the descendant of destination folder "
+"“{target}”."
+msgstr ""
+"Dosja “{source}” nuk mund të bëhet pasardhëse e dosjes së destinacionit "
+"“{target}”."
+
+#: models/folder.py:305 models/folder.py:311
+msgid "A parent folder cannot become the descendant of a destination folder."
+msgstr ""
+"Një dosje prind nuk mund të bëhet pasardhëse e një dosjeje destinacioni."
+
+#: models/folder.py:315
+#, python-brace-format
+msgid "Folder named “{name}” already exists in destination folder."
+msgstr ""
+"Një dosje me emrin “{name}” ekziston tashmë në dosjen e destinacionit."
+
+#: models/folder.py:318
+#, python-brace-format
+msgid "Folder name “{name}” is reserved."
+msgstr "Emri i dosjes “{name}” është i rezervuar."
+
+#: models/folder.py:469 models/inode.py:297
+msgid "Created at"
+msgstr "Krijuar më"
+
+#: models/folder.py:475
+msgid "Pinned Folder"
+msgstr "Dosje e fiksuar"
+
+#: models/folder.py:476
+msgid "Pinned Folders"
+msgstr "Dosje të fiksuara"
+
+#: models/inode.py:288
+msgid "Owner"
+msgstr "Pronar"
+
+#: models/inode.py:292
+msgid "Name"
+msgstr "Emër"
+
+#: models/inode.py:302
+msgid "Modified at"
+msgstr "Ndryshuar më"
+
+#: models/inode.py:307
+msgid "Ordering index"
+msgstr "Indeksi i renditjes"
+
+#: models/inode.py:442
+msgid "Deleted at"
+msgstr "Fshirë më"
+
+#: models/permission.py:10
+msgid "Read"
+msgstr "Lexim"
+
+#: models/permission.py:11
+msgid "Write (Dropbox)"
+msgstr "Shkrim (Dropbox)"
+
+#: models/permission.py:12
+msgid "Read & Write"
+msgstr "Lexim dhe shkrim"
+
+#: models/permission.py:13
+msgid "Administrator"
+msgstr "Administrator"
+
+#: models/permission.py:14
+msgid "Full Control"
+msgstr "Kontroll i plotë"
+
+#: models/permission.py:123
+msgid "Access Control Entry"
+msgstr "Zë i kontrollit të aksesit"
+
+#: models/permission.py:124
+msgid "Access Control Entries"
+msgstr "Zëra të kontrollit të aksesit"
+
+#: models/permission.py:167
+msgid "Default Access Control Entry"
+msgstr "Zë i parazgjedhur i kontrollit të aksesit"
+
+#: models/permission.py:168
+msgid "Default Access Control Entries"
+msgstr "Zëra të parazgjedhur të kontrollit të aksesit"
+
+#: templates/finder/admin/base_site.html:6
+#: templates/finder/admin/base_site.html:7
+msgid "Go back to"
+msgstr "Kthehu te"
+
+#: templates/finder/admin/base_site.html:6
+msgid "admin homepage"
+msgstr "faqja kryesore e administrimit"
+
+#: templates/finder/admin/base_site.html:6
+msgid "Home"
+msgstr "Kreu"
+
+#: templates/finder/admin/base_site.html:7
+msgid "Finder"
+msgstr "Finder"
+
+#: templates/finder/admin/change_file_form.html:19
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ju lutemi korrigjoni gabimin më poshtë."
+msgstr[1] "Ju lutemi korrigjoni gabimet më poshtë."
