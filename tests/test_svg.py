@@ -10,8 +10,12 @@ from django.test import TestCase
 
 from easy_thumbnails.files import get_thumbnailer
 
-from filer.models.imagemodels import Image
+from filer.settings import FILER_IMAGE_MODEL
 from filer.utils import svg
+from filer.utils.loader import load_model
+
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 SVG_TEMPLATE = (
