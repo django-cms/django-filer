@@ -10,6 +10,26 @@ describe('Cl.FocalPoint', function () {
     var circle;
     var location;
 
+    var simulateDrag = function (deltaX, deltaY) {
+        var rect = circle.getBoundingClientRect();
+        var startX = rect.left + rect.width / 2;
+        var startY = rect.top + rect.height / 2;
+
+        circle.dispatchEvent(new MouseEvent('mousedown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: startX,
+            clientY: startY
+        }));
+        document.dispatchEvent(new MouseEvent('mousemove', {
+            bubbles: true,
+            cancelable: true,
+            clientX: startX + deltaX,
+            clientY: startY + deltaY
+        }));
+        document.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, cancelable: true}));
+    };
+
     beforeEach(function () {
         fixture.setBase('frontend/fixtures');
         this.markup = fixture.load('focal-point.html');
@@ -132,6 +152,44 @@ describe('Cl.FocalPoint', function () {
 
             setTimeout(function () {
                 expect(updateLocationValueStub).toHaveBeenCalled();
+                done();
+            }, 100);
+        }, 200);
+    });
+    it('stays inactive when the form has no location field', function (done) {
+        // The file admin renders the same preview but has no subject location
+        // field to write to: the circle must not pretend to be draggable (#1579)
+        focalPoint.destroy();
+        location.remove();
+        focalPoint = new Cl.FocalPoint();
+        focalPoint.initialize();
+
+        image.setAttribute('src', '/img/blank.png');
+
+        setTimeout(function () {
+            expect(circle.classList.contains('hidden')).toBe(true);
+            expect(circle.classList.contains('draggable')).toBe(false);
+            done();
+        }, 200);
+    });
+
+    it('writes to the location field after its node has been replaced', function (done) {
+        image.setAttribute('src', '/img/blank.png');
+
+        setTimeout(function () {
+            // An admin theme re-rendering the fieldset leaves the focal point
+            // holding a detached node - it has to resolve the field again (#1579)
+            var replacement = location.cloneNode(true);
+
+            location.replaceWith(replacement);
+            replacement.value = 'not written yet';
+
+            simulateDrag(-20, -30);
+
+            setTimeout(function () {
+                expect(replacement.value).toMatch(/^-?\d+,-?\d+$/);
+                // The detached node keeps its old value, the drag did not go there
+                expect(location.value).toBe('100,200');
                 done();
             }, 100);
         }, 200);

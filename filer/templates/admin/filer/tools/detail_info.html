@@ -3,7 +3,7 @@
         <div class="image-info-title"></div>
         <div class="image-details-left">
             <div class="image-preview-container">
-                {% file_icon original detail=True %}
+                {% file_icon original detail=True focal_point=show_focal_point %}
                 <div class="text-left button-group">
                 {% if original.file.exists %}
                     <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}" rel="noopener noreferrer">

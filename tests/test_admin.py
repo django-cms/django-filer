@@ -293,6 +293,26 @@ class FilerImageAdminUrlsTests(TestCase):
                 # Does not redirect to a static file
                 self.assertNotIn("/static/", response["Location"])
 
+    def test_focal_point_only_where_it_can_be_saved(self):
+        """The preview doubles as focal point widget only if the form has the field"""
+        # The image admin offers the subject location, so the preview is a focal point
+        response = self.client.get(reverse(admin_urlname(Image._meta, 'change'),
+                                           kwargs={'object_id': self.file_object.pk}))
+
+        self.assertContains(response, 'id="id_subject_location"')
+        self.assertContains(response, 'js-focal-point')
+        self.assertContains(response, 'data-location-selector="#id_subject_location"')
+
+        # The file admin shows the same image but has no subject location field:
+        # a focal point there would silently drop what the user does (#1579)
+        response = self.client.get(reverse(admin_urlname(File._meta, 'change'),
+                                           kwargs={'object_id': self.file_object.pk}))
+
+        self.assertNotContains(response, 'id="id_subject_location"')
+        self.assertNotContains(response, 'js-focal-point')
+        # ... the preview itself is still shown
+        self.assertContains(response, 'width="210"')
+
     def test_missing_file(self):
         """Directory shows static icon for missing files"""
         image = Image.objects.create(
