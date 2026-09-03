@@ -10,6 +10,16 @@ CHANGELOG
   element-qualified CSS selectors expect, and keep the legacy
   ``<div class="breadcrumbs">`` markup on older versions.
 * ci: Test against Django 6.0 and 6.1.
+* fix: The image preview of the file admin's change view no longer renders as a focal
+  point widget. The file form has no subject location field, so the circle could be
+  dragged but the subject location was silently dropped (#1579). ``file_icon`` takes a
+  new ``focal_point`` argument for this; templates overriding
+  ``admin/filer/tools/detail_info.html`` need to pass it on to keep the focal point.
+* fix: The focal point resolves the subject location field every time it writes to it
+  instead of keeping the element from set-up time. Admin themes that re-render the
+  fieldset left filer writing into a detached node, losing the subject location without
+  any error. It now also stays inactive - the circle stays hidden - when there is no
+  field to write to.
 
 .. note::
 

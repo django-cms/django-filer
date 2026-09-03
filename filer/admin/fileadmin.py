@@ -129,12 +129,16 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        adminform = context.get('adminform')
         context.update({
             'show_delete': True,
             'history_url': admin_urlname(self.opts, 'history'),
             'expand_image_url': None,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
+            # The image preview only doubles as the focal point widget if this
+            # form offers a subject location to store it in (#1579)
+            'show_focal_point': bool(adminform and 'subject_location' in adminform.form.fields),
         })
         if obj and obj.mime_maintype == 'image' and obj.file.exists():
             if 'svg' in obj.mime_type:
