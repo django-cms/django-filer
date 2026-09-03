@@ -5,11 +5,31 @@ CHANGELOG
 3.6.0 (unreleased)
 ==================
 
+* feat: SVG support no longer requires an SVG renderer. filer reads an SVG's size
+  from the document and thumbnails it by rewriting ``width``, ``height`` and
+  ``viewBox`` on the root element, which keeps the vector data intact instead of
+  re-drawing it. ``easy-thumbnails[svg]`` - and with it svglib, reportlab and lxml,
+  around 14 MB - moved from a hard dependency to the new ``django-filer[svg]``
+  extra (#1547).
+* fix: SVG thumbnails without a ``viewBox`` were scaled by growing the canvas
+  rather than the drawing.
+* fix: When an image's dimensions could not be read, the file object was left at
+  its end, so upload validators that inspect the content saw an empty file.
 * feat: Add support for Django 6.1. The admin breadcrumbs now render as
   ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
   element-qualified CSS selectors expect, and keep the legacy
   ``<div class="breadcrumbs">`` markup on older versions.
 * ci: Test against Django 6.0 and 6.1.
+
+.. note::
+
+   Existing installations keep SVG support unchanged: upgrading does not always uninstall
+   svglib or reportlab. Fresh installs and re-locked dependency files no longer get
+   them. The only documents that still need them are those whose size cannot be read
+   from the markup, for example ``width="100%"`` without a ``viewBox``; install
+   ``django-filer[svg]`` if your project has such files. Thumbnails generated from
+   now on are the original document rescaled rather than a reportlab rendering of
+   it - existing cached thumbnails keep their file names and are still served.
 
 .. note::
 

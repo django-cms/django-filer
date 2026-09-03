@@ -193,6 +193,11 @@ Defaults to ``MAX_IMAGE_PIXELS``. But when set, should always be lower than the 
 
 This is useful setting to prevent decompression bomb DOS attack.
 
+The limit applies to raster images. A vector image (SVG) is measured by the size
+it declares; one that declares no usable size is stored with unset dimensions and
+rendered with a generic icon in the admin, since it carries no pixel count that
+could be a decompression bomb.
+
 
 ``FILER_ADD_FILE_VALIDATORS``
 -----------------------------

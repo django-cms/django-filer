@@ -18,6 +18,22 @@ retrieved from iOS devices by airdrop) using an optional dependency::
 
     $ pip install django-filer\[heif\]
 
+.. _optional_svg_support:
+
+Optional SVG renderer
+---------------------
+
+django-filer reads the size of an SVG and scales or crops it by rewriting the
+document itself, so SVG uploads and thumbnails work out of the box. Documents
+that state their size only in relative units (``width="100%"`` without a
+``viewBox``, say) cannot be measured that way. If you have such files, install
+the optional SVG renderer, which derives their size by drawing them::
+
+    $ pip install django-filer\[svg\]
+
+This pulls in `svglib`_ and `reportlab`_ through ``easy-thumbnails[svg]``.
+Before version 3.6, django-filer always installed them.
+
 
 Dependencies
 ------------
@@ -36,6 +52,11 @@ check `Pillow doc`_.
 If heif support is chosen, django-filer also installs
 
 * pillow-heif
+
+If the optional SVG renderer is chosen, django-filer also installs
+
+* svglib
+* reportlab
 
 
 Configuration
@@ -163,6 +184,8 @@ generation errors,  two options are provided to help when working with ``django-
 .. _Django: http://djangoproject.com
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
+.. _svglib: https://github.com/deeplook/svglib
+.. _reportlab: https://www.reportlab.com/
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
 .. _Pillow doc: https://pillow.readthedocs.io/en/latest/installation.html
