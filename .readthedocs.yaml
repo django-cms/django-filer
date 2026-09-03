@@ -2,28 +2,22 @@
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
-# Required
 version: 2
 
-# Set the version of Python and other tools you might need
 build:
-  os: ubuntu-20.04
+  os: ubuntu-24.04
   tools:
-    python: "3.9"
-    # You can also specify other tool versions:
-    # nodejs: "16"
-    # rust: "1.55"
-    # golang: "1.17"
+    python: "3.12"
 
-# Build documentation in the docs/ directory with Sphinx
 sphinx:
-   configuration: docs/conf.py
+  configuration: docs/conf.py
+  # Match the CI docs job and `make strict`: a warning means a broken cross-reference,
+  # an orphaned page or malformed markup, and those should not reach the published docs.
+  fail_on_warning: true
 
-# If using Sphinx, optionally build your docs in additional formats such as PDF
-# formats:
-#    - pdf
-
-# Optionally declare the Python requirements required to build your docs
+# The package itself is deliberately not installed. docs/conf.py reads the version
+# straight out of finder/__init__.py through sys.path, and installing django-finder
+# would pull in Django 5.2+, which conflicts with the Django pinned for the docs build.
 python:
-   install:
-   - requirements: docs/requirements.txt
+  install:
+    - requirements: docs/requirements.txt

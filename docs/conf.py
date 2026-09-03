@@ -17,13 +17,7 @@ import sys
 
 sys.path.append(os.path.abspath("../"))
 
-from importlib.metadata import PackageNotFoundError, version as _version  # NOQA
-
-try:
-    __version__ = _version("django-finder")
-except PackageNotFoundError:
-    # not installed (a docs-only checkout); the exact number does not matter here
-    __version__ = "4.0"
+from finder import __version__  # NOQA
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
