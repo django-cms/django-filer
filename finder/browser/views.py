@@ -158,12 +158,30 @@ class BrowserView(View):
             **self.list(request, last_folder_id),
         }
 
+    def _get_inode(self, request, inode_id, privilege, **lookup):
+        """
+        Look an inode up, refusing unless the caller holds `privilege` on its folder.
+
+        Refused the same way as an unknown ambit, so that neither the existence of an
+        inode nor the reason for the refusal can be read off the response.
+        """
+        try:
+            inode = FileModel.objects.get_inode(id=inode_id, **lookup)
+        except ObjectDoesNotExist:
+            logger.warning("No inode “%s”.", inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        folder = inode if inode.is_folder else inode.folder
+        if not folder.has_permission(request.user, privilege):
+            logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        return inode
+
     @method_decorator(require_GET)
     def fetch(self, request, inode_id):
         """
         Open the given folder and fetch children data for the given folder.
         """
-        inode = FileModel.objects.get_inode(id=inode_id)
+        inode = self._get_inode(request, inode_id, Privilege.READ)
         ambit = inode.folder.get_ambit()
         inode_id = str(inode_id)
         if inode.is_folder:
@@ -214,6 +232,7 @@ class BrowserView(View):
         """
         List all the files of the given folder.
         """
+        current_folder = self._get_inode(request, folder_id, Privilege.READ)
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
@@ -223,7 +242,6 @@ class BrowserView(View):
             'can_view': True,
             'mime_types': request.GET.getlist('mimetypes'),
         }
-        current_folder = FolderModel.objects.get(id=folder_id)
         if recursive:
             if isinstance(current_folder.descendants, QuerySet):
                 parent_ids = Subquery(current_folder.descendants.values('id'))
@@ -286,12 +304,10 @@ class BrowserView(View):
         """
         Upload a single file into the given folder.
         """
+        current_folder = self._get_inode(request, folder_id, Privilege.WRITE)
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
-        current_folder = FolderModel.objects.get(id=folder_id)
-        if not current_folder.has_permission(request.user, Privilege.WRITE):
-            raise PermissionDenied("Permission denied to upload file.")
         ambit = current_folder.get_ambit()
         file = model.objects.create_from_upload(
             ambit,
@@ -312,7 +328,7 @@ class BrowserView(View):
         """
         Change some fields after uploading a single file.
         """
-        file = FileModel.objects.get_inode(id=file_id)
+        file = self._get_inode(request, file_id, Privilege.WRITE, is_folder=False)
         if request.method == 'DELETE':
             file.delete()
             return {'file_info': None}
@@ -333,7 +349,7 @@ class BrowserView(View):
         """
         Widgets using the <finder-file-select> use this endpoint to fetch a cropped version of the image.
         """
-        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
+        image = self._get_inode(request, image_id, Privilege.READ, mime_types=['image/*'], is_folder=False)
         ambit = image.folder.get_ambit()
         width, height = request.POST.get('width'), request.POST.get('height')
         width = int(width) if str(width).isdigit() else None

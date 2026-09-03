@@ -49,6 +49,7 @@ ul.messagelist {
 	position: absolute;
 	right: 0;
 	left: 0;
+	top: 0;
 	bottom: 0;
 	padding: 0;
 	user-select: none;
@@ -62,13 +63,6 @@ ul.messagelist {
 
 	&:has(.work-area) {
 		overflow: hidden;
-	}
-
-	&.folder {
-		top: 0;
-	}
-	&.file {
-		top: 36px;
 	}
 
 	@include menubar.menubar;

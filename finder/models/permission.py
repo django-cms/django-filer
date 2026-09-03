@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
+from django.db.models import BooleanField, Value
 from django.db.models.expressions import Exists, F, OuterRef, Q
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
@@ -12,6 +13,17 @@ class Privilege(models.IntegerChoices):
     READ_WRITE = 3, _("Read & Write")
     ADMIN = 4, _("Administrator")
     FULL = 7, _("Full Control")
+
+
+def is_anonymous(user):
+    """
+    Whether `user` is nobody in particular.
+
+    The “everyone” entry means every *signed in* user. Matching it against an
+    unauthenticated visitor would publish the folder tree to the internet, while the
+    browser endpoints exist to edit it — files are served from storage, not from here.
+    """
+    return user is None or user.is_anonymous
 
 
 class AccessControlBase(models.Model):
@@ -102,6 +114,8 @@ class AccessControlManager(models.Manager):
     _everyone = Q(user__isnull=True, group__isnull=True)
 
     def get_privilege_queryset(self, user, privilege):
+        if is_anonymous(user):
+            return self.get_queryset().none()
         group_ids = user.groups.values_list('id', flat=True)
         return self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
             Q(privilege_mask__gt=0)
@@ -109,6 +123,8 @@ class AccessControlManager(models.Manager):
         )
 
     def privilege_subquery_exists(self, user, privilege):
+        if is_anonymous(user):
+            return Value(False, output_field=BooleanField())
         group_ids = user.groups.values_list('id', flat=True)
         return Exists(self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
             Q(privilege_mask__gt=0) & (self._everyone | Q(group_id__in=group_ids) | Q(user_id=user.id)),

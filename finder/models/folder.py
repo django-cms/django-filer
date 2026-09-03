@@ -10,7 +10,9 @@ from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeModel
-from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege
+from finder.models.permission import (
+    AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege, is_anonymous,
+)
 from finder.storages import delete_directory
 
 ROOT_FOLDER_NAME = '__root__'
@@ -181,6 +183,10 @@ class FolderModel(InodeModel):
         }
 
     def has_permission(self, user, privilege):
+        # guard before the ownership test: an unowned trash folder would otherwise match
+        # `self.owner == user` when `user` is None
+        if is_anonymous(user):
+            return False
         if self.is_trash and self.owner == user:
             return True
         return super().has_permission(user, privilege)
