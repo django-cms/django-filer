@@ -17,6 +17,9 @@ CHANGELOG
   of a file now also links to its own admin's expand view instead of always linking to
   the image admin's. The expand view now checks read permissions, just like the icon and
   change views.
+* fix: Send the CSRF token with uploads started from the "Upload Files" button in the
+  folder view. Since 3.5.1 the upload endpoint enforces CSRF, but this uploader had not
+  been updated and every upload from it failed with "CSRF token missing" (#1617).
 
 .. note::
 
