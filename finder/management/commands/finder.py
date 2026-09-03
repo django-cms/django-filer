@@ -1,6 +1,6 @@
 from django.contrib.admin.sites import all_sites
 from django.contrib.sites.models import Site
-from django.core.files.storage import storages
+from django.core.files.storage import InvalidStorageError, storages
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.models.fields.related import ForeignKey, ManyToManyField
@@ -91,9 +91,23 @@ class Command(BaseCommand):
         if sum_reorders == 0:
             self.stdout.write("No folder required any reordering.")
 
+    @staticmethod
+    def describe_storage(alias):
+        """Name the storage an ambit refers to, rather than showing the backend's repr."""
+        try:
+            backend = storages[alias]
+        except InvalidStorageError:
+            return f"{alias} (not configured!)"
+        return f"{alias} ({type(backend).__name__})"
+
     def list_ambits(self):
         for ambit in AmbitModel.objects.all():
-            self.stdout.write(f"Slug: {ambit.slug}, Name: {ambit.verbose_name}, Site: {ambit.site}, Admin: {ambit.admin_name}, Storage: {ambit.original_storage}, Sample Storage: {ambit.sample_storage}")
+            self.stdout.write(
+                f"Slug: {ambit.slug}, Name: {ambit.verbose_name}, Site: {ambit.site}, "
+                f"Admin: {ambit.admin_name}, "
+                f"Storage: {self.describe_storage(ambit._original_storage)}, "
+                f"Sample Storage: {self.describe_storage(ambit._sample_storage)}"
+            )
 
     def add_ambit(self, **options):
         slug = options.pop('slug')

@@ -3,7 +3,15 @@ from django.conf import settings as django_settings
 
 # Default ambit slug to use when no ambit is specified
 # This should match the slug of an AmbitModel instance in your database
-FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'default')
+# Slug of the ambit a `FinderFileField`/`FinderFolderField` refers to when it declares
+# none of its own, and the one `finder.0002_default_ambit` creates. It matches the
+# `finder_public`/`finder_public_samples` storages an ambit defaults to.
+FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'public')
+
+
+# FINDER_CREATE_DEFAULT_AMBIT (default True) makes `migrate` create the ambit named by
+# FINDER_DEFAULT_AMBIT when the project has no ambit at all. It is read at call time by
+# `finder.management.create_default_ambit`, so that tests can override it.
 
 
 # The validators run against every uploaded payload unless a project opts out of them.
