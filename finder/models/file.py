@@ -17,7 +17,7 @@ from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 from finder.storages import delete_directory
-from finder.validators import validate_payload
+from finder.validators import payload_validator, validate_payload
 
 
 def mimetype_validator(value):
