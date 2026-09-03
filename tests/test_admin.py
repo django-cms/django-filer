@@ -125,12 +125,13 @@ class FilerFolderAdminUrlsTests(TestCase):
                 thumbnail_urls.append(thumbnailer.get_thumbnail(thumbnail_options).url)
 
         self.assertEqual(Image.objects.count(), images)
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             # Expected queries:
             # 1. Authentication check
             # 2.-5. Loading the user clipboard
-            # 6. Loading directory data and thumbnails (1 query)
+            # 6. Loading directory data
             # 7. Selecting file and owner data
+            # 8. Loading the thumbnail names of the files on this page (1 query)
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
         self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
