@@ -195,6 +195,13 @@ class SvgImage:
         viewbox = parse_viewbox(root.get('viewBox'))
         width, width_invalid = _dimension(root.get('width'))
         height, height_invalid = _dimension(root.get('height'))
+        if width_invalid or height_invalid:
+            # A stated but impossible size is broken markup. The viewBox must
+            # not paper over it: the document is saying something wrong, which
+            # is different from leaving the size for someone else to work out.
+            raise ValueError(
+                "SVG document declares a width or height that is not a positive length"
+            )
         if viewbox is not None:
             # A viewBox states both a size and an aspect ratio, so a dimension
             # the markup does state is kept and only the missing one is derived
@@ -206,10 +213,6 @@ class SvgImage:
             elif height is None:
                 height = width * viewbox[3] / viewbox[2]
         if width is None or height is None:
-            if width_invalid or height_invalid:
-                raise ValueError(
-                    "SVG document declares a width or height that is not a positive length"
-                )
             raise UnresolvableSize(
                 "SVG document states no absolute width and height and has no viewBox"
             )
@@ -353,9 +356,20 @@ def _load_with_vil(fp):
             # Continue and let VIL try to load from the current stream position.
             pass
     try:
-        return VILImage.load(fp)
+        image = VILImage.load(fp)
     except Exception:
         return None
+    if image is None:
+        return None
+    try:
+        width, height = (float(value) for value in image.size)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(width) or not math.isfinite(height) or width <= 0 or height <= 0:
+        # The renderer reports a zero or partial size for documents it cannot
+        # size either, which is no more usable than no answer at all.
+        return None
+    return image
 
 
 def open_image(fp):

@@ -172,9 +172,17 @@ class LoadTests(TestCase):
         with self.assertRaises(ValueError):
             svg.load(BytesIO(bomb))
 
-    def test_non_positive_size_falls_back_to_the_viewbox(self):
-        image = svg.load(BytesIO(make_svg(width='0', height='0', viewBox='0 0 8 4')))
-        self.assertEqual(image.size, (8.0, 4.0))
+    def test_the_viewbox_does_not_rescue_an_impossible_size(self):
+        """
+        Inference fills in what the markup leaves out; it must not overwrite
+        what the markup gets wrong.
+        """
+        for attrs in ({'width': '0', 'height': '0'},
+                      {'width': '-10', 'height': '20'},
+                      {'width': '1e999', 'height': '20'}):
+            with self.assertRaises(ValueError) as caught:
+                svg.load(BytesIO(make_svg(viewBox='0 0 100 50', **attrs)))
+            self.assertNotIsInstance(caught.exception, svg.UnresolvableSize)
 
     def test_non_positive_size_without_a_viewbox_is_an_error(self):
         """A stated but impossible size is wrong markup, not a missing size."""
@@ -438,10 +446,13 @@ class OptionalDependencyTests(TestCase):
 
 class ImageSizeGuardTests(TestCase):
     """
-    ``BaseImage.clean()`` refuses images whose dimensions cannot be read: for a
-    raster image that is the signature of a decompression bomb, since Pillow
-    reports no size for one. A vector image has no pixel count at all, so the
-    guard must not catch it.
+    ``BaseImage.clean()`` measures every image it can against
+    ``FILER_MAX_IMAGE_PIXELS``, vector images included.
+
+    Only images whose dimensions cannot be read are treated by type: for a
+    raster image that is itself the signature of a decompression bomb, since
+    Pillow reports no size for one, while a vector image has no pixel count to
+    compare against.
     """
 
     def unmeasurable_image(self, name, mime_type):
@@ -455,6 +466,14 @@ class ImageSizeGuardTests(TestCase):
 
     def test_vector_image_without_dimensions_is_allowed(self):
         self.unmeasurable_image('vector.svg', 'image/svg+xml').clean()
+
+    def test_oversized_vector_image_is_rejected(self):
+        """An SVG that does state its size is measured like any other image."""
+        image = self.unmeasurable_image('huge.svg', 'image/svg+xml')
+        image._width, image._height = 30000, 30000
+        with self.assertRaises(ValidationError) as caught:
+            image.clean()
+        self.assertEqual(caught.exception.code, 'image_size')
 
     def test_raster_image_without_dimensions_is_rejected(self):
         image = self.unmeasurable_image('photo.jpg', 'image/jpeg')
@@ -499,6 +518,16 @@ class RendererFallbackTests(TestCase):
                       b'width="1e999" height="10"'):
             with self.assertRaises(ValueError):
                 self.open(b'<svg xmlns="http://www.w3.org/2000/svg" ' + attrs + b'/>')
+
+    def test_a_partial_renderer_size_is_not_accepted(self):
+        """
+        The renderer answers ``(200, 0)`` for a document stating only a width,
+        and ``(0, 0)`` for one stating nothing. Neither is a size.
+        """
+        for attrs in (b'width="200"', b''):
+            with self.assertRaises(svg.UnresolvableSize):
+                self.open(b'<svg xmlns="http://www.w3.org/2000/svg" ' + attrs +
+                          b'><rect width="5" height="5"/></svg>')
 
     def test_an_unresolvable_size_is_what_the_renderer_is_for(self):
         image = self.open(

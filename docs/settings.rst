@@ -193,10 +193,15 @@ Defaults to ``MAX_IMAGE_PIXELS``. But when set, should always be lower than the 
 
 This is useful setting to prevent decompression bomb DOS attack.
 
-The limit applies to raster images. A vector image (SVG) is measured by the size
-it declares; one that declares no usable size is stored with unset dimensions and
-rendered with a generic icon in the admin, since it carries no pixel count that
-could be a decompression bomb.
+The limit applies to every image whose pixel size is known, a vector image (SVG)
+included: an SVG is measured by the size it declares, and is refused just like a
+raster image if that exceeds the limit.
+
+Images whose size cannot be read are treated differently by type. For a raster
+image that is itself the signature of a decompression bomb, because Pillow
+reports no size for one, so it is refused. A vector image has no pixel count to
+compare against, so it is stored with unset dimensions and rendered with a
+generic icon in the admin.
 
 
 ``FILER_ADD_FILE_VALIDATORS``
