@@ -1,5 +1,5 @@
 #
-# django-filer documentation build configuration file, created by
+# django-finder documentation build configuration file, originally created by
 # sphinx-quickstart on Tue Nov 16 22:05:55 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -17,7 +17,13 @@ import sys
 
 sys.path.append(os.path.abspath("../"))
 
-from filer import __version__  # NOQA
+from importlib.metadata import PackageNotFoundError, version as _version  # NOQA
+
+try:
+    __version__ = _version("django-finder")
+except PackageNotFoundError:
+    # not installed (a docs-only checkout); the exact number does not matter here
+    __version__ = "4.0"
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -55,9 +61,12 @@ source_suffix = ".rst"
 # The master toctree document.
 master_doc = "index"
 
+# The docs are a work in progress; show what is still missing.
+todo_include_todos = True
+
 # General information about the project.
-project = "django-filer"
-copyright = "%s, Stefan Foulis" % (datetime.date.today().year,)
+project = "django-finder"
+copyright = "%s, Django CMS Association and contributors" % (datetime.date.today().year,)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -80,7 +89,9 @@ release = __version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build", "_images", "README.rst"]
+# "env" and friends: `make install` creates the virtualenv inside this directory, and
+# without excluding it Sphinx reads .rst files out of site-packages.
+exclude_patterns = ["_build", "build", "_images", "README.rst", "env", ".venv", "venv"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -182,7 +193,7 @@ html_static_path = ["_static"]
 # html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "django-filerdoc"
+htmlhelp_basename = "django-finderdoc"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -198,8 +209,8 @@ htmlhelp_basename = "django-filerdoc"
 latex_documents = [
     (
         "index",
-        "django-filer.tex",
-        "django-filer Documentation",
+        "django-finder.tex",
+        "django-finder Documentation",
         "Stefan Foulis",
         "manual",
     ),
@@ -234,7 +245,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ("index", "django-filer", "django-filer Documentation", ["Stefan Foulis"], 1)
+    ("index", "django-finder", "django-finder Documentation", ["Django CMS Association"], 1)
 ]
 
 
