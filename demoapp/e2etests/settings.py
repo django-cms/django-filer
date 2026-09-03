@@ -10,7 +10,7 @@ Run the suite with::
     pytest demoapp/e2etests --ds=demoapp.e2etests.settings
 """
 
-from demoapp.settings import *  # noqa: F401,F403
+from demoapp.settings import *  # noqa: F403
 from demoapp.settings import BASE_DIR
 
 
