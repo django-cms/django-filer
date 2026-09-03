@@ -104,8 +104,11 @@ class FolderModel(InodeModel):
             from django_cte import CTE, with_cte
         except ImportError:  # pragma: without django-cte
             # traversing the tree folder by folder (slow)
-            folder, ancestors = self, []
-            while folder:
+            # `validate_constraints()` reads this property to detect a cyclic parent
+            # chain, so it must terminate on one rather than walk it forever.
+            folder, ancestors, visited = self, [], set()
+            while folder and folder.id not in visited:
+                visited.add(folder.id)
                 ancestors.append(folder)
                 folder = folder.parent
             return ancestors
