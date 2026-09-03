@@ -1,4 +1,4 @@
-name: Test django-filer (finder branch)
+name: django Finder Unit Tests
 
 on:
   push:
