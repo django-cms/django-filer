@@ -86,7 +86,8 @@ def reject_entity_declarations(content):
     except _EntityDeclaration:
         raise ValueError("SVG documents declaring XML entities are not supported") from None
     except _PrologParsed:
-        pass
+        # Expected sentinel exception used to stop parsing after the prolog.
+        return
     except expat.ExpatError:
         # Malformed: leave the reporting to the parse below, which has the
         # better error message.
@@ -272,7 +273,9 @@ def load(fp):
             try:
                 fp.seek(0)
             except (OSError, ValueError):
-                pass
+                # Some file-like objects are not seekable; continue reading
+                # from the current position to preserve compatibility.
+                _ = None
         content = fp.read()
     else:
         with open(fp, 'rb') as handle:
@@ -305,6 +308,8 @@ def _load_with_vil(fp):
         try:
             fp.seek(0)
         except (OSError, ValueError):
+            # Best-effort rewind only; some file-like objects are not seekable.
+            # Continue and let VIL try to load from the current stream position.
             pass
     try:
         return VILImage.load(fp)

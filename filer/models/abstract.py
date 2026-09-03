@@ -148,8 +148,11 @@ class BaseImage(File):
                     # not be handed an exhausted stream.
                     try:
                         imgfile.seek(0)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.debug(
+                            "Failed to rewind image file stream after metadata read.",
+                            exc_info=exc,
+                        )
         return attrs_updated
 
     def clean(self):
