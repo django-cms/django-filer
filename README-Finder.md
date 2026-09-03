@@ -266,16 +266,54 @@ STORAGES = {
 
 Note that multiple root folders can share the same storage location or bucket.
 
+If you declare neither `finder_public` nor `finder_public_samples`, finder derives them
+from your `default` storage on startup: same filesystem root and URL prefix, but a
+subdirectory per alias, the `FinderSystemStorage` backend and `allow_overwrite` turned on.
+With Django's defaults that gives you
+
+```
+MEDIA_ROOT/finder_public/          served from  MEDIA_URL + finder_public/
+MEDIA_ROOT/finder_public_samples/  served from  MEDIA_URL + finder_public_samples/
+```
+
+which is enough to get started. Declare them yourself once you want the files somewhere
+else — on S3, on another volume, or shared between projects.
+
+> [!NOTE]
+> The derivation needs a `FileSystemStorage` as your `default`. If that is a remote
+> backend there is no location to put a subdirectory under, and `manage.py check` reports
+> `finder.W001`. Declare the two storages explicitly in that case.
+
 Run the migrations for app `finder`:
 
 ```shell
 python manage.py migrate finder
 ```
 
-Create an ambit using the above configuration:
+This creates a first ambit for you, so that the admin and the form widgets work right away.
+It is named by `FINDER_DEFAULT_AMBIT`, which is `"public"` — the slug the
+`FinderFileField`s and `FinderFolderField`s of your models refer to when they declare no
+ambit of their own. Override it if you want a different name:
+
+```python
+FINDER_DEFAULT_AMBIT = 'assets'
+```
+
+Its root folder grants read/write to everybody, which is the same thing
+`manage.py finder add-ambit` does. Restrict it through the permission editor in the admin,
+or set up the ambits yourself instead:
+
+```python
+FINDER_CREATE_DEFAULT_AMBIT = False
+```
+
+The setting is only read while `finder.0002_default_ambit` is applied, so it has to be in
+place before you migrate for the first time.
+
+Create further ambits with the configuration above:
 
 ```shell
-python manage.py finder add-ambit public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
+python manage.py finder add-ambit private --values name="Private Folder" storage=finder_private sample_storage=finder_private_samples
 ```
 
 You can create multiple root folders, each with their own unique slug and name. You may configure a

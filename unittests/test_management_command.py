@@ -86,15 +86,23 @@ def test_add_ambit_with_unknown_admin_site(db, finder_command):
     assert AmbitModel.objects.filter(slug='extra').exists() is False
 
 
-@pytest.mark.parametrize('storage_values, expected', [
-    (['storage=no-such-storage', 'sample_storage=finder_test_samples'], 'no-such-storage'),
-    (['storage=finder_test', 'sample_storage=no-such-storage'], 'no-such-storage'),
-    ([], 'None'),
+@pytest.mark.parametrize('storage_values', [
+    ['storage=no-such-storage', 'sample_storage=finder_test_samples'],
+    ['storage=finder_test', 'sample_storage=no-such-storage'],
 ])
-def test_add_ambit_with_unknown_storage(db, finder_command, storage_values, expected):
+def test_add_ambit_with_unknown_storage(db, finder_command, storage_values):
     stdout, stderr = finder_command('add-ambit', 'extra', '--values', *storage_values)
-    assert stderr.strip() == f"Error while adding ambit: ‘Storage backend ‘{expected}’ is not configured.’"
+    assert stderr.strip() == "Error while adding ambit: ‘Storage backend ‘no-such-storage’ is not configured.’"
     assert AmbitModel.objects.filter(slug='extra').exists() is False
+
+
+def test_add_ambit_without_storage(db, finder_command):
+    """Omitting the storages is no longer an error: they fall back to the default alias."""
+    stdout, stderr = finder_command('add-ambit', 'extra', '--values')
+    assert stderr.strip() == ''
+    ambit_obj = AmbitModel.objects.get(slug='extra')
+    assert ambit_obj._original_storage == 'default'
+    assert ambit_obj._sample_storage == 'default'
 
 
 def test_edit_ambit(db, finder_command, ambit):

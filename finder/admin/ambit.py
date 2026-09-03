@@ -7,11 +7,14 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
 from django.http import Http404
 from django.http.response import HttpResponsePermanentRedirect
-from django.urls import resolve, reverse
+from django.urls import include, path, resolve, reverse
 from django.views.decorators.common import no_append_slash
 
 from finder.models.ambit import AmbitModel
 from finder.models.permission import Privilege
+
+
+FINDER_APP_LABEL = AmbitModel._meta.app_label
 
 
 def get_ambit_queryset(admin_name, current_site):
@@ -77,13 +80,16 @@ def get_app_list(self, request, app_label=None):
     current_site = get_current_site(request)
     ambit_models = get_ambit_queryset(self.name, current_site)
     register_ambit_admins(ambit_models)
-    app_dict = self._build_app_dict(request)
+    app_dict = self._build_app_dict(request, app_label)
+    if app_label not in [None, FINDER_APP_LABEL]:
+        # `app_index()` for another application: leave its list of models alone
+        return sorted(app_dict.values(), key=lambda x: x['name'].lower())
 
     # override the 'Finder' app to only show the ambit proxy models
-    app_dict['finder'] = {
+    app_dict[FINDER_APP_LABEL] = {
         'name': 'Finder',
-        'app_label': 'finder',
-        'app_url': reverse('admin:app_list', kwargs={'app_label': 'finder'}, current_app=self.name),
+        'app_label': FINDER_APP_LABEL,
+        'app_url': reverse('admin:app_list', kwargs={'app_label': FINDER_APP_LABEL}, current_app=self.name),
         'has_module_perms': True,
         'models': [],
     }
@@ -113,5 +119,28 @@ def get_app_list(self, request, app_label=None):
     return app_list
 
 
+def get_urls(self):
+    """
+    Serve the endpoints of ``finder.browser.urls`` from the admin, so that a project does
+    not have to add them to its own URLconf.
+
+    They are deliberately *not* wrapped in ``self.admin_view()``. The
+    ``<finder-file-select>`` and ``<finder-folder-select>`` widgets render on ordinary
+    forms outside the admin, so whoever edits such a form must be able to reach these
+    endpoints without being a staff member. Authorization is left to the views, which
+    check the access control list of the folder they operate on.
+
+    The prefix is ``finder-api/`` rather than ``finder/``, which ``catch_all_view()``
+    above resolves against the slug of an ambit.
+    """
+    from finder.browser import urls as browser_urls
+
+    return [
+        path('finder-api/', include(browser_urls)),
+        *sites.AdminSite.get_urls(self),
+    ]
+
+
 site.catch_all_view = MethodType(catch_all_view, site)
 site.get_app_list = MethodType(get_app_list, site)
+site.get_urls = MethodType(get_urls, site)

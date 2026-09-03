@@ -4,9 +4,9 @@ import uuid
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.widgets import TextInput
-from django.urls import reverse
 from django.utils.html import format_html
 
+from finder.browser.urls import reverse_api
 from finder.models.ambit import AmbitModel
 from finder.models.file import AbstractFileModel, FileModel
 from finder.models.folder import FolderModel
@@ -41,7 +41,7 @@ class FinderFileSelect(FinderInodeSelect):
             attrs['data-selected_file'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
         context = {
             **super().get_context(name, value, attrs),
-            'base_url': reverse('finder-api:base-url'),
+            'base_url': reverse_api('base-url'),
             'ambit': self.ambit,
             'style_url': staticfiles_storage.url('finder/css/finder-browser.css'),
         }
@@ -76,7 +76,7 @@ class FinderFolderSelect(FinderInodeSelect):
             attrs['data-selected_folder'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
         return {
             **super().get_context(name, value, attrs),
-            'base_url': reverse('finder-api:base-url'),
+            'base_url': reverse_api('base-url'),
             'ambit': self.ambit,
             'style_url': staticfiles_storage.url('finder/css/finder-browser.css'),
             'folder_icon_url': staticfiles_storage.url('finder/icons/folder.svg'),

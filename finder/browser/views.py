@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist, PermissionDenied
 from django.db.models import BooleanField, QuerySet, Subquery, Value
 from django.forms.renderers import DjangoTemplates
@@ -5,7 +7,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy as _
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -15,6 +17,9 @@ from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
+
+
+logger = logging.getLogger(__name__)
 
 
 class FormRenderer(DjangoTemplates):
@@ -71,21 +76,64 @@ class BrowserView(View):
         else:
             return AccessControlEntry.objects.privilege_subquery_exists(user, Privilege.READ)
 
+    #: Sent both when an ambit does not exist and when it may not be read, so that the
+    #: response cannot be used to find out which ambits a site has configured.
+    access_denied_message = _("You do not have permission to browse this folder tree.")
+
+    def _get_ambit(self, request, slug):
+        """
+        Look up an ambit by its slug, refusing anonymously.
+
+        The reason is written to the log rather than to the response: telling a caller
+        that a slug does not exist, while an existing one it may not read is refused
+        differently, would let it enumerate the ambits of a site.
+        """
+        try:
+            ambit = AmbitModel.objects.get(slug=slug)
+        except AmbitModel.DoesNotExist:
+            logger.warning(
+                "No ambit named “%s”. It is the `ambit` of the model field rendering the "
+                "widget, or FINDER_DEFAULT_AMBIT if the field declares none. Run "
+                "`manage.py finder list-ambits` to see the configured ones.", slug,
+            )
+            raise PermissionDenied(self.access_denied_message)
+        if not ambit.root_folder.has_permission(request.user, Privilege.READ):
+            logger.warning("“%s” may not read the root folder of ambit “%s”.", request.user, slug)
+            raise PermissionDenied(self.access_denied_message)
+        return ambit
+
+    @staticmethod
+    def _get_last_folder(ambit, folder_id):
+        """
+        The folder the browser reopens on, falling back to the root folder of `ambit`.
+
+        `finder.last_folder` is one session key shared by every ambit, and it outlives the
+        folder it names: deleting and recreating an ambit, or opening the browser for a
+        different one, leaves an id behind which does not belong here. Without this the
+        request fails with a bare 404, because listing that folder raises `DoesNotExist`.
+        """
+        if folder_id:
+            try:
+                folder = FolderModel.objects.get(id=folder_id)
+            except (FolderModel.DoesNotExist, ValidationError, ValueError):
+                pass
+            else:
+                if folder.get_ambit().id == ambit.id:
+                    return folder
+        return ambit.root_folder
+
     @method_decorator(require_GET)
     def structure(self, request, slug=None):
-        ambit = AmbitModel.objects.get(slug=slug)
+        ambit = self._get_ambit(request, slug)
         request.session.setdefault('finder.open_folders', [])
-        request.session.setdefault('finder.last_folder', str(ambit.root_folder.id))
-        last_folder_id = request.GET.get('folder', request.session['finder.last_folder'])
+        last_folder = self._get_last_folder(ambit, request.GET.get('folder') or request.session.get('finder.last_folder'))
+        last_folder_id = str(last_folder.id)
+        request.session['finder.last_folder'] = last_folder_id
         if is_open := ambit.root_folder.subfolders.exists():
             # direct children of the root folder are open regardless of the session variable `open_folders`.
             # in addition to that, also open all ancestors of the last opened folder
             open_folders = {last_folder_id, *request.session['finder.open_folders']}
-            try:
-                ancestors = FolderModel.objects.get(id=last_folder_id).ancestors
-            except FolderModel.DoesNotExist:
-                ancestors = []
-                last_folder_id = str(ambit.root_folder.id)
+            ancestors = last_folder.ancestors
             can_view_subquery = self._get_can_view_subquery(request.user)
             if isinstance(ancestors, QuerySet):  # pragma: with django-cte
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
@@ -110,12 +158,30 @@ class BrowserView(View):
             **self.list(request, last_folder_id),
         }
 
+    def _get_inode(self, request, inode_id, privilege, **lookup):
+        """
+        Look an inode up, refusing unless the caller holds `privilege` on its folder.
+
+        Refused the same way as an unknown ambit, so that neither the existence of an
+        inode nor the reason for the refusal can be read off the response.
+        """
+        try:
+            inode = FileModel.objects.get_inode(id=inode_id, **lookup)
+        except ObjectDoesNotExist:
+            logger.warning("No inode “%s”.", inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        folder = inode if inode.is_folder else inode.folder
+        if not folder.has_permission(request.user, privilege):
+            logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        return inode
+
     @method_decorator(require_GET)
     def fetch(self, request, inode_id):
         """
         Open the given folder and fetch children data for the given folder.
         """
-        inode = FileModel.objects.get_inode(id=inode_id)
+        inode = self._get_inode(request, inode_id, Privilege.READ)
         ambit = inode.folder.get_ambit()
         inode_id = str(inode_id)
         if inode.is_folder:
@@ -166,6 +232,7 @@ class BrowserView(View):
         """
         List all the files of the given folder.
         """
+        current_folder = self._get_inode(request, folder_id, Privilege.READ)
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
@@ -175,7 +242,6 @@ class BrowserView(View):
             'can_view': True,
             'mime_types': request.GET.getlist('mimetypes'),
         }
-        current_folder = FolderModel.objects.get(id=folder_id)
         if recursive:
             if isinstance(current_folder.descendants, QuerySet):
                 parent_ids = Subquery(current_folder.descendants.values('id'))
@@ -238,12 +304,10 @@ class BrowserView(View):
         """
         Upload a single file into the given folder.
         """
+        current_folder = self._get_inode(request, folder_id, Privilege.WRITE)
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
-        current_folder = FolderModel.objects.get(id=folder_id)
-        if not current_folder.has_permission(request.user, Privilege.WRITE):
-            raise PermissionDenied("Permission denied to upload file.")
         ambit = current_folder.get_ambit()
         file = model.objects.create_from_upload(
             ambit,
@@ -264,7 +328,7 @@ class BrowserView(View):
         """
         Change some fields after uploading a single file.
         """
-        file = FileModel.objects.get_inode(id=file_id)
+        file = self._get_inode(request, file_id, Privilege.WRITE, is_folder=False)
         if request.method == 'DELETE':
             file.delete()
             return {'file_info': None}
@@ -285,7 +349,7 @@ class BrowserView(View):
         """
         Widgets using the <finder-file-select> use this endpoint to fetch a cropped version of the image.
         """
-        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
+        image = self._get_inode(request, image_id, Privilege.READ, mime_types=['image/*'], is_folder=False)
         ambit = image.folder.get_ambit()
         width, height = request.POST.get('width'), request.POST.get('height')
         width = int(width) if str(width).isdigit() else None

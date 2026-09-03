@@ -16,7 +16,7 @@ from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from finder.models.permission import AccessControlEntry, Privilege
+from finder.models.permission import AccessControlEntry, Privilege, is_anonymous
 
 if DJANGO_VERSION < (6, 0):
     try:
@@ -361,6 +361,8 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     def has_permission(self, user, privilege):
         assert (privilege & Privilege.FULL) != 0, "Invalid privilege value."
+        if is_anonymous(user):
+            return False
         if user.is_superuser:
             return True
         group_ids = user.groups.values_list('id', flat=True)

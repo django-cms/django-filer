@@ -1,9 +1,12 @@
+import logging
 import uuid
 from pathlib import Path
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.files.temp import NamedTemporaryFile
+from django.utils.module_loading import import_string
 
 
 class FinderSystemStorage(FileSystemStorage):
@@ -83,3 +86,92 @@ def copy_to_local(storage, file_path):
             local_file.write(chunk)
     local_file.flush()
     return local_file
+
+
+logger = logging.getLogger(__name__)
+
+
+def derive_storage(alias, default_config):
+    """
+    Build a `FinderSystemStorage` configuration for `alias` out of the `default` one.
+
+    It keeps whatever the project configured for `default` — the filesystem root and the
+    URL prefix — and puts the ambit into a subdirectory named after the alias.
+    """
+    options = dict(default_config.get('OPTIONS') or {})
+    location = options.get('location') or settings.MEDIA_ROOT
+    base_url = options.get('base_url') or settings.MEDIA_URL or '/media/'
+    return {
+        'BACKEND': 'finder.storages.FinderSystemStorage',
+        'OPTIONS': {
+            'location': str(Path(location) / alias),
+            'base_url': f"{base_url.rstrip('/')}/{alias}/",
+            # finder rewrites a payload in place when a sanitizing validator changes it,
+            # and regenerates samples under a stable name
+            'allow_overwrite': True,
+        },
+    }
+
+
+def configure_default_storages():
+    """
+    Add the storages an ambit refers to by default, unless the project declared them.
+
+    A plain `FileSystemStorage` cannot stand in for them: `FinderSystemStorage` shards
+    payloads by UUID in `path()` and `url()`, so pointing an ambit at `default` would
+    write files where finder will not look for them later.
+
+    Called from `finder.apps.FinderConfig.ready()`, before anything reads `storages`.
+    Returns the aliases which had to be derived.
+    """
+    from finder.models.ambit import AmbitModel
+
+    aliases = [
+        AmbitModel._meta.get_field('_original_storage').default,
+        AmbitModel._meta.get_field('_sample_storage').default,
+    ]
+    configured = settings.STORAGES
+    default_config = configured.get('default')
+    if default_config is None:  # pragma: no cover
+        return []
+    try:
+        backend = import_string(default_config['BACKEND'])
+    except ImportError:  # pragma: no cover
+        return []
+    if not issubclass(backend, FileSystemStorage):
+        # a remote default storage carries no location to derive a subdirectory from
+        logger.warning(
+            "The “default” storage is %s, so the finder storages %s cannot be derived from "
+            "it. Declare them in STORAGES.",
+            default_config['BACKEND'],
+            ', '.join(f'“{alias}”' for alias in aliases if alias not in configured),
+        )
+        return []
+
+    derived = []
+    for alias in aliases:
+        if alias in configured:
+            continue
+        configured[alias] = derive_storage(alias, default_config)
+        derived.append(alias)
+    if derived:
+        _reset_storage_handler()
+    return derived
+
+
+def _reset_storage_handler():
+    """
+    Drop the cached backends of `django.core.files.storage.storages`.
+
+    Another application may have resolved a storage while its own `ready()` ran, which
+    caches `settings.STORAGES` as it was before the aliases above were added. This is what
+    Django's own `setting_changed` receiver does when a test overrides STORAGES.
+    """
+    from django.core.files.storage import storages
+
+    try:
+        del storages.backends
+    except AttributeError:
+        pass
+    storages._backends = None
+    storages._storages = {}
