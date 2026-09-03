@@ -46,6 +46,20 @@ _UNITS_IN_PX = {
 _LENGTH = re.compile(r'^([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s*([a-z%]*)$')
 
 
+class UnresolvableSize(ValueError):
+    """
+    Raised when a well-formed SVG states no size that can be worked out from the
+    markup: a missing or relative width and height, and no viewBox to take the
+    size or the aspect ratio from.
+
+    It is the only failure the optional renderer can do anything about, so it is
+    the only one :func:`open_image` falls back on. Everything else -- a document
+    declaring entities, a root element that is not ``<svg>``, markup that does
+    not parse, a width that is not a positive length -- stays rejected whether
+    the renderer is installed or not.
+    """
+
+
 class _EntityDeclaration(Exception):
     """Raised out of the expat handler when the document declares an entity."""
 
@@ -99,25 +113,42 @@ def is_svg(name):
     return os.path.splitext(name or '')[1][1:].lower() == 'svg'
 
 
-def parse_length(value):
+def _dimension(value):
     """
-    Return ``value`` converted to pixels, or ``None`` if it is not an absolute
-    length. Relative units (``%``, ``em``, ``ex``, ...) cannot be resolved
-    without a rendering context; the ``viewBox`` is the better source then.
+    Return ``(length, invalid)`` for a ``width`` or ``height`` attribute.
+
+    ``length`` is the value in pixels, or ``None`` when the attribute does not
+    yield one. ``invalid`` tells the two reasons for that apart: markup that is
+    simply wrong -- a negative, zero or overflowing length -- as opposed to a
+    size that is merely not stated in absolute units, which a renderer could
+    still work out.
     """
-    if not value:
-        return None
+    if not value or not value.strip():
+        # An absent width or height defaults to 100% of the viewport.
+        return None, False
     match = _LENGTH.match(value.strip())
     if not match:
-        return None
+        return None, False
     number, unit = match.groups()
-    try:
-        factor = _UNITS_IN_PX[unit.lower()]
-    except KeyError:
-        return None
+    factor = _UNITS_IN_PX.get(unit.lower())
+    if factor is None:
+        # A relative unit (%, em, ex, ...) has no meaning without a context.
+        return None, False
     length = float(number) * factor
     # "1e999" parses as infinity, which overflows as soon as it is used.
-    return length if math.isfinite(length) else None
+    if not math.isfinite(length) or length <= 0:
+        return None, True
+    return length, False
+
+
+def parse_length(value):
+    """
+    Return ``value`` converted to pixels, or ``None`` if it is not a usable
+    absolute length. Relative units (``%``, ``em``, ``ex``, ...) cannot be
+    resolved without a rendering context, and a width or height has to be a
+    positive, finite number to be a size at all.
+    """
+    return _dimension(value)[0]
 
 
 def parse_viewbox(value):
@@ -162,16 +193,26 @@ class SvgImage:
     def __init__(self, root):
         self.root = root
         viewbox = parse_viewbox(root.get('viewBox'))
-        width = parse_length(root.get('width'))
-        height = parse_length(root.get('height'))
-        if width is None or height is None or width <= 0 or height <= 0:
-            # A size that is missing, relative or not a positive length at all
-            # leaves the viewBox as the only thing left to measure.
-            if viewbox is None:
+        width, width_invalid = _dimension(root.get('width'))
+        height, height_invalid = _dimension(root.get('height'))
+        if viewbox is not None:
+            # A viewBox states both a size and an aspect ratio, so a dimension
+            # the markup does state is kept and only the missing one is derived
+            # from the ratio -- the way a browser sizes an SVG.
+            if width is None and height is None:
+                width, height = viewbox[2], viewbox[3]
+            elif width is None:
+                width = height * viewbox[2] / viewbox[3]
+            elif height is None:
+                height = width * viewbox[3] / viewbox[2]
+        if width is None or height is None:
+            if width_invalid or height_invalid:
                 raise ValueError(
-                    "SVG document declares no usable width and height and no viewBox"
+                    "SVG document declares a width or height that is not a positive length"
                 )
-            width, height = viewbox[2], viewbox[3]
+            raise UnresolvableSize(
+                "SVG document states no absolute width and height and has no viewBox"
+            )
         if viewbox is None:
             # Without a viewBox, changing width and height resizes the canvas
             # but not its contents. Fall back to the implied one.
@@ -325,13 +366,15 @@ def open_image(fp):
     The two share the interface the thumbnail pipeline needs.
 
     The renderer is the optional ``django-filer[svg]`` extra; without it such a
-    document cannot be measured at all.
+    document cannot be measured at all. It is only asked about
+    :class:`UnresolvableSize`: a document filer rejects stays rejected either
+    way, so installing the extra can never weaken a check.
 
     :exception ValueError: If no image can be opened.
     """
     try:
         return load(fp)
-    except ValueError:
+    except UnresolvableSize:
         image = _load_with_vil(fp)
         if image is None:
             raise

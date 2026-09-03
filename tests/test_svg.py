@@ -88,12 +88,29 @@ class LoadTests(TestCase):
         image = svg.load(BytesIO(make_svg(width='100%', height='100%', viewBox='0 0 30 15')))
         self.assertEqual(image.size, (30.0, 15.0))
 
+    def test_stated_width_is_kept_and_height_follows_the_viewbox_ratio(self):
+        """
+        A viewBox states an aspect ratio as well as a size, so a width the
+        markup does give must not be thrown away for the viewBox's own width.
+        """
+        image = svg.load(BytesIO(make_svg(width='200', viewBox='0 0 100 50')))
+        self.assertEqual(image.size, (200.0, 100.0))
+
+    def test_stated_height_is_kept_and_width_follows_the_viewbox_ratio(self):
+        image = svg.load(BytesIO(make_svg(height='200', viewBox='0 0 100 50')))
+        self.assertEqual(image.size, (400.0, 200.0))
+
+    def test_both_stated_dimensions_win_over_the_viewbox(self):
+        image = svg.load(BytesIO(make_svg(width='200', height='33', viewBox='0 0 100 50')))
+        self.assertEqual(image.size, (200.0, 33.0))
+
     def test_size_from_viewbox_alone(self):
         image = svg.load(BytesIO(make_svg(viewBox='0 0 30 15')))
         self.assertEqual(image.size, (30.0, 15.0))
 
-    def test_missing_size_is_an_error(self):
-        with self.assertRaises(ValueError):
+    def test_missing_size_is_unresolvable(self):
+        """Only a renderer can size a document that states no size at all."""
+        with self.assertRaises(svg.UnresolvableSize):
             svg.load(BytesIO(make_svg()))
 
     def test_malformed_document_is_an_error(self):
@@ -160,13 +177,16 @@ class LoadTests(TestCase):
         self.assertEqual(image.size, (8.0, 4.0))
 
     def test_non_positive_size_without_a_viewbox_is_an_error(self):
+        """A stated but impossible size is wrong markup, not a missing size."""
         for attrs in ({'width': '0', 'height': '0'}, {'width': '-10', 'height': '-5'}):
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as caught:
                 svg.load(BytesIO(make_svg(**attrs)))
+            self.assertNotIsInstance(caught.exception, svg.UnresolvableSize)
 
     def test_infinite_size_is_an_error(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as caught:
             svg.load(BytesIO(make_svg(width='1e999', height='10')))
+        self.assertNotIsInstance(caught.exception, svg.UnresolvableSize)
 
     def test_external_doctype_is_accepted(self):
         """The DTD reference that many authoring tools emit is harmless."""
@@ -441,3 +461,73 @@ class ImageSizeGuardTests(TestCase):
         with self.assertRaises(ValidationError) as caught:
             image.clean()
         self.assertEqual(caught.exception.code, 'image_size')
+
+
+@unittest.skipUnless(VIL.is_available(), "requires the django-filer[svg] extra")
+class RendererFallbackTests(TestCase):
+    """
+    Installing the optional renderer must never weaken a check.
+
+    ``open_image()`` falls back to it for one failure only - a document whose
+    size cannot be worked out from the markup. Anything filer rejects has to
+    stay rejected, or the renderer would quietly launder documents past the
+    entity, root-element and geometry checks.
+    """
+
+    def open(self, content):
+        return svg.open_image(
+            SimpleUploadedFile('doc.svg', content, content_type='image/svg+xml'))
+
+    def test_entity_declarations_are_not_laundered(self):
+        with self.assertRaises(ValueError):
+            self.open(
+                b'<!DOCTYPE svg [<!ENTITY a "aaaaaaaaaa">]>'
+                b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+                b'<desc>&a;</desc></svg>')
+
+    def test_a_non_svg_root_is_not_laundered(self):
+        with self.assertRaises(ValueError):
+            self.open(b'<html width="10" height="10"></html>')
+
+    def test_malformed_markup_is_not_laundered(self):
+        with self.assertRaises(ValueError):
+            self.open(b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+                      b'<rect></svg>')
+
+    def test_impossible_dimensions_are_not_laundered(self):
+        for attrs in (b'width="-10" height="10"', b'width="0" height="10"',
+                      b'width="1e999" height="10"'):
+            with self.assertRaises(ValueError):
+                self.open(b'<svg xmlns="http://www.w3.org/2000/svg" ' + attrs + b'/>')
+
+    def test_an_unresolvable_size_is_what_the_renderer_is_for(self):
+        image = self.open(
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">'
+            b'<rect width="5" height="5"/></svg>')
+        self.assertIsNotNone(image)
+
+
+@unittest.skipIf(VIL.is_available(), "covers a default install, without the extra")
+class WithoutRendererTests(TestCase):
+    """
+    What a plain ``pip install django-filer`` makes of a document only the
+    optional renderer could measure. The mirror image of
+    :class:`RendererFallbackTests`, so that both installations are covered.
+    """
+
+    RELATIVE = (b'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">'
+                b'<rect width="5" height="5"/></svg>')
+
+    def test_open_image_reports_the_size_as_unresolvable(self):
+        with self.assertRaises(svg.UnresolvableSize):
+            svg.open_image(SimpleUploadedFile(
+                'relative.svg', self.RELATIVE, content_type='image/svg+xml'))
+
+    def test_dimensions_stay_unset(self):
+        """The admin falls back to a generic icon rather than failing."""
+        image = Image.objects.create(
+            file=SimpleUploadedFile(
+                'relative.svg', self.RELATIVE, content_type='image/svg+xml'),
+            original_filename='relative.svg',
+        )
+        self.assertEqual((image.width, image.height), (0.0, 0.0))

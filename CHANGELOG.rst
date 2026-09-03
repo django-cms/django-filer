@@ -13,6 +13,10 @@ CHANGELOG
   extra (#1547).
 * fix: SVG thumbnails without a ``viewBox`` were scaled by growing the canvas
   rather than the drawing.
+* fix: An SVG stating only one of ``width`` and ``height`` alongside a ``viewBox``
+  now keeps the dimension it states and derives the other from the viewBox's
+  aspect ratio, the way a browser sizes it. The renderer reported the viewBox's
+  own height instead, which does not match how the image is drawn.
 * fix: When an image's dimensions could not be read, the file object was left at
   its end, so upload validators that inspect the content saw an empty file.
 * feat: Add support for Django 6.1. The admin breadcrumbs now render as
@@ -30,6 +34,8 @@ CHANGELOG
    ``django-filer[svg]`` if your project has such files. Thumbnails generated from
    now on are the original document rescaled rather than a reportlab rendering of
    it - existing cached thumbnails keep their file names and are still served.
+   Installing the extra only ever adds documents filer can size; it never accepts
+   a document filer rejects, so it cannot weaken the SVG upload checks.
 
 .. note::
 
