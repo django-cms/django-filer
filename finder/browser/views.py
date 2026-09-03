@@ -42,7 +42,7 @@ class BrowserView(View):
             return JsonResponse(action(request, *args, **kwargs))
         except ObjectDoesNotExist as e:
             return HttpResponseNotFound(str(e))
-        except PermissionError as e:
+        except (PermissionDenied, PermissionError) as e:
             return HttpResponseForbidden(str(e))
         except ValidationError as e:
             return JsonResponse({'error': e.messages}, status=422)

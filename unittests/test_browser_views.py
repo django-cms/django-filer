@@ -413,8 +413,7 @@ def test_upload_without_write_permission(staff_client, ambit, sub_folder, api_ur
         {'upload_file': upload_file},
         content_type=MULTIPART,
     )
-    # Django's PermissionDenied is not a builtin PermissionError, so `dispatch()` maps it to 400 rather than 403.
-    assert response.status_code == 400
+    assert response.status_code == 403
     assert FileModel.objects.filter(name='uploaded.bin').exists() is False
 
 

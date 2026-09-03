@@ -19,6 +19,19 @@ VALID_SVG = (
     b'</svg>'
 )
 MALFORMED_SVG = b'<svg xmlns="http://www.w3.org/2000/svg"><rect></svg>'
+# Attack vectors and the token which must not survive validation, taken from the filer branch's
+# `tests/test_validation.py`, where `sanitize_svg()` strips them from the stored payload.
+SVG_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.1" baseProfile="full" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+   <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900" stroke="#004400"/>
+   {}
+</svg>"""
+XSS_PAYLOADS = [
+    ('<script>alert(document.domain);</script>', 'alert'),
+    ("""<a href="javascript: alert('ing');">test</a>""", 'javascript:'),
+    ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 'onclick'),
+    ('<image href="data:image/svg+xml;base64,PHN2Zz48L3N2Zz4="/>', ';base64,'),
+]
 ENTITY_SVG = (
     b'<?xml version="1.0"?>'
     b'<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>'
@@ -137,14 +150,42 @@ def test_svg_validator_rejects_unparsable_content():
 
 
 @requires_py_svg_hush
+@pytest.mark.parametrize('attack, disallowed', XSS_PAYLOADS)
 @pytest.mark.xfail(
     strict=True,
-    reason="svg_validator() discards the sanitized output of filter_svg() and hence accepts scripted SVGs.",
+    reason="svg_validator() discards the sanitized output of filter_svg(), so the payload is stored as it is.",
 )
-def test_svg_validator_rejects_script_element():
-    scripted_svg = b'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
-    with pytest.raises(ValueError):
-        svg_validator('scripted.svg', BytesIO(scripted_svg), None, 'image/svg+xml')
+def test_uploaded_svg_is_sanitized_or_rejected(ambit, admin_user, register_validators, attack, disallowed):
+    """
+    Uploading an SVG carrying an XSS vector must either be rejected, or the stored payload must no longer
+    carry the vector. The attack vectors are the ones from `tests/test_validation.py` of the filer branch.
+
+    Neither happens: `filter_svg()` does not raise for a scripted SVG, it returns the sanitized document —
+    and `svg_validator()` throws that return value away. `validate_payload()` opens the payload read-only,
+    so a sanitizing validator could not write it back either.
+    """
+    register_validators(
+        ('image/svg+xml', 'finder.contrib.image.svg.validators.svg_validator'),
+        ('image/svg+xml', 'finder.contrib.image.svg.validators.xml_validator'),
+    )
+    try:
+        file_obj = upload(ambit, admin_user, name='attack.svg', content=SVG_TEMPLATE.format(attack).encode(),
+                          mime_type='image/svg+xml')
+    except ValueError:
+        return  # rejected on upload, hence nothing was stored
+
+    with ambit.original_storage.open(file_obj.file_path, 'rb') as handle:
+        assert disallowed not in handle.read().decode().lower()
+
+
+@requires_py_svg_hush
+def test_uploading_an_svg_with_an_unbalanced_script_tag_is_rejected(ambit, admin_user, register_validators):
+    """This attack vector is caught, but only as a side effect of it being unparsable XML."""
+    register_validators(('image/svg+xml', 'finder.contrib.image.svg.validators.svg_validator'))
+    attack = '&#x3c;script>alert(document.domain);</script>'
+    with pytest.raises(ValueError, match="Invalid or malicious SVG in “attack.svg”"):
+        upload(ambit, admin_user, name='attack.svg', content=SVG_TEMPLATE.format(attack).encode(),
+               mime_type='image/svg+xml')
 
 
 def test_svg_validator_without_py_svg_hush(monkeypatch):
