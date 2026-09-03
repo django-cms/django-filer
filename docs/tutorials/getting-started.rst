@@ -2,8 +2,9 @@
 Getting started
 ===============
 
-By the end of this tutorial you will have django-finder installed in a Django project, a first
-ambit created, and a file uploaded through the admin interface.
+By the end of this tutorial you will have django-finder installed in a Django project and a
+file uploaded through the admin interface. Storages and a first ambit are set up for you, so
+there is less to configure than you might expect.
 
 You need a working Django project running Django 5.2 or later, and Python 3.11 or later.
 django-finder has been tested against SQLite and PostgreSQL; it should also work on MariaDB
@@ -54,42 +55,32 @@ Each contrib app brings its own dependencies. :doc:`../how-to/install-file-type-
 lists what each one needs.
 
 
-Configure the two storage backends
-==================================
+Storages: nothing to configure
+==============================
 
-Every ambit — django-finder's term for a self-contained folder tree — needs two Django
-storage backends: one holding the uploaded originals, one holding everything derived from
-them, such as thumbnails and audio or video samples.
+Every ambit — django-finder's term for a self-contained folder tree — uses two Django storage
+backends: one holding the uploaded originals, one holding everything derived from them, such
+as thumbnails and audio or video samples.
 
-.. code-block:: python
+You do not have to declare either of them. When ``STORAGES`` contains no ``finder_public``
+and no ``finder_public_samples``, django-finder derives both from your ``default`` storage as
+the app registry is loaded: the same filesystem root and URL prefix, a subdirectory per name,
+the :class:`~finder.storages.FinderSystemStorage` backend and ``allow_overwrite`` enabled.
 
-    STORAGES = {
-        'default': {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage',
-        },
-        'staticfiles': {
-            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-        },
-        'finder_public': {
-            'BACKEND': 'finder.storages.FinderSystemStorage',
-            'OPTIONS': {
-                'location': '/path/to/your/media/finder_public',
-                'base_url': '/media/finder_public/',
-                'allow_overwrite': True,
-            },
-        },
-        'finder_public_samples': {
-            'BACKEND': 'finder.storages.FinderSystemStorage',
-            'OPTIONS': {
-                'location': '/path/to/your/media/finder_public_samples',
-                'base_url': '/media/finder_public_samples/',
-                'allow_overwrite': True,
-            },
-        },
-    }
+With Django's defaults that gives you::
 
-:doc:`../explanation/thumbnails-and-samples` explains why the split exists, and
-:doc:`../how-to/configure-storages` covers object storage such as S3.
+    MEDIA_ROOT/finder_public/          served from  MEDIA_URL + finder_public/
+    MEDIA_ROOT/finder_public_samples/  served from  MEDIA_URL + finder_public_samples/
+
+which is enough to work through this tutorial. Declare them yourself once you want the files
+somewhere else — :doc:`../how-to/configure-storages` covers both the local and the S3 case,
+and :doc:`../explanation/thumbnails-and-samples` explains why the split exists.
+
+.. note::
+
+   Deriving them needs a ``FileSystemStorage`` as your ``default``. A remote default has no
+   location to put a subdirectory under, so nothing is derived and ``manage.py check``
+   reports ``finder.W001``. Declare the two storages explicitly in that case.
 
 
 Run the migrations
@@ -99,26 +90,27 @@ Run the migrations
 
     ./manage.py migrate
 
+Besides creating the tables, this creates your first ambit, so that the admin and the form
+widgets have something to show. It is named by ``FINDER_DEFAULT_AMBIT``, which is ``public``
+— the same name a :class:`~finder.models.fields.FinderFileField` refers to when it is
+declared without an ``ambit`` argument.
 
-Create your first ambit
-=======================
-
-An ambit holds one root folder, one trash folder per user, and its own pair of storage
-backends. There is no default ambit — you must create one before the admin has anything to
-show:
-
-.. code-block:: shell
-
-    ./manage.py finder add-ambit default \
-        --values name="Media Library" \
-                 storage=finder_public \
-                 sample_storage=finder_public_samples
-
-Check that it exists:
+Check that it is there:
 
 .. code-block:: shell
 
     ./manage.py finder list-ambits
+
+.. code-block:: text
+
+    Slug: public, Name: Public, Site: None, Admin: None,
+    Storage: finder_public (FinderSystemStorage),
+    Sample Storage: finder_public_samples (FinderSystemStorage)
+
+Its root folder grants read and write to every signed-in user. Narrow that down with the
+permission editor in the admin (:doc:`../how-to/grant-permissions`), or take the ambits into
+your own hands by setting ``FINDER_CREATE_DEFAULT_AMBIT = False`` before you migrate for the
+first time — see :doc:`../how-to/manage-ambits`.
 
 
 Upload a file
@@ -130,9 +122,9 @@ Start the development server and open the admin:
 
     ./manage.py runserver
 
-Visit http://localhost:8000/admin/finder/foldermodel/ — you are redirected to the root folder
-of your new ambit. Drag a file from your desktop onto the folder listing, or use the upload
-button.
+Visit http://localhost:8000/admin/finder/ — it lists the ambits, and following ``Public``
+takes you to its root folder. Drag a file from your desktop onto the folder listing, or use
+the upload button.
 
 .. todo::
 

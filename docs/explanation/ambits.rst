@@ -22,16 +22,15 @@ Why they are created from the command line
 An ambit is infrastructure: it names storage backends that must already exist in the
 ``STORAGES`` setting, and creating one creates a root folder that everything else hangs off.
 Making that an admin form would invite creating an ambit pointing at a storage that is not
-configured. So ambits are created with ``manage.py finder add-ambit`` instead — see
+configured. So further ambits are created with ``manage.py finder add-ambit`` — see
 :doc:`../how-to/manage-ambits`.
 
-A consequence worth knowing: a fresh installation has no ambit at all, and the admin has
-nothing to show until you create one.
+The first one is an exception. A fresh installation would otherwise have no ambit at all and
+the admin nothing to show, so the ``finder.0002_default_ambit`` migration creates one named
+by ``FINDER_DEFAULT_AMBIT`` on storages derived from your ``default`` one. That keeps the
+infrastructure argument intact — the storages it names are guaranteed to exist, because
+django-finder derives them when the project has not declared them.
 
-.. todo::
-
-   Explain the interaction between ambits and ``FINDER_DEFAULT_AMBIT``, and what happens when
-   a ``FinderFileField`` names an ambit that does not exist.
 
 .. todo::
 
