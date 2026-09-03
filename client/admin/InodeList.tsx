@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {Folder, File} from './Item';
 import GalleryPreview from './GalleryPreview';
+import {nextPreselectionIndex} from '../common/navigation';
 
 
 function InodeListHeader() {
@@ -182,16 +183,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 
 	function navigatePreselection(event: KeyboardEvent) {
 		const index = inodes.findIndex((inode) => inode.id === preselectedInode.id);
-		let nextPreselectedInode;
-		if (event.key === 'ArrowLeft') {
-			nextPreselectedInode = layout === 'columns' ? inodes[0] : inodes[index - 1];
-		} else if (event.key === 'ArrowRight') {
-			nextPreselectedInode = layout === 'columns' ? inodes[0] : inodes[index + 1];
-		} else if (event.key === 'ArrowUp') {
-			nextPreselectedInode = inodes[index - inodesPerRow.current];
-		} else if (event.key === 'ArrowDown') {
-			nextPreselectedInode = inodes[index + inodesPerRow.current];
-		} else if (event.key === ' ') {
+		if (event.key === ' ') {
 			if (event.shiftKey) {
 				// shift click
 				extendSelection(preselectedInode);
@@ -201,8 +193,17 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 			} else {
 				toggleSelection(preselectedInode);
 			}
+			return;
 		}
-		if (nextPreselectedInode) {
+		const nextIndex = nextPreselectionIndex({
+			key: event.key,
+			index,
+			count: inodes.length,
+			inodesPerRow: inodesPerRow.current,
+			layout,
+		});
+		if (nextIndex !== null) {
+			const nextPreselectedInode = inodes[nextIndex];
 			nextPreselectedInode.elementRef.current.scrollIntoView({behaviour: 'smooth', block: 'center', container: 'nearest', inline: 'center'});
 			setPreselectedInode(nextPreselectedInode);
 		}

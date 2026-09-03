@@ -1,4 +1,4 @@
-name: End-to-end tests (finder branch)
+name: Client tests (finder branch)
 
 on:
   push:
@@ -19,6 +19,18 @@ on:
       - 'package.json'
 
 jobs:
+  unit:
+    runs-on: ubuntu-latest
+    name: "Vitest unit tests"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.x'
+    - run: npm install --include=dev
+    - run: npm test
+
   e2e:
     runs-on: ubuntu-latest
     name: "Playwright end-to-end tests"

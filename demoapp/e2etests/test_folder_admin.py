@@ -167,3 +167,40 @@ def test_move_file_to_trash(folder_admin_page, root_folder, assets_dir):
     # the file has been moved into the trash folder rather than being erased
     file_obj.refresh_from_db()
     assert file_obj.parent_id != root_folder.id
+
+
+def test_arrow_keys_move_the_preselection(folder_admin_page, root_folder, assets_dir):
+    """
+    The index arithmetic behind this lives in ``client/common/navigation.ts`` and is
+    covered by ``navigation.test.ts``. This test only asserts that the keyboard is
+    still wired up to it.
+    """
+    page = folder_admin_page
+    upload(page, root_folder, 'image_0.png', 'image_1.png', 'image_2.png', assets_dir=assets_dir)
+
+    def preselected_index():
+        classes = [inodes(page).nth(i).get_attribute('class').split() for i in range(3)]
+        return next((i for i, cls in enumerate(classes) if 'preselected' in cls), None)
+
+    inodes(page).first.click()
+    page.wait_for_selector('#content-react ul.inode-list li[data-id].preselected')
+    assert preselected_index() == 0
+
+    page.keyboard.press('ArrowRight')
+    page.wait_for_function(
+        "() => document.querySelectorAll('#content-react ul.inode-list li[data-id]')[1]"
+        ".classList.contains('preselected')"
+    )
+    assert preselected_index() == 1
+
+    page.keyboard.press('ArrowLeft')
+    page.wait_for_function(
+        "() => document.querySelectorAll('#content-react ul.inode-list li[data-id]')[0]"
+        ".classList.contains('preselected')"
+    )
+    assert preselected_index() == 0
+
+    # ArrowLeft on the first inode must not wrap around to the last one
+    page.keyboard.press('ArrowLeft')
+    page.wait_for_timeout(200)
+    assert preselected_index() == 0
