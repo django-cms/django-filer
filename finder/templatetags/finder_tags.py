@@ -11,5 +11,5 @@ def download_url(file_id):
         finder_file = FileModel.objects.get_inode(id=file_id, is_folder=False)
     except FileModel.DoesNotExist:
         return ''
-    ambit = finder_file.get_ambit()
+    ambit = finder_file.folder.get_ambit()
     return finder_file.get_download_url(ambit)

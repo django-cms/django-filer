@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<title>Test App</title>
+	<script src="{% url 'finder-api:javascript-catalog' %}"></script>
+	{{ form.media }}
+</head>
+<body>
+	<form method="post">
+		{% csrf_token %}
+		{{ form }}
+		<button type="submit">Submit</button>
+	</form>
+</body>
+</html>

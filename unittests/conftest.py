@@ -104,6 +104,12 @@ def alternative_ambit(django_db_blocker):
 
 
 @pytest.fixture
+def public_ambit(django_db_blocker):
+    """The ambit referred to by the `FinderFileField`s of the test application."""
+    return _ensure_ambit(django_db_blocker, 'public', 'finder_test', 'finder_test_samples')
+
+
+@pytest.fixture
 def root_folder_url(ambit):
     base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
     return f'{base_url}{ambit.slug}/{ambit.root_folder_id}'
