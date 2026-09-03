@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useSessionStorage} from '../common/Storage';
+import {createSessionStorage} from '../common/Storage';
 
-export const useScrollCache = useSessionStorage('filer-scroll', {});
+export const useScrollCache = createSessionStorage('filer-scroll', {});
 
 
 function SelectionRectangle(props) {

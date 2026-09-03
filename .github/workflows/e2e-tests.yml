@@ -21,7 +21,7 @@ on:
 jobs:
   unit:
     runs-on: ubuntu-latest
-    name: "Vitest unit tests"
+    name: "Type-check, lint and unit tests"
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js
@@ -29,7 +29,12 @@ jobs:
       with:
         node-version: '24.x'
     - run: npm install --include=dev
-    - run: npm test
+    - name: Type-check the client
+      run: npm run typecheck
+    - name: Lint the client
+      run: npm run lint
+    - name: Run the unit tests
+      run: npm test
 
   e2e:
     runs-on: ubuntu-latest

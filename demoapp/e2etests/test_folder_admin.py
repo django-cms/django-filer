@@ -204,3 +204,42 @@ def test_arrow_keys_move_the_preselection(folder_admin_page, root_folder, assets
     page.keyboard.press('ArrowLeft')
     page.wait_for_timeout(200)
     assert preselected_index() == 0
+
+
+def search_zone(page):
+    return page.locator('#content-react nav li.search-field span.search-zone')
+
+
+def search_zone_option(page, label):
+    """Open the search zone drop down of the search field and return the given option."""
+    drop_down = search_zone(page)
+    if drop_down.get_attribute('aria-expanded') == 'false':
+        # the caret is drawn by CSS, so the <span> itself is the only clickable trigger
+        drop_down.click(position={'x': 4, 'y': 4})
+    return drop_down.locator('ul[role="listbox"] > li[role="option"]', has_text=label).first
+
+
+def test_switch_search_zone(folder_admin_page, root_folder, assets_dir):
+    """
+    Switching the search zone refreshes every column.
+
+    This used to raise a ReferenceError, because the handler referred to a variable
+    which does not exist in that scope. The ``fail_on_browser_errors`` fixture turns
+    such an error into a failure, so no explicit assertion on it is needed.
+    """
+    page = folder_admin_page
+    upload(page, root_folder, 'image_0.png', assets_dir=assets_dir)
+
+    assert search_zone_option(page, "From current folder").get_attribute('aria-selected') == 'true'
+    search_zone_option(page, "In all folders").click()
+
+    # choosing an option closes the drop down again
+    page.wait_for_selector('#content-react nav li.search-field span.search-zone[aria-expanded="false"]')
+    options = search_zone(page).locator('ul[role="listbox"] > li[role="option"]')
+    assert options.nth(0).get_attribute('aria-selected') == 'false'
+    assert options.nth(1).get_attribute('aria-selected') == 'true'
+
+    cookies = {cookie['name']: cookie['value'] for cookie in page.context.cookies()}
+    assert cookies['django-finder-search-zone'] == 'everywhere'
+    # the columns were refreshed rather than blown away
+    assert inodes(page).count() == 1

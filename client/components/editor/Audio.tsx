@@ -45,13 +45,13 @@ export default function Audio(props) {
 	};
 
 	const onPlayPause = () => {
-		wavesurfer && wavesurfer.playPause();
+		wavesurfer?.playPause();
 	};
 
 	function setVolume(event) {
 		const volume = parseFloat(event.target.value);
 		setAudioSettings({volume: volume});
-		wavesurfer && wavesurfer.setVolume(volume);
+		wavesurfer?.setVolume(volume);
 	}
 
 	const controlButtons = [

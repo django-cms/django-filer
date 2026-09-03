@@ -12,6 +12,10 @@ import GalleryPreview from './GalleryPreview';
 import {nextPreselectionIndex} from '../common/navigation';
 
 
+/** Maps an inode onto its next state while a selection is being changed. */
+type InodeModifier = (inode: any, index: number) => any;
+
+
 function InodeListHeader() {
 	return (
 		<li className="header">
@@ -116,7 +120,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		}
 	}
 
-	function modifySelectedInodes(inode, modifier: Function) {
+	function modifySelectedInodes(inode, modifier: InodeModifier) {
 		const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
 		setInodes(modifiedInodes);
 		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
@@ -124,7 +128,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 
 	function extendSelection(inode) {
 		const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
-		let modifier: Function;
+		let modifier: InodeModifier;
 		if (selectedInodeIndex < lastSelectedIndex.current) {
 			modifier = (f, k) => ({...f, selected: k >= selectedInodeIndex && k <= lastSelectedIndex.current || f.selected});
 		} else if (lastSelectedIndex.current !== -1 && selectedInodeIndex > lastSelectedIndex.current) {
@@ -136,7 +140,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 	}
 
 	function addToSelection(inode) {
-		let modifier: Function;
+		let modifier: InodeModifier;
 		if (inode.selected) {
 			modifier = f => ({...f, selected: f.selected && f.id !== inode.id});
 		} else {
@@ -148,7 +152,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 	}
 
 	function toggleSelection(inode) {
-		let modifier: Function;
+		let modifier: InodeModifier;
 		if (inode.selected) {
 			modifier = f => ({...f, selected: false});
 		} else {
