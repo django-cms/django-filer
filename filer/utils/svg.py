@@ -12,11 +12,13 @@ now: it is only consulted as a fallback for documents whose size cannot be read
 from the markup itself.
 """
 
+import math
 import os
 import re
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from pathlib import Path
+from xml.parsers import expat
 
 
 SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
@@ -43,11 +45,52 @@ _UNITS_IN_PX = {
 
 _LENGTH = re.compile(r'^([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s*([a-z%]*)$')
 
-# The internal subset of a DTD is the only place where entity declarations can
-# appear. ``xml.etree`` expands them, which makes "billion laughs" expansion
-# possible, so documents carrying them are rejected. External entities are not
-# a concern: expat does not resolve them and reports an undefined entity.
-_INTERNAL_SUBSET = re.compile(rb'<!DOCTYPE[^>\[]*\[(.*?)\]', re.DOTALL)
+
+class _EntityDeclaration(Exception):
+    """Raised out of the expat handler when the document declares an entity."""
+
+
+class _PrologParsed(Exception):
+    """Raised out of the expat handler once the root element starts."""
+
+
+def reject_entity_declarations(content):
+    """
+    Refuse documents that declare XML entities.
+
+    ``xml.etree`` expands internal entities, so a handful of nested declarations
+    expand to gigabytes ("billion laughs"). Entities can only be declared in a
+    DTD, which expat reports before the root element starts, so this reads no
+    further than the prolog. Letting expat do it rather than matching the markup
+    means comments, quoting and the document's encoding are all handled by the
+    same parser that will parse it for real.
+
+    External entities need no handling: expat does not resolve them and does not
+    fetch external DTD subsets, it reports an undefined entity instead.
+
+    :exception ValueError: If the document declares an entity.
+    """
+    parser = expat.ParserCreate()
+
+    def entity_declared(*args, **kwargs):
+        raise _EntityDeclaration
+
+    def root_element_started(*args, **kwargs):
+        raise _PrologParsed
+
+    parser.EntityDeclHandler = entity_declared
+    parser.UnparsedEntityDeclHandler = entity_declared
+    parser.StartElementHandler = root_element_started
+    try:
+        parser.Parse(content, True)
+    except _EntityDeclaration:
+        raise ValueError("SVG documents declaring XML entities are not supported") from None
+    except _PrologParsed:
+        pass
+    except expat.ExpatError:
+        # Malformed: leave the reporting to the parse below, which has the
+        # better error message.
+        pass
 
 
 def is_svg(name):
@@ -71,7 +114,9 @@ def parse_length(value):
         factor = _UNITS_IN_PX[unit.lower()]
     except KeyError:
         return None
-    return float(number) * factor
+    length = float(number) * factor
+    # "1e999" parses as infinity, which overflows as soon as it is used.
+    return length if math.isfinite(length) else None
 
 
 def parse_viewbox(value):
@@ -87,6 +132,9 @@ def parse_viewbox(value):
     try:
         x, y, width, height = (float(part) for part in parts)
     except ValueError:
+        return None
+    # float() happily accepts "nan" and "inf", which are not coordinates.
+    if not all(math.isfinite(value) for value in (x, y, width, height)):
         return None
     if width <= 0 or height <= 0:
         return None
@@ -115,10 +163,12 @@ class SvgImage:
         viewbox = parse_viewbox(root.get('viewBox'))
         width = parse_length(root.get('width'))
         height = parse_length(root.get('height'))
-        if width is None or height is None:
+        if width is None or height is None or width <= 0 or height <= 0:
+            # A size that is missing, relative or not a positive length at all
+            # leaves the viewBox as the only thing left to measure.
             if viewbox is None:
                 raise ValueError(
-                    "SVG document declares neither an absolute width and height nor a viewBox"
+                    "SVG document declares no usable width and height and no viewBox"
                 )
             width, height = viewbox[2], viewbox[3]
         if viewbox is None:
@@ -230,9 +280,7 @@ def load(fp):
     if isinstance(content, str):
         content = content.encode()
 
-    subset = _INTERNAL_SUBSET.search(content)
-    if subset and b'<!ENTITY' in subset.group(1):
-        raise ValueError("SVG documents declaring XML entities are not supported")
+    reject_entity_declarations(content)
 
     try:
         root = ET.fromstring(content)
@@ -264,20 +312,31 @@ def _load_with_vil(fp):
         return None
 
 
-def get_dimensions(fp):
+def open_image(fp):
     """
-    Return the ``(width, height)`` of an SVG document in pixels.
+    Return an image for ``fp``: an :class:`SvgImage`, or a
+    ``easy_thumbnails.VIL`` one for documents that do not state their size in
+    absolute units and can only be measured by rendering the whole drawing.
+    The two share the interface the thumbnail pipeline needs.
 
-    Documents that do not state their size in absolute units fall back to
-    ``easy_thumbnails.VIL`` (``pip install django-filer[svg]``), which can
-    derive it by rendering the whole drawing.
+    The renderer is the optional ``django-filer[svg]`` extra; without it such a
+    document cannot be measured at all.
 
-    :exception ValueError: If the size cannot be determined at all.
+    :exception ValueError: If no image can be opened.
     """
     try:
-        return load(fp).size
+        return load(fp)
     except ValueError:
         image = _load_with_vil(fp)
         if image is None:
             raise
-        return image.size
+        return image
+
+
+def get_dimensions(fp):
+    """
+    Return the ``(width, height)`` of an SVG document in pixels.
+
+    :exception ValueError: If the size cannot be determined.
+    """
+    return open_image(fp).size

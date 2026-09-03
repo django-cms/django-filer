@@ -4,7 +4,7 @@ from io import StringIO
 from django.core.files.base import ContentFile
 
 from easy_thumbnails import engine, utils
-from easy_thumbnails.exceptions import InvalidImageFormatError
+from easy_thumbnails.exceptions import EasyThumbnailsError, InvalidImageFormatError
 from easy_thumbnails.files import Thumbnailer, ThumbnailFile
 
 from . import svg
@@ -91,10 +91,14 @@ def svg_source_generator(source, **options):
     An easy-thumbnails source generator that opens an SVG with
     :mod:`filer.utils.svg` instead of ``easy_thumbnails.VIL``, so that
     thumbnailing an SVG needs no SVG renderer.
+
+    Documents that can only be measured by rendering them still go through the
+    renderer when the optional ``django-filer[svg]`` extra is installed, so that
+    they thumbnail as well as they report their size.
     """
     if not source:
         return None
-    return svg.load(source)
+    return svg.open_image(source)
 
 
 class SvgThumbnailFile(ThumbnailFile):
@@ -134,6 +138,7 @@ class SvgThumbnailerMixin:
                 silent_template_exception=silent_template_exception)
 
         thumbnail_options = self.get_options(thumbnail_options)
+        self._check_thumbnail_size(thumbnail_options['size'])
         image = engine.generate_source_image(
             self, thumbnail_options, [svg_source_generator],
             fail_silently=silent_template_exception)
@@ -157,6 +162,26 @@ class SvgThumbnailerMixin:
         thumbnail._committed = False
         thumbnail._dimensions_cache = thumbnail_image.size
         return thumbnail
+
+    @staticmethod
+    def _check_thumbnail_size(size):
+        """
+        Reject the sizes ``Thumbnailer.generate_thumbnail()`` rejects.
+
+        Its check runs before the branch this mixin replaces, so it has to be
+        repeated here: an SVG is happy to be written with a zero or negative
+        width, where PIL would refuse.
+        """
+        min_dim, max_dim = 0, 0
+        for dim in size:
+            try:
+                dim = float(dim)
+            except (TypeError, ValueError):
+                continue
+            min_dim, max_dim = min(min_dim, dim), max(max_dim, dim)
+        if max_dim == 0 or min_dim < 0:
+            raise EasyThumbnailsError(
+                "The source image has an invalid size ({0}x{1})".format(*size))
 
     def get_existing_thumbnail(self, thumbnail_options):
         thumbnail = super().get_existing_thumbnail(thumbnail_options)

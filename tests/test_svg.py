@@ -2,12 +2,15 @@
 
 import ast
 import pathlib
+import unittest
 import xml.etree.ElementTree as ET
 from io import BytesIO, StringIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
+from easy_thumbnails import VIL
+from easy_thumbnails.exceptions import EasyThumbnailsError
 from easy_thumbnails.files import get_thumbnailer
 
 from filer.settings import FILER_IMAGE_MODEL
@@ -48,6 +51,11 @@ class ParseLengthTests(TestCase):
         for value in ('100%', '2em', '3ex', '', None, 'auto'):
             self.assertIsNone(svg.parse_length(value), value)
 
+    def test_non_finite_lengths_are_rejected(self):
+        """``float()`` turns an overflowing exponent into infinity."""
+        for value in ('1e999', '-1e999', '1e999pt'):
+            self.assertIsNone(svg.parse_length(value), value)
+
 
 class ParseViewBoxTests(TestCase):
     def test_separators(self):
@@ -57,6 +65,11 @@ class ParseViewBoxTests(TestCase):
 
     def test_unusable(self):
         for value in ('', None, '0 0 10', '0 0 a b', '0 0 0 10', '0 0 10 -3'):
+            self.assertIsNone(svg.parse_viewbox(value), value)
+
+    def test_non_finite_coordinates_are_rejected(self):
+        """``float()`` accepts "nan" and "inf", which are not coordinates."""
+        for value in ('nan 0 10 10', '0 inf 10 10', '0 0 1e999 10', '0 0 10 -inf'):
             self.assertIsNone(svg.parse_viewbox(value), value)
 
 
@@ -99,6 +112,59 @@ class LoadTests(TestCase):
         )
         with self.assertRaises(ValueError):
             svg.load(BytesIO(bomb))
+
+    def test_entity_declaration_hidden_in_a_comment_is_rejected(self):
+        """A ``]`` inside a DTD comment must not be taken for the subset's end."""
+        bomb = (
+            b'<!DOCTYPE svg [<!-- ] --><!ENTITY a "aaaaaaaaaa">'
+            b'<!ENTITY b "&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;">]>'
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            b'<desc>&b;</desc></svg>'
+        )
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(bomb))
+
+    def test_entity_declaration_after_a_quoted_bracket_is_rejected(self):
+        bomb = (
+            b'<!DOCTYPE svg SYSTEM "a]b" [<!ENTITY a "aaaaaaaaaa">]>'
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            b'<desc>&a;</desc></svg>'
+        )
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(bomb))
+
+    def test_entity_declaration_in_another_encoding_is_rejected(self):
+        """The check has to see the document the way the parser will."""
+        bomb = (
+            '<?xml version="1.0" encoding="UTF-16"?>'
+            '<!DOCTYPE svg [<!ENTITY a "aaaaaaaaaa">]>'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            '<desc>&a;</desc></svg>'
+        ).encode('utf-16')
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(bomb))
+
+    def test_byte_order_mark_does_not_hide_an_entity_declaration(self):
+        bomb = (
+            b'\xef\xbb\xbf<!DOCTYPE svg [<!ENTITY a "aaaaaaaaaa">]>'
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            b'<desc>&a;</desc></svg>'
+        )
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(bomb))
+
+    def test_non_positive_size_falls_back_to_the_viewbox(self):
+        image = svg.load(BytesIO(make_svg(width='0', height='0', viewBox='0 0 8 4')))
+        self.assertEqual(image.size, (8.0, 4.0))
+
+    def test_non_positive_size_without_a_viewbox_is_an_error(self):
+        for attrs in ({'width': '0', 'height': '0'}, {'width': '-10', 'height': '-5'}):
+            with self.assertRaises(ValueError):
+                svg.load(BytesIO(make_svg(**attrs)))
+
+    def test_infinite_size_is_an_error(self):
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(make_svg(width='1e999', height='10')))
 
     def test_external_doctype_is_accepted(self):
         """The DTD reference that many authoring tools emit is harmless."""
@@ -247,6 +313,30 @@ class SvgThumbnailTests(TestCase):
         existing = thumbnailer.get_existing_thumbnail(options)
         self.assertIsNotNone(existing)
         self.assertEqual((existing.width, existing.height), (100.0, 50.0))
+
+    def test_invalid_thumbnail_sizes_are_rejected(self):
+        """An SVG is happy to be written at any size, where PIL would refuse."""
+        thumbnailer = get_thumbnailer(self.create_image())
+        for size in ((0, 0), (-100, 100)):
+            with self.assertRaises(EasyThumbnailsError):
+                thumbnailer.get_thumbnail({'size': size})
+
+    @unittest.skipUnless(VIL.is_available(), "requires the django-filer[svg] extra")
+    def test_relative_size_thumbnails_with_the_optional_renderer(self):
+        """
+        A document that only the renderer can measure has to thumbnail as well
+        as it reports its size - the installation docs promise as much.
+        """
+        image = self.create_image(
+            content=b'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">'
+                    b'<rect width="5" height="5"/></svg>',
+            name='relative.svg',
+        )
+        self.assertEqual((image.width, image.height), (100.0, 100.0))
+        thumbnail = get_thumbnailer(image).get_thumbnail({'size': (50, 50)})
+        self.assertTrue(thumbnail.name.endswith('.svg'))
+        self.assertEqual(ET.fromstring(self.read(thumbnail)).tag,
+                         '{http://www.w3.org/2000/svg}svg')
 
     def test_unreadable_svg_leaves_dimensions_unset(self):
         image = self.create_image(content=b'<svg><rect></svg>', name='broken.svg')
