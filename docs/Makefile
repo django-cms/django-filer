@@ -3,23 +3,34 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
-VENV = env/bin/activate
-PORT = 8001
+VENVDIR       = env
+VENVBIN       = $(VENVDIR)/bin
+PORT          = 8001
+
+# Prefer the virtualenv created by `make install`, fall back to whatever is on
+# PATH, and let either be overridden from the command line:
+#     make html SPHINXBUILD=/path/to/sphinx-build
+SPHINXBUILD     ?= $(if $(wildcard $(VENVBIN)/sphinx-build),$(VENVBIN)/sphinx-build,sphinx-build)
+SPHINXAUTOBUILD ?= $(if $(wildcard $(VENVBIN)/sphinx-autobuild),$(VENVBIN)/sphinx-autobuild,sphinx-autobuild)
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest
+.PHONY: help install clean html strict run spelling dirhtml singlehtml pickle json \
+        htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  install    to create a virtualenv in $(VENVDIR) and install the requirements"
 	@echo "  html       to make standalone HTML files"
-	@echo "  run       to build the docs, watch for changes, and serve them at http://0.0.0.0:8001"
+	@echo "  strict     to build HTML with warnings treated as errors, as CI does"
+	@echo "  run        to build the docs, watch for changes, and serve them at http://0.0.0.0:$(PORT)"
+	@echo "  spelling   to check for typos in documentation"
+	@echo "  clean      to remove everything under $(BUILDDIR)"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
@@ -35,22 +46,21 @@ help:
 	@echo "  changes    to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
-	@echo "  spelling  to check for typos in documentation"
 
 install:
-	@echo "... setting up virtualenv"
-	python3 -m venv env
-	. $(VENV); pip install -r requirements.txt
+	@echo "... setting up virtualenv in $(VENVDIR)"
+	python3 -m venv $(VENVDIR)
+	$(VENVBIN)/pip install -r requirements.txt
+	@echo ""
+	@echo "--------------------------------------------------------------------------------"
+	@echo "* watch, build and serve the documentation: make run"
+	@echo "* build exactly as CI does:                 make strict"
+	@echo "* check spelling:                           make spelling"
+	@echo ""
+	@echo "enchant must be installed for pyenchant, and therefore spelling checks, to work."
+	@echo "See https://www.abisource.com/projects/enchant/"
+	@echo "--------------------------------------------------------------------------------"
 
-	@echo "\n" \
-	      "-------------------------------------------------------------------------------------------------- \n" \
-		    "* watch, build and serve the documentation: make run \n" \
-		    "* check spelling: make spelling \n" \
-		    "\n" \
-				"enchant must be installed in order for pyenchant (and therefore spelling checks) to work. See \n" \
-				"http://docs.django-cms.org/en/latest/contributing/documentation.html#install-the-spelling-software \n" \
-	      "-------------------------------------------------------------------------------------------------- \n" \	
-		  
 clean:
 	-rm -rf $(BUILDDIR)/*
 
@@ -58,6 +68,11 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+strict:
+	$(SPHINXBUILD) -W -E -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@echo "Build finished with no warnings. The HTML pages are in $(BUILDDIR)/html."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
@@ -90,17 +105,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/django-filer.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/django-finder.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/django-filer.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/django-finder.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/django-filer"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/django-filer"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/django-finder"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/django-finder"
 	@echo "# devhelp"
 
 epub:
@@ -148,10 +163,9 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 spelling:
-	. $(VENV); $(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) build/spelling
+	$(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) $(BUILDDIR)/spelling
 	@echo
-	@echo "Check finished. Wrong words can be found in " \
-		"build/spelling/output.txt."
+	@echo "Check finished. Wrong words can be found in $(BUILDDIR)/spelling/output.txt."
 
 run:
-	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) build/html --host 0.0.0.0 --port $(PORT)		  
+	$(SPHINXAUTOBUILD) $(ALLSPHINXOPTS) $(BUILDDIR)/html --host 0.0.0.0 --port $(PORT)
