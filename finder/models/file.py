@@ -17,7 +17,7 @@ from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 from finder.storages import delete_directory
-from finder.validators import payload_validator, validate_payload
+from finder.validators import validate_payload
 
 
 def mimetype_validator(value):
@@ -275,16 +275,6 @@ class AbstractFileModel(InodeModel):
             delete_directory(ambit.original_storage, dir_path)
             delete_directory(ambit.sample_storage, dir_path)
         self.delete(using, keep_parents)
-
-    def validate_payload(self, ambit):
-        for mime_type, validator in settings.FINDER_PAYLOAD_VALIDATORS:
-            if (
-                self.mime_type == mime_type
-                or f'{self.mime_maintype}/*' == mime_type
-                or mime_type == '*/*'
-            ):
-                with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
-                    payload_validator(validator)(self.name, readhandle, self.owner, self.mime_type)
 
 
 class FileModel(AbstractFileModel):
