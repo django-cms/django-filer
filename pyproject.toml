@@ -56,6 +56,8 @@ classifiers = [
 
 [project.optional-dependencies]
 heif = ["pillow-heif"]
+# Pillow supports avif natively since 11.3, the plugin is only needed for older versions
+avif = ["pillow-avif-plugin"]
 
 [project.urls]
 Homepage = "https://github.com/django-cms/django-filer"

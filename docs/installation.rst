@@ -19,6 +19,25 @@ retrieved from iOS devices by airdrop) using an optional dependency::
     $ pip install django-filer\[heif\]
 
 
+Optional avif support
+---------------------
+
+django-filer treats avif images (``*.avif``, ``*.avifs``) as images if Pillow can
+decode them. `Pillow`_ does so out of the box since Pillow 11.3 (its wheels bundle
+libaom and dav1d). With older Pillow versions install the optional
+`pillow-avif-plugin`_ dependency::
+
+    $ pip install django-filer\[avif\]
+
+If neither is available, avif uploads are kept as regular files instead of images.
+
+.. note::
+
+    avif files uploaded *before* avif support became available stay regular files:
+    django-filer decides on the model class at upload time. Re-upload them to turn
+    them into images.
+
+
 Dependencies
 ------------
 
@@ -36,6 +55,10 @@ check `Pillow doc`_.
 If heif support is chosen, django-filer also installs
 
 * pillow-heif
+
+If avif support is chosen, django-filer also installs
+
+* pillow-avif-plugin (only needed for Pillow < 11.3)
 
 
 Configuration
@@ -167,5 +190,6 @@ generation errors,  two options are provided to help when working with ``django-
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
 .. _Pillow doc: https://pillow.readthedocs.io/en/latest/installation.html
 .. _PIL: http://www.pythonware.com/products/pil/
+.. _pillow-avif-plugin: https://pypi.org/project/pillow-avif-plugin/
 .. _pip: http://pypi.python.org/pypi/pip
 .. _South: http://south.aeracode.org/
