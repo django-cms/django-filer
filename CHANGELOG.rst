@@ -19,6 +19,10 @@ CHANGELOG
   own height instead, which does not match how the image is drawn.
 * fix: When an image's dimensions could not be read, the file object was left at
   its end, so upload validators that inspect the content saw an empty file.
+* fix: SVG documents nesting elements more than
+  ``filer.utils.svg.MAX_NESTING_DEPTH`` (100) levels deep are refused. Writing
+  such a document out recurses once per level and would exhaust the stack while
+  a thumbnail is generated. Real documents nest a handful of levels.
 * feat: Add support for Django 6.1. The admin breadcrumbs now render as
   ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
   element-qualified CSS selectors expect, and keep the legacy

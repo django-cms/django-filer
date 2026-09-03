@@ -117,6 +117,29 @@ class LoadTests(TestCase):
         with self.assertRaises(ValueError):
             svg.load(BytesIO(b'<svg><rect></svg>'))
 
+    def test_deeply_nested_documents_are_rejected(self):
+        """
+        ``ElementTree`` serializes recursively, one stack frame per level, so a
+        few kilobytes of nested groups would otherwise raise ``RecursionError``
+        while a thumbnail is written - inside a request, where much of the stack
+        is already spent.
+        """
+        def nested(depth):
+            return (b'<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">'
+                    + b'<g>' * depth + b'</g>' * depth + b'</svg>')
+
+        # One under the limit, counting the root element, still thumbnails.
+        image = svg.load(BytesIO(nested(svg.MAX_NESTING_DEPTH - 1)))
+        destination = StringIO()
+        image.resize((50, 50)).save(destination)
+        self.assertTrue(destination.getvalue())
+
+        with self.assertRaises(ValueError) as caught:
+            svg.load(BytesIO(nested(svg.MAX_NESTING_DEPTH)))
+        self.assertNotIsInstance(caught.exception, svg.UnresolvableSize)
+        with self.assertRaises(ValueError):
+            svg.load(BytesIO(nested(2000)))
+
     def test_non_svg_root_is_an_error(self):
         with self.assertRaises(ValueError):
             svg.load(BytesIO(b'<html width="10" height="10"></html>'))

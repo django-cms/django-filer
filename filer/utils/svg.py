@@ -45,6 +45,13 @@ _UNITS_IN_PX = {
 
 _LENGTH = re.compile(r'^([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s*([a-z%]*)$')
 
+# Deepest element nesting accepted. ``ElementTree`` serializes recursively, one
+# frame per level, so a deeply nested document exhausts the interpreter's stack
+# while a thumbnail is being written -- inside a request, where much of that
+# stack is already spent. A few kilobytes of nested <g> elements are enough.
+# Real documents are nowhere near this: filer's own icons nest five levels deep.
+MAX_NESTING_DEPTH = 100
+
 
 class UnresolvableSize(ValueError):
     """
@@ -106,6 +113,22 @@ def reject_entity_declarations(content):
         # Malformed: leave the reporting to the parse below, which has the
         # better error message.
         pass
+
+
+def _exceeds_nesting_depth(root, limit=MAX_NESTING_DEPTH):
+    """
+    Return whether ``root`` nests deeper than ``limit``.
+
+    Walked iteratively: measuring the tree must not be able to blow the very
+    stack the limit exists to protect.
+    """
+    stack = [(root, 1)]
+    while stack:
+        node, depth = stack.pop()
+        if depth > limit:
+            return True
+        stack.extend((child, depth + 1) for child in node)
+    return False
 
 
 def is_svg(name):
@@ -335,6 +358,10 @@ def load(fp):
         raise ValueError(f"Cannot parse SVG document: {error}") from error
     if root.tag not in ('svg', f'{{{SVG_NAMESPACE}}}svg'):
         raise ValueError(f"Root element is <{root.tag}>, not <svg>")
+    if _exceeds_nesting_depth(root):
+        raise ValueError(
+            f"SVG document nests elements more than {MAX_NESTING_DEPTH} levels deep"
+        )
     return SvgImage(root)
 
 
