@@ -209,7 +209,10 @@ In `settings.py` of your project, add these extra dependencies or those you real
 If you use:
 * `finder.contrib.audio` or `finder.contrib.video`, assure that `ffmpeg-python` is installed.
 * `finder.contrib.image.pil`, assure that `Pillow` is installed.
-* `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
+* `finder.contrib.image.svg` needs no extra dependency; it reads an SVG's size from the
+  document and thumbnails it by rewriting the root element. Documents that state their
+  size only in relative units (`width="100%"` without a `viewBox`) cannot be measured
+  that way and are shown with a generic icon.
 * Postgres as a database, install `psycopg2` or `psycopg2-binary` if available for your platform.
 
 Each root folder requires two storage backends. One for the public files and one for their

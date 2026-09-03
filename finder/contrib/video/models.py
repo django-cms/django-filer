@@ -7,7 +7,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 import ffmpeg
 
-from filer import settings as filer_settings
 from finder.models.file import FileModel
 from finder.storages import copy_to_local
 
@@ -21,9 +20,6 @@ class VideoFileModel(FileModel):
     editor_component = folderitem_component = 'Video'
     thumbnail_size = 180
     fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-video.svg')
-    filer_public_thumbnails = Path(
-        filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
-    )
 
     class Meta:
         proxy = True
