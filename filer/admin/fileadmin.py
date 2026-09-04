@@ -6,6 +6,7 @@ from django.contrib.admin.utils import unquote
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -138,7 +139,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         })
         if obj and obj.mime_maintype == 'image' and obj.file.exists():
             if 'svg' in obj.mime_type:
-                context['expand_image_url'] = reverse(admin_urlname(Image._meta, 'expand'), args=(obj.pk,))
+                # Reverse this admin's own expand view: obj may be a plain File
+                context['expand_image_url'] = reverse(admin_urlname(self.opts, 'expand'), args=(obj.pk,))
             else:
                 context['expand_image_url'] = obj.file.url
         return super().render_change_form(
@@ -203,8 +205,31 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         return super().get_urls() + [
             path("icon/<int:file_id>/<int:size>",
                  self.admin_site.admin_view(self.icon_view),
-                 name=f"filer_{self.model._meta.model_name}_fileicon")
+                 name=f"filer_{self.model._meta.model_name}_fileicon"),
+            path("expand/<int:file_id>",
+                 self.admin_site.admin_view(self.expand_view),
+                 name=f"{self.opts.app_label}_{self.opts.model_name}_expand"),
         ]
+
+    def expand_view(self, request, file_id):
+        """Show a file (currently only SVG images) in its original size.
+
+        Registered on ``FileAdmin`` and not only on ``ImageAdmin``: SVGs are
+        not necessarily stored as ``Image`` instances (e.g. if uploaded before
+        ``image/svg+xml`` became part of ``FILER_IMAGE_MIME_TYPES``), and the
+        directory listing links to the expand view of whatever model the file
+        actually is.
+        """
+        file = get_object_or_404(self.model, pk=file_id)
+        if not has_admin_read_permission(request, file):
+            raise Http404()
+        return TemplateResponse(
+            request,
+            "admin/filer/image/expand.html",
+            context={
+                "original_url": file.url
+            },
+        )
 
     def icon_view(self, request, file_id: int, size: int) -> HttpResponse:
         if size not in DEFERRED_THUMBNAIL_SIZES:
