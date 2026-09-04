@@ -5,6 +5,24 @@ CHANGELOG
 3.6.0 (unreleased)
 ==================
 
+* feat: SVG support no longer requires an SVG renderer. filer reads an SVG's size
+  from the document and thumbnails it by rewriting ``width``, ``height`` and
+  ``viewBox`` on the root element, which keeps the vector data intact instead of
+  re-drawing it. ``easy-thumbnails[svg]`` - and with it svglib, reportlab and lxml,
+  around 14 MB - moved from a hard dependency to the new ``django-filer[svg]``
+  extra (#1547).
+* fix: SVG thumbnails without a ``viewBox`` were scaled by growing the canvas
+  rather than the drawing.
+* fix: An SVG stating only one of ``width`` and ``height`` alongside a ``viewBox``
+  now keeps the dimension it states and derives the other from the viewBox's
+  aspect ratio, the way a browser sizes it. The renderer reported the viewBox's
+  own height instead, which does not match how the image is drawn.
+* fix: When an image's dimensions could not be read, the file object was left at
+  its end, so upload validators that inspect the content saw an empty file.
+* fix: SVG documents nesting elements more than
+  ``filer.utils.svg.MAX_NESTING_DEPTH`` (100) levels deep are refused. Writing
+  such a document out recurses once per level and would exhaust the stack while
+  a thumbnail is generated. Real documents nest a handful of levels.
 * feat: Add support for Django 6.1. The admin breadcrumbs now render as
   ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
   element-qualified CSS selectors expect, and keep the legacy
@@ -13,6 +31,18 @@ CHANGELOG
 * fix: Send the CSRF token with uploads started from the "Upload Files" button in the
   folder view. Since 3.5.1 the upload endpoint enforces CSRF, but this uploader had not
   been updated and every upload from it failed with "CSRF token missing" (#1617).
+
+.. note::
+
+   Existing installations keep SVG support unchanged: upgrading does not always uninstall
+   svglib or reportlab. Fresh installs and re-locked dependency files no longer get
+   them. The only documents that still need them are those whose size cannot be read
+   from the markup, for example ``width="100%"`` without a ``viewBox``; install
+   ``django-filer[svg]`` if your project has such files. Thumbnails generated from
+   now on are the original document rescaled rather than a reportlab rendering of
+   it - existing cached thumbnails keep their file names and are still served.
+   Installing the extra only ever adds documents filer can size; it never accepts
+   a document filer rejects, so it cannot weaken the SVG upload checks.
 
 .. note::
 
