@@ -7,6 +7,34 @@ Usually upgrade procedure is straightforward: update the package and run migrati
 require special attention from the developer and here we provide upgrade instructions for such cases.
 
 
+from 3.x to 3.6
+---------------
+
+django-filer 3.6 no longer installs an SVG renderer. It reads an SVG's size from
+the document and thumbnails it by rewriting the root element, so svglib and
+reportlab (roughly 14 MB, pulled in through ``easy-thumbnails[svg]``) became the
+optional :ref:`optional_svg_support` extra.
+
+Upgrading an existing environment changes nothing: ``pip install -U django-filer``
+does not uninstall packages that are already there. Fresh installs and re-locked
+dependency files (``uv.lock``, ``poetry.lock``, ``pip-compile`` output) do drop
+them, and that is where you may notice a difference.
+
+Only documents whose size cannot be read from the markup still need the renderer,
+for example ``width="100%"`` without a ``viewBox``. Their dimensions stay unset
+and the admin shows a generic image icon instead of a preview. If your project has
+such files, install
+
+.. code-block:: shell
+
+    $ pip install django-filer\[svg\]
+
+SVG thumbnails generated from 3.6 on are the original document rescaled rather
+than a reportlab rendering of it, which preserves the vector data more faithfully.
+Thumbnail file names are unchanged, so thumbnails cached by earlier versions keep
+being served.
+
+
 from 3.x to 3.3
 ---------------
 
