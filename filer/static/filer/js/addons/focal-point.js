@@ -78,6 +78,13 @@ window.Cl = window.Cl || {};
             this._onMouseMove = this._onMouseMove.bind(this);
             this._onMouseUp = this._onMouseUp.bind(this);
 
+            if (!this.location) {
+                // Without a form field to write to, dragging the circle would
+                // silently discard whatever the user does. Leave the focal point
+                // inactive instead - the circle stays hidden. (#1579)
+                return;
+            }
+
             if (this.image?.complete) {
                 this._onImageLoaded();
             } else if (this.image) {
@@ -86,13 +93,27 @@ window.Cl = window.Cl || {};
         }
 
         _updateLocationValue(x, y) {
-            const locationValue = `${Math.round(x * this.ratio)},${Math.round(y * this.ratio)}`;
-            if (this.location) {
-                this.location.value = locationValue;
+            const location = this._getLocation();
+            if (location) {
+                location.value = `${Math.round(x * this.ratio)},${Math.round(y * this.ratio)}`;
             }
         }
 
         _getLocation() {
+            // Resolved on every access rather than kept from setup time: admin
+            // themes and formset scripts may replace the form field's node, and
+            // writing to the detached one loses the focal point. (#1579)
+            if (this.location?.isConnected) {
+                return this.location;
+            }
+            this.location = this._findLocation() || null;
+            return this.location;
+        }
+
+        _findLocation() {
+            if (!this.container) {
+                return null;
+            }
             const locationSelector = this.container.dataset[this.options.dataLocation];
             if (locationSelector) {
                 const newLocation = document.querySelector(locationSelector);
@@ -188,7 +209,7 @@ window.Cl = window.Cl || {};
 
             this.circle?.classList.remove(this.options.hiddenClass);
 
-            const locationValue = this.location?.value || '';
+            const locationValue = this._getLocation()?.value || '';
             const imageWidth = this.image.offsetWidth;
             const imageHeight = this.image.offsetHeight;
 

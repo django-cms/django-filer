@@ -117,13 +117,15 @@ def filer_has_permission(context, item, action):
     return permission_method(request)
 
 
-def file_icon_context(file, detail, width, height):
+def file_icon_context(file, detail, width, height, focal_point=True):
     mime_maintype, mime_subtype = file.mime_maintype, file.mime_subtype
     context = {
         'mime_maintype': mime_maintype,
         'mime_type': file.mime_type,
     }
-    height, width, context = get_aspect_ratio_and_download_url(context, detail, file, height, width)
+    height, width, context = get_aspect_ratio_and_download_url(
+        context, detail, file, height, width, focal_point=focal_point
+    )
     # returned context if icon is not available
     not_available_context = {
         'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
@@ -206,7 +208,7 @@ def file_icon_context(file, detail, width, height):
     return context
 
 
-def get_aspect_ratio_and_download_url(context, detail, file, height, width):
+def get_aspect_ratio_and_download_url(context, detail, file, height, width, focal_point=True):
     # Get download_url and aspect ratio right for detail view
     if detail:
         context['download_url'] = file.url
@@ -216,16 +218,22 @@ def get_aspect_ratio_and_download_url(context, detail, file, height, width):
             # because they don't really have width or height
             if file.width:
                 width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = '%.6f' % (file.width / 210)
+                if focal_point:
+                    # Only the ratio turns the preview into a focal point widget
+                    context['sidebar_image_ratio'] = '%.6f' % (file.width / 210)
     return height, width, context
 
 
 @register.inclusion_tag('admin/filer/templatetags/file_icon.html')
-def file_icon(file, detail=False, size=None):
+def file_icon(file, detail=False, size=None, focal_point=True):
     """
     This templatetag returns a rendered `<img src="..." srcset="..." width="..." height="..." class="..." />
     to be used for rendering thumbnails of files in the directory listing or in the corresponding detail
     views for that image.
+
+    ``focal_point`` renders the detail preview as the focal point widget. Set it to
+    ``False`` where the form does not offer a subject location field: the widget
+    would appear to work but have nowhere to store the subject location (#1579).
     """
     if size:
         width, height = (int(s) for s in size.split('x'))
@@ -235,7 +243,7 @@ def file_icon(file, detail=False, size=None):
         width, height = 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE
     else:
         width, height = FILER_TABLE_ICON_SIZE, FILER_TABLE_ICON_SIZE
-    return file_icon_context(file, detail is True, width, height)
+    return file_icon_context(file, detail is True, width, height, focal_point=focal_point)
 
 
 @register.simple_tag
