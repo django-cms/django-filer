@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewImageWrapperSelector = '.js-img-wrapper';
     const filerClearerSelector = '.filerClearer';
     const fileChooseSelector = '.js-file-selector';
+    const thumbnailSelector = '.thumbnail_img';
+    const descriptionSelector = '.description_text';
     const fileIdInputSelector = '.vForeignKeyRawIdAdminField';
     const dragHoverClass = 'dz-drag-hover';
     const hiddenClass = 'hidden';
@@ -71,6 +73,71 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         window.addEventListener('resize', resizeHandler);
 
+        // The dropzone preview and the widget's own file representation are both
+        // positioned absolutely inside the dropzone. Only ever show one of them:
+        // the preview while a dropped file is being uploaded, the widget's own
+        // markup before and after. Otherwise they overlap and the widget's
+        // buttons end up covered by the preview (#1573).
+        const showFileRepresentation = (visible) => {
+            if (fileChoose) {
+                fileChoose.style.display = visible ? '' : 'none';
+            }
+        };
+
+        // Bring the widget's file representation in line with the file that was
+        // just uploaded, so that it shows the same as it would after a reload.
+        const updateFileRepresentation = (response) => {
+            if (!fileChoose) {
+                return;
+            }
+            const thumbnail = fileChoose.querySelector(thumbnailSelector);
+            const description = fileChoose.querySelector(descriptionSelector);
+
+            if (thumbnail) {
+                // The srcset still points at the previously selected file
+                thumbnail.removeAttribute('srcset');
+                thumbnail.src = response.thumbnail_180 || clearButton?.dataset.noIconFile || thumbnail.src;
+                thumbnail.alt = response.alt_text || '';
+                thumbnail.classList.remove(hiddenClass);
+                const link = thumbnail.parentElement;
+                if (link?.tagName === 'A') {
+                    if (response.original_image) {
+                        link.href = response.original_image;
+                    } else {
+                        link.removeAttribute('href');
+                    }
+                }
+            }
+            if (description) {
+                description.textContent = response.label || '';
+            }
+            if (editButton && response.change_url) {
+                editButton.href = `${response.change_url}?_edit_from_widget=1`;
+            }
+            clearButton?.classList.remove(hiddenClass);
+        };
+
+        // The widget's appearance when it holds no file
+        const showEmptyState = () => {
+            dropzone.classList.remove(objectAttachedClass);
+            lookupButton?.classList.remove('related-lookup-change');
+            editButton?.classList.remove('related-lookup-change');
+            message?.classList.remove(hiddenClass);
+        };
+
+        // Dropzone emits "removedfile" both when the user removes a file and when
+        // the code below discards previews it no longer needs. Only the former
+        // should clear the widget.
+        // Nesting level of the element the pointer is over while dragging, see
+        // the dragenter/dragleave handlers below
+        let dragDepth = 0;
+        let removingPreviews = false;
+        const discardPreviews = (dz) => {
+            removingPreviews = true;
+            dz.removeAllFiles(true);
+            removingPreviews = false;
+        };
+
         new Dropzone(dropzone, {
             url: dropzoneUrl,
             headers: { 'X-CSRFToken': getCsrfToken() },
@@ -84,12 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkMinWidth(dropzone);
 
                 this.on('removedfile', () => {
-                    if (fileChoose) {
-                        fileChoose.style.display = '';
+                    showFileRepresentation(true);
+                    if (removingPreviews) {
+                        return;
                     }
                     dropzone.classList.remove(objectAttachedClass);
-                    this.removeAllFiles();
+                    discardPreviews(this);
                     clearButton?.click();
+                    if (inputId) {
+                        const changeEvent = new Event('change', { bubbles: true });
+                        inputId.dispatchEvent(changeEvent);
+                    }
                 });
 
                 const images = this.element.querySelectorAll('img');
@@ -107,19 +179,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             },
+            dragenter: function () {
+                dragDepth += 1;
+                dropzone.classList.add(dragHoverClass);
+            },
+            dragleave: function () {
+                // dragleave also fires when the pointer moves from one of the
+                // dropzone's children to the next. Counting the enters keeps the
+                // drag state stable until the pointer really left (#1573).
+                dragDepth = Math.max(dragDepth - 1, 0);
+                if (dragDepth === 0) {
+                    dropzone.classList.remove(dragHoverClass);
+                }
+            },
+            dragend: function () {
+                dragDepth = 0;
+                dropzone.classList.remove(dragHoverClass);
+            },
             maxfilesexceeded: function () {
-                this.removeAllFiles(true);
+                discardPreviews(this);
+                showFileRepresentation(true);
             },
             drop: function () {
-                this.removeAllFiles(true);
-                clearButton?.click();
+                dragDepth = 0;
+                discardPreviews(this);
                 const progressEl = dropzone.querySelector(progressSelector);
                 if (progressEl) {
                     progressEl.classList.remove(hiddenClass);
                 }
-                if (fileChoose) {
-                    fileChoose.style.display = 'block';
-                }
+                // Hand the widget over to the dropzone preview for the duration of
+                // the upload. The current selection is kept until the upload
+                // succeeded, so that a failed upload leaves the widget untouched.
+                showFileRepresentation(false);
                 lookupButton?.classList.add('related-lookup-change');
                 editButton?.classList.add('related-lookup-change');
                 message?.classList.add(hiddenClass);
@@ -148,12 +239,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             wrapper.classList.remove(hiddenClass);
                         }
                     }
+                    // The upload is done: the widget shows the new file itself,
+                    // the dropzone preview is no longer needed.
+                    updateFileRepresentation(response);
+                    discardPreviews(this);
                 } else {
                     if (response && response.error) {
                         showError(`${file.name}: ${response.error}`);
                     }
-                    this.removeAllFiles(true);
+                    discardPreviews(this);
                 }
+                showFileRepresentation(true);
 
                 const images = this.element.querySelectorAll('img');
                 images.forEach((img) => {
@@ -168,9 +264,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const message = (msg && (msg.error || msg.message)) || msg;
 
                 showError(`${file.name}: ${message}`);
-                this.removeAllFiles(true);
+                // Restore the widget: the failed upload did not change the selection
+                discardPreviews(this);
+                showFileRepresentation(true);
+                if (!inputId?.value) {
+                    showEmptyState();
+                }
             },
             reset: function () {
+                // Dropzone resets when its last preview is removed - which also
+                // happens when a finished upload's preview is discarded. Only an
+                // actual removal by the user empties the widget.
+                if (removingPreviews) {
+                    return;
+                }
                 if (isImage) {
                     const wrapper = dropzone.querySelector(previewImageWrapperSelector);
                     if (wrapper) {
@@ -181,13 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         previewImg.style.backgroundImage = 'none';
                     }
                 }
-                dropzone.classList.remove(objectAttachedClass);
                 if (inputId) {
                     inputId.value = '';
                 }
-                lookupButton?.classList.remove('related-lookup-change');
-                editButton?.classList.remove('related-lookup-change');
-                message?.classList.remove(hiddenClass);
+                showEmptyState();
                 if (inputId) {
                     const changeEvent = new Event('change', { bubbles: true });
                     inputId.dispatchEvent(changeEvent);
