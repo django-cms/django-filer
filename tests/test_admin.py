@@ -1,5 +1,6 @@
 import json
 import os
+import unittest
 
 import django
 import django.core.files
@@ -27,13 +28,14 @@ from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
-from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
+from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL, FILER_THUMBNAIL_ICON_SIZE
 from filer.templatetags.filer_admin_tags import (
     django_version_gte,
     file_icon_url,
     get_aspect_ratio_and_download_url,
 )
 from filer.thumbnail_processors import normalize_subject_location
+from filer.utils.compatibility import PILImage
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 from tests.utils.extended_app.models import ExtImage, Video
@@ -413,14 +415,17 @@ class FilerImageAdminUrlsTests(TestCase):
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg'),  # missing file
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg', file=self.file_object.file),
             Image.objects.create(owner=self.superuser, original_filename='some-image.svg', file=self.file_object.file),
+            # SVGs are not necessarily stored as Image, see #1590
+            File.objects.create(owner=self.superuser, original_filename='some-file.svg', file=self.file_object.file),
         ]
         test_set = [
-            (files[0], 'text/plain', None),
-            (files[1], 'image/jpeg', None),
-            (files[2], 'image/jpeg', files[2].file.url),
-            (files[3], 'image/svg+xml', reverse(admin_urlname(Image._meta, 'expand'), args=(files[3].pk,))),
+            (files[0], 'text/plain', False),
+            (files[1], 'image/jpeg', False),
+            (files[2], 'image/jpeg', True),
+            (files[3], 'image/svg+xml', True),
+            (files[4], 'image/svg+xml', True),
         ]
-        for file, mime_type, expected_url in test_set:
+        for file, mime_type, has_expand_link in test_set:
             file.mime_type = mime_type
             file.save()
             models = [File]
@@ -429,10 +434,15 @@ class FilerImageAdminUrlsTests(TestCase):
             for model in models:
                 response = self.client.get(reverse(admin_urlname(model._meta, 'change'),
                                                    kwargs={'object_id': file.pk}))
-                if expected_url:
+                if not has_expand_link:
+                    self.assertNotContains(response, 'filer-icon-expand')
+                elif 'svg' in mime_type:
+                    # Each admin links to its own expand view, so that the file can be
+                    # looked up by the model the admin is registered for
+                    expected_url = reverse(admin_urlname(model._meta, 'expand'), args=(file.pk,))
                     self.assertContains(response, f'href="{expected_url}"')
                 else:
-                    self.assertNotContains(response, 'filer-icon-expand')
+                    self.assertContains(response, f'href="{file.file.url}"')
 
     def test_image_expand_view(self):
         url = reverse(admin_urlname(Image._meta, 'expand'), kwargs={
@@ -446,6 +456,62 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(
             response,
             f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
+        )
+
+    def test_file_expand_view(self):
+        """SVGs stored as File (not Image) have an expand view, too, see #1590"""
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            mime_type='image/svg+xml',
+        )
+        url = reverse(admin_urlname(File._meta, 'expand'), kwargs={'file_id': file.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(url, file.get_admin_expand_view_url())
+        self.assertContains(
+            response,
+            f"""<img id="img" src="{file.url}" onclick="this.classList.toggle('zoom')"/>"""
+        )
+
+    def test_expand_view_requires_read_permission(self):
+        """The expand view does not disclose files the user may not read"""
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            mime_type='image/svg+xml',
+            folder=Folder.objects.create(name='svgs', owner=self.superuser),
+        )
+        url = reverse(admin_urlname(File._meta, 'expand'), kwargs={'file_id': file.pk})
+
+        with unittest.mock.patch.object(File, 'has_read_permission', return_value=False):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_directory_listing_with_svg_file(self):
+        """A folder containing an SVG stored as File can be listed, see #1590"""
+        folder = Folder.objects.create(name='svgs', owner=self.superuser)
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            folder=folder,
+        )
+        # The MIME type is what counts, it is reset when the file contents change
+        file.mime_type = 'image/svg+xml'
+        file.save()
+
+        response = self.client.get(reverse('admin:filer-directory_listing',
+                                           kwargs={'folder_id': folder.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse(admin_urlname(File._meta, 'expand'), args=(file.pk,)),
         )
 
 
@@ -511,6 +577,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+
+    def test_filer_upload_response(self):
+        """The upload response carries what the file widget needs to show the new file"""
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            response = self.client.post(url, {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key,
+            })
+
+        image = Image.objects.get()
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {
+                'thumbnail': None,
+                'alt_text': '',
+                'label': str(image),
+                'file_id': image.pk,
+                'change_url': image.get_admin_change_url(),
+                'thumbnail_180': reverse('admin:filer_image_fileicon',
+                                         args=(image.pk, FILER_THUMBNAIL_ICON_SIZE)),
+                'original_image': image.url,
+            },
+        )
 
     def test_filer_upload_video(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
@@ -629,6 +722,41 @@ class FilerClipboardAdminUrlsTests(TestCase):
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    @unittest.skipUnless(
+        ".avif" in PILImage.registered_extensions(),
+        "Pillow does not support AVIF",
+    )
+    def test_filer_ajax_upload_avif_file(self):
+        """AVIF uploads are recognized as images (and thumbnailed) if Pillow can
+        decode them, see https://github.com/django-cms/django-filer/issues/1560"""
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        avif_name = 'test_file.avif'
+        avif_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, avif_name)
+        self.img.save(avif_filename, 'AVIF')
+        try:
+            with open(avif_filename, 'rb') as fh:
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % avif_name
+                self.client.post(
+                    url,
+                    data=fh.read(),
+                    content_type='image/avif',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+        finally:
+            os.remove(avif_filename)
+
+        self.assertEqual(Image.objects.count(), 1)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, avif_name)
+        self.assertEqual(stored_image.mime_type, 'image/avif')
+        self.assertEqual((stored_image.width, stored_image.height), self.img.size)
+        # Thumbnails are generated from the avif original
+        self.assertTrue(stored_image.icons)
 
     def test_filer_ajax_decompression_bomb(self):
         DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS

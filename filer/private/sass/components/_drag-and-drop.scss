@@ -33,23 +33,22 @@ form .form-row {
             bottom: 0;
             left: 0;
         }
+        // A file being dragged over the widget only recolors its background.
+        // Hiding the widget's content instead - or growing its border - moves
+        // what is under the cursor, and the dragleave/dragenter storm that
+        // follows makes the dropzone flicker (#1573).
         &.dz-drag-hover {
-            background-color: $color-primary;
-            filter: brightness(1.5);
-            border: solid 2px $color-primary !important;
+            background-color: $gray-darker;
+            border-color: $gray-darker;
             .z-index-fix {
                 z-index: 1;
             }
-            .dz-message {
-                opacity: 1;
-                display: block !important;
-                visibility: visible;
-            }
-            .filerFile {
-                display: none;
-            }
             .dz-message, .dz-message .icon {
-                color: $color-primary !important;
+                color: $btn-action-color !important;
+            }
+            .filerFile .description_text,
+            .filerFile .dz-name {
+                color: $btn-action-color;
             }
         }
         &.dz-started .fileUpload {

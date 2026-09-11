@@ -257,6 +257,11 @@ To activate it, register it for the image mime types you want sanitized:
     django-filer[heif]``) and register the sanitizer for ``image/heic`` /
     ``image/heif``.
 
+    ``strip_exif`` keeps the encoding parameters of JPEG and WebP images. For
+    other lossy formats — ``image/avif`` and ``image/heic`` among them — it
+    re-encodes with Pillow's defaults, which costs image quality. Only register
+    it for those MIME types if that trade-off is acceptable.
+
 Block other MIME types
 ----------------------
 
