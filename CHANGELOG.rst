@@ -40,6 +40,13 @@ CHANGELOG
   element-qualified CSS selectors expect, and keep the legacy
   ``<div class="breadcrumbs">`` markup on older versions.
 * ci: Test against Django 6.0 and 6.1.
+* fix: The expand view for SVG images is now registered on ``FileAdmin`` instead of only
+  on ``ImageAdmin``. SVGs are not necessarily stored as ``Image`` instances, and listing
+  a folder containing such a file raised
+  ``NoReverseMatch: Reverse for 'filer_file_expand' not found`` (#1590). The change view
+  of a file now also links to its own admin's expand view instead of always linking to
+  the image admin's. The expand view now checks read permissions, just like the icon and
+  change views.
 * fix: Dropping a file on the admin file widget no longer stacks the upload preview
   on top of the widget's own markup, which left two files visible and covered the
   widget's buttons (#1573). The widget now shows the uploaded file itself - thumbnail,
