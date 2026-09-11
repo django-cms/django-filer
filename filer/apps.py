@@ -29,6 +29,38 @@ class FilerConfig(AppConfig):
             # No heif support installed
             pass
 
+    def register_optional_avif_support(self):
+        """Pillow decodes AVIF itself since Pillow 11.3 (its wheels bundle libaom and
+        dav1d). For older Pillow versions the optional pillow-avif-plugin package
+        provides the same plugin."""
+        from PIL import Image
+
+        try:  # pragma: no cover
+            import pillow_avif  # noqa: F401
+        except (ModuleNotFoundError, ImportError):
+            # No pillow-avif-plugin installed: Pillow's own AVIF plugin (if any) is used
+            pass
+
+        # registered_extensions() imports Pillow's plugins. Pillow only registers the
+        # extensions if the AVIF codec actually is available.
+        if ".avif" not in Image.registered_extensions():  # pragma: no cover
+            # No AVIF support: leave avif files as plain files, they could not be
+            # thumbnailed anyway
+            return
+
+        from .settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
+
+        AVIF_EXTENSIONS = [".avif", ".avifs"]
+        # Add extensions to python mimetypes which filer uses
+        for ext in AVIF_EXTENSIONS:
+            mimetypes.add_type("image/avif", ext)
+        # Mark them as images
+        for ext in AVIF_EXTENSIONS:
+            if ext not in IMAGE_EXTENSIONS:
+                IMAGE_EXTENSIONS.append(ext)
+        if "avif" not in IMAGE_MIME_TYPES:
+            IMAGE_MIME_TYPES.append("avif")
+
     def resolve_validators(self):
         """Resolve dotted path file validators"""
 
@@ -62,6 +94,9 @@ class FilerConfig(AppConfig):
     def ready(self):
         # Make webp MIME type known to python (needed for python < 3.11)
         mimetypes.add_type("image/webp", ".webp")
+        # Make avif MIME type known to python (needed for older python versions)
+        mimetypes.add_type("image/avif", ".avif")
         #
         self.resolve_validators()
         self.register_optional_heif_supprt()
+        self.register_optional_avif_support()

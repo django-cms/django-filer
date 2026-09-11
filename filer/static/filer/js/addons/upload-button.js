@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { getCsrfToken } from './csrf.js';
+
 /* globals Cl */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -67,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Dropzone.autoDiscover = false;
     const dropzone = new Dropzone(uploadButton, {
         url: uploadUrl,
+        headers: { 'X-CSRFToken': getCsrfToken() },
         paramName: 'file',
         maxFilesize: maxFilesize,  // already in MB
         parallelUploads: maxUploaderConnections,

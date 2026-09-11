@@ -2,6 +2,9 @@
 Pillow
 pillow-heif
 django-app-helper>=3.3.1
+# Optional: the SVG renderer behind the django-filer[svg] extra. The test suite
+# passes without it too; OptionalDependencyTests guards that it stays optional.
+easy-thumbnails[svg]
 
 # other requirements
 coverage
