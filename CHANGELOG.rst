@@ -55,6 +55,16 @@ CHANGELOG
   ``change_url`` key for this.
 * fix: The file widget's clear button works again in widgets that are added to the page
   after it loaded, e.g. in Django admin inline formsets.
+* fix: Raw (XMLHttpRequest) uploads with a missing or malformed ``Content-Length`` header,
+  or that no upload handler accepts, are answered with 400 instead of raising
+  ``KeyError``, ``TypeError`` or ``UnboundLocalError``.
+* fix: The directory listing no longer creates and loads the user's clipboard on every
+  request. The clipboard object was not used, so this saves three queries per listing.
+* fix: Close the file handles used by the protected file server and by the
+  ``filer_import`` management command.
+* fix: Remove the dead ``var _actions_icnt`` inline scripts from the listing templates.
+  Django's admin ``actions.js`` reads ``data-actions-icnt``, which the templates already
+  provide, so the widely disallowed inline script served no purpose.
 * fix: A file dragged over the file widget now only recolors the widget's background in
   the admin's primary color. The widget used to hide its content and grow its border,
   which moved what was under the cursor and made the widget flicker between its drop
