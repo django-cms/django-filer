@@ -5,6 +5,18 @@ CHANGELOG
 3.6.0 (unreleased)
 ==================
 
+* feat: Support avif images. ``*.avif`` and ``*.avifs`` uploads now become
+  ``Image`` objects (with dimensions, thumbnails and use in image fields) if Pillow
+  can decode them: natively since Pillow 11.3, or through the optional
+  ``pillow-avif-plugin`` package (``pip install django-filer[avif]``) for older
+  Pillow versions.
+
+.. note::
+
+   avif files that were uploaded *before* upgrading remain regular ``File`` objects:
+   filer picks the model class when a file is uploaded. Re-upload them to turn them
+   into ``Image`` objects.
+
 * feat: SVG support no longer requires an SVG renderer. filer reads an SVG's size
   from the document and thumbnails it by rewriting ``width``, ``height`` and
   ``viewBox`` on the root element, which keeps the vector data intact instead of

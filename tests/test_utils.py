@@ -8,7 +8,8 @@ from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
-from filer.settings import IMAGE_EXTENSIONS
+from filer.settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
+from filer.utils.compatibility import PILImage
 from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
 from filer.utils.files import (
     UploadException,
@@ -82,6 +83,20 @@ class MimeTypesTestCase(TestCase):
         for ext in IMAGE_EXTENSIONS:
             self.assertIsNotNone(mimetypes.guess_type(f"file{ext}")[0],
                                  f"Mime type for extension {ext} unknown")
+
+
+class AvifSupportTestCase(TestCase):
+    def test_avif_is_an_image_type_if_pillow_supports_it(self):
+        """avif is registered as an image type if, and only if, Pillow can decode it
+        (natively since Pillow 11.3, or through the pillow-avif-plugin package)"""
+        supported = ".avif" in PILImage.registered_extensions()
+
+        self.assertEqual(supported, ".avif" in IMAGE_EXTENSIONS)
+        self.assertEqual(supported, ".avifs" in IMAGE_EXTENSIONS)
+        self.assertEqual(supported, "avif" in IMAGE_MIME_TYPES)
+
+    def test_avif_mime_type_known(self):
+        self.assertEqual(mimetypes.guess_type("file.avif")[0], "image/avif")
 
 
 class ThumbnailToOriginalFilenameTestCase(TestCase):
