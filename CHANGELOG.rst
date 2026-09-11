@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-3.6.0 (unreleased)
+3.6.0 (2026-09-12)
 ==================
 
 * feat: Support avif images. ``*.avif`` and ``*.avifs`` uploads now become
