@@ -75,6 +75,7 @@ If heif support is chosen, django-filer also installs
 If avif support is chosen, django-filer also installs
 
 * pillow-avif-plugin (only needed for Pillow < 11.3)
+
 If the optional SVG renderer is chosen, django-filer also installs
 
 * svglib

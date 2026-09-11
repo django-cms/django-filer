@@ -1,6 +1,5 @@
 import json
 import os
-from unittest import mock
 import unittest
 
 import django
@@ -486,7 +485,7 @@ class FilerImageAdminUrlsTests(TestCase):
         )
         url = reverse(admin_urlname(File._meta, 'expand'), kwargs={'file_id': file.pk})
 
-        with mock.patch.object(File, 'has_read_permission', return_value=False):
+        with unittest.mock.patch.object(File, 'has_read_permission', return_value=False):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
