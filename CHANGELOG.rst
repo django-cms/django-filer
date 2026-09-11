@@ -5,6 +5,36 @@ CHANGELOG
 3.6.0 (unreleased)
 ==================
 
+* feat: Support avif images. ``*.avif`` and ``*.avifs`` uploads now become
+  ``Image`` objects (with dimensions, thumbnails and use in image fields) if Pillow
+  can decode them: natively since Pillow 11.3, or through the optional
+  ``pillow-avif-plugin`` package (``pip install django-filer[avif]``) for older
+  Pillow versions.
+
+.. note::
+
+   avif files that were uploaded *before* upgrading remain regular ``File`` objects:
+   filer picks the model class when a file is uploaded. Re-upload them to turn them
+   into ``Image`` objects.
+
+* feat: SVG support no longer requires an SVG renderer. filer reads an SVG's size
+  from the document and thumbnails it by rewriting ``width``, ``height`` and
+  ``viewBox`` on the root element, which keeps the vector data intact instead of
+  re-drawing it. ``easy-thumbnails[svg]`` - and with it svglib, reportlab and lxml,
+  around 14 MB - moved from a hard dependency to the new ``django-filer[svg]``
+  extra (#1547).
+* fix: SVG thumbnails without a ``viewBox`` were scaled by growing the canvas
+  rather than the drawing.
+* fix: An SVG stating only one of ``width`` and ``height`` alongside a ``viewBox``
+  now keeps the dimension it states and derives the other from the viewBox's
+  aspect ratio, the way a browser sizes it. The renderer reported the viewBox's
+  own height instead, which does not match how the image is drawn.
+* fix: When an image's dimensions could not be read, the file object was left at
+  its end, so upload validators that inspect the content saw an empty file.
+* fix: SVG documents nesting elements more than
+  ``filer.utils.svg.MAX_NESTING_DEPTH`` (100) levels deep are refused. Writing
+  such a document out recurses once per level and would exhaust the stack while
+  a thumbnail is generated. Real documents nest a handful of levels.
 * feat: Add support for Django 6.1. The admin breadcrumbs now render as
   ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
   element-qualified CSS selectors expect, and keep the legacy
@@ -17,9 +47,33 @@ CHANGELOG
   of a file now also links to its own admin's expand view instead of always linking to
   the image admin's. The expand view now checks read permissions, just like the icon and
   change views.
+* fix: Dropping a file on the admin file widget no longer stacks the upload preview
+  on top of the widget's own markup, which left two files visible and covered the
+  widget's buttons (#1573). The widget now shows the uploaded file itself - thumbnail,
+  label, and working lookup, edit and clear buttons - as it does after a reload, and a
+  failed upload leaves the previous selection untouched. The upload response gained a
+  ``change_url`` key for this.
+* fix: The file widget's clear button works again in widgets that are added to the page
+  after it loaded, e.g. in Django admin inline formsets.
+* fix: A file dragged over the file widget now only recolors the widget's background in
+  the admin's primary color. The widget used to hide its content and grow its border,
+  which moved what was under the cursor and made the widget flicker between its drop
+  state and the file it holds.
 * fix: Send the CSRF token with uploads started from the "Upload Files" button in the
   folder view. Since 3.5.1 the upload endpoint enforces CSRF, but this uploader had not
   been updated and every upload from it failed with "CSRF token missing" (#1617).
+
+.. note::
+
+   Existing installations keep SVG support unchanged: upgrading does not always uninstall
+   svglib or reportlab. Fresh installs and re-locked dependency files no longer get
+   them. The only documents that still need them are those whose size cannot be read
+   from the markup, for example ``width="100%"`` without a ``viewBox``; install
+   ``django-filer[svg]`` if your project has such files. Thumbnails generated from
+   now on are the original document rescaled rather than a reportlab rendering of
+   it - existing cached thumbnails keep their file names and are still served.
+   Installing the extra only ever adds documents filer can size; it never accepts
+   a document filer rejects, so it cannot weaken the SVG upload checks.
 
 .. note::
 

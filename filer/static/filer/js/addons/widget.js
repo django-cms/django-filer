@@ -2,9 +2,12 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const filer_clear = (ev) => {
+        const clearer = ev.target.closest('.filerFile .filerClearer');
+        if (!clearer) {
+            return;
+        }
         ev.preventDefault();
 
-        const clearer = ev.currentTarget;
         const container = clearer.closest('.filerFile');
         if (!container) {
             return;
@@ -48,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         field.setAttribute('type', 'hidden');
     });
 
-    // Remove any existing handlers and add new ones
-    const clearers = document.querySelectorAll('.filerFile .filerClearer');
-    clearers.forEach((clearer) => {
-        clearer.addEventListener('click', filer_clear);
-    });
+    // Delegated: also covers widgets added later, e.g. by inline formsets, and
+    // the clear button of the dropzone's upload preview
+    document.addEventListener('click', filer_clear);
 });
