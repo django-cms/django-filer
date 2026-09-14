@@ -470,6 +470,14 @@ def test_delete_file(admin_client, ambit, uploaded_file, api_url):
     assert FileModel.objects.filter(id=uploaded_file.id).exists() is False
 
 
+def test_delete_file_anonymously(client, ambit, uploaded_file, api_url):
+    """An anonymous request must not be allowed to delete a file."""
+    assert '_auth_user_id' not in client.session
+    response = client.delete(f'{api_url}{uploaded_file.id}/change')
+    assert FileModel.objects.filter(id=uploaded_file.id).exists() is True
+    assert response.status_code == 403
+
+
 def test_crop_image(admin_client, ambit, uploaded_image, api_url):
     response = admin_client.post(f'{api_url}{uploaded_image.id}/crop', {'width': 120, 'height': 60})
     assert response.status_code == 200
