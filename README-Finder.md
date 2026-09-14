@@ -307,7 +307,7 @@ or set up the ambits yourself instead:
 FINDER_CREATE_DEFAULT_AMBIT = False
 ```
 
-The setting is only read while `finder.0002_default_ambit` is applied, so it has to be in
+The setting is only read while `finder.0001_initial` is applied, so it has to be in
 place before you migrate for the first time.
 
 Create further ambits with the configuration above:

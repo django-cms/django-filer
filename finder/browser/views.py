@@ -76,6 +76,23 @@ class BrowserView(View):
         else:
             return AccessControlEntry.objects.privilege_subquery_exists(user, Privilege.READ)
 
+    def _get_inode(self, request, inode_id, privilege, **lookup):
+        """
+        Look an inode up, refusing unless the caller holds `privilege` on its folder.
+
+        Refused the same way as an unknown ambit, so that neither the existence of an
+        inode nor the reason for the refusal can be read off the response.
+        """
+        try:
+            inode = FileModel.objects.get_inode(id=inode_id, **lookup)
+        except ObjectDoesNotExist:
+            logger.warning("No inode “%s”.", inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        if not inode.folder.has_permission(request.user, privilege):
+            logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
+            raise PermissionDenied(self.access_denied_message)
+        return inode
+
     #: Sent both when an ambit does not exist and when it may not be read, so that the
     #: response cannot be used to find out which ambits a site has configured.
     access_denied_message = _("You do not have permission to browse this folder tree.")
@@ -157,24 +174,6 @@ class BrowserView(View):
             'last_folder': last_folder_id,
             **self.list(request, last_folder_id),
         }
-
-    def _get_inode(self, request, inode_id, privilege, **lookup):
-        """
-        Look an inode up, refusing unless the caller holds `privilege` on its folder.
-
-        Refused the same way as an unknown ambit, so that neither the existence of an
-        inode nor the reason for the refusal can be read off the response.
-        """
-        try:
-            inode = FileModel.objects.get_inode(id=inode_id, **lookup)
-        except ObjectDoesNotExist:
-            logger.warning("No inode “%s”.", inode_id)
-            raise PermissionDenied(self.access_denied_message)
-        folder = inode if inode.is_folder else inode.folder
-        if not folder.has_permission(request.user, privilege):
-            logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
-            raise PermissionDenied(self.access_denied_message)
-        return inode
 
     @method_decorator(require_GET)
     def fetch(self, request, inode_id):

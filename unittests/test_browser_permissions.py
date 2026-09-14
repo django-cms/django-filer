@@ -99,7 +99,7 @@ class TestAnonymousAccess:
     """
     The “everyone” entry means every *signed in* user.
 
-    `manage.py finder add-ambit` and `finder.0002_default_ambit` grant READ_WRITE to
+    `manage.py finder add-ambit` and `finder.0001_initial` grant READ_WRITE to
     everyone, so without this rule a fresh installation would publish its folder tree —
     and its delete endpoint — to the internet.
     """

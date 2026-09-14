@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from django.apps import apps as global_apps
-from django.db import connection
+from django.db import connection, migrations
 
 from finder.models.ambit import AmbitModel
 from finder.models.folder import FolderModel, ROOT_FOLDER_NAME
@@ -17,7 +17,7 @@ from finder.models.permission import AccessControlEntry, DefaultAccessControlEnt
 from finder import checks
 from finder.settings import FINDER_DEFAULT_AMBIT
 
-migration = import_module('finder.migrations.0002_default_ambit')
+migration = import_module('finder.migrations.0001_initial')
 
 pytestmark = pytest.mark.django_db
 
@@ -89,8 +89,11 @@ class TestCreateDefaultAmbit:
         assert AmbitModel.objects.count() == 1
 
     def test_the_migration_is_reversible(self):
-        """A `RunPython` without a reverse callable would block `migrate finder 0001`."""
-        operation = migration.Migration.operations[0]
+        """A `RunPython` without a reverse callable would block `migrate finder zero`."""
+        operation = next(
+            op for op in migration.Migration.operations
+            if isinstance(op, migrations.RunPython)
+        )
         assert operation.reversible
 
 

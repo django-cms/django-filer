@@ -4,7 +4,7 @@ from django.conf import settings as django_settings
 # Default ambit slug to use when no ambit is specified
 # This should match the slug of an AmbitModel instance in your database
 # Slug of the ambit a `FinderFileField`/`FinderFolderField` refers to when it declares
-# none of its own, and the one `finder.0002_default_ambit` creates. It matches the
+# none of its own, and the one `finder.0001_initial` creates. It matches the
 # `finder_public`/`finder_public_samples` storages an ambit defaults to.
 FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'public')
 
