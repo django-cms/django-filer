@@ -1,6 +1,7 @@
 import pytest
 from io import BytesIO
 
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from finder.contrib.image.svg.models import SVGImageModel
@@ -17,6 +18,25 @@ SIMPLE_SVG = (
 
 def make_svg(markup=SIMPLE_SVG, name='test_image.svg'):
     return SimpleUploadedFile(name, markup.encode(), content_type='image/svg+xml')
+
+
+def break_stored_svg(ambit, owner, name, markup='<svg><rect></svg>'):
+    """
+    Upload a sound SVG, then replace the stored document with an unparseable one.
+
+    The sanitizing validator rejects a malformed SVG on upload, so a document this
+    broken can only reach the storage afterwards — by an outside write, or by having
+    been stored before the validator existed.
+    """
+    image = SVGImageModel.objects.create_from_upload(
+        ambit,
+        make_svg(name=name),
+        folder=ambit.root_folder,
+        owner=owner,
+    )
+    ambit.original_storage.delete(image.file_path)
+    ambit.original_storage.save(image.file_path, ContentFile(markup.encode()))
+    return image
 
 
 @pytest.fixture
@@ -242,21 +262,11 @@ class TestSVGImageModel:
         assert thumbnail.viewbox[0] == pytest.approx(0.0)
         assert thumbnail.viewbox[2] == pytest.approx(24.0)
 
-    def test_crop_reports_unparseable_documents(self, ambit, admin_user, without_svg_sanitizer):
-        image = SVGImageModel.objects.create_from_upload(
-            ambit,
-            make_svg('<svg><rect></svg>', name='broken.svg'),
-            folder=ambit.root_folder,
-            owner=admin_user,
-        )
+    def test_crop_reports_unparseable_documents(self, ambit, admin_user):
+        image = break_stored_svg(ambit, admin_user, name='broken.svg')
         with pytest.raises(FileValidationError):
             image.crop(ambit, f'{image.id}/broken__180x180.svg', 180, 180)
 
-    def test_broken_document_falls_back_to_the_icon(self, ambit, admin_user, without_svg_sanitizer):
-        image = SVGImageModel.objects.create_from_upload(
-            ambit,
-            make_svg('<svg><rect></svg>', name='broken2.svg'),
-            folder=ambit.root_folder,
-            owner=admin_user,
-        )
+    def test_broken_document_falls_back_to_the_icon(self, ambit, admin_user):
+        image = break_stored_svg(ambit, admin_user, name='broken2.svg')
         assert image.get_thumbnail_url(ambit) == image.fallback_thumbnail_url

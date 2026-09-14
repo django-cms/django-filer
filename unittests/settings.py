@@ -148,6 +148,9 @@ if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
         },
     }
 
+# the fixtures create the ambits they need, an implicit one would only add noise
+FINDER_CREATE_DEFAULT_AMBIT = False
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 USE_TZ = True

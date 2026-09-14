@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import NoReverseMatch, path, reverse
 from django.views.i18n import JavaScriptCatalog
 
 from finder.browser.views import BrowserView
@@ -53,3 +53,17 @@ urlpatterns = [
         name="base-url",
     ),
 ]
+
+
+def reverse_api(viewname):
+    """
+    Reverse one of the endpoints above.
+
+    The admin serves them below ``finder-api/`` (see ``finder.admin.ambit.get_urls``), but
+    a project may additionally include this module in its own URLconf. That mount is
+    preferred here, because it is the explicit one and it does not live below ``admin/``.
+    """
+    try:
+        return reverse(f'finder-api:{viewname}')
+    except NoReverseMatch:
+        return reverse(f'admin:finder-api:{viewname}')
