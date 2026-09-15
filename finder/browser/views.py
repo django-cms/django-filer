@@ -87,7 +87,7 @@ class BrowserView(View):
             inode = FileModel.objects.get_inode(id=inode_id, **lookup)
         except ObjectDoesNotExist:
             logger.warning("No inode “%s”.", inode_id)
-            raise PermissionDenied(self.access_denied_message)
+            raise
         if not inode.folder.has_permission(request.user, privilege):
             logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
             raise PermissionDenied(self.access_denied_message)
@@ -113,7 +113,7 @@ class BrowserView(View):
                 "widget, or FINDER_DEFAULT_AMBIT if the field declares none. Run "
                 "`manage.py finder list-ambits` to see the configured ones.", slug,
             )
-            raise PermissionDenied(self.access_denied_message)
+            raise
         if not ambit.root_folder.has_permission(request.user, Privilege.READ):
             logger.warning("“%s” may not read the root folder of ambit “%s”.", request.user, slug)
             raise PermissionDenied(self.access_denied_message)

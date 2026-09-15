@@ -1,5 +1,6 @@
 from django.contrib.admin.sites import all_sites
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import InvalidStorageError, storages
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -10,6 +11,7 @@ from finder.models.file import FileModel as FinderFileModel
 from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_NAME
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
+from finder.storages import UUID4_PATTERN
 
 
 class Command(BaseCommand):
@@ -31,6 +33,11 @@ class Command(BaseCommand):
         delete_ambit_parser = subparsers.add_parser('delete-ambit', help="Delete a named ambit.")
         delete_ambit_parser.add_argument('slug', action='store', type=str)
         delete_ambit_parser.add_argument('--erase-files', action='store_true', help="Erase files from storage.")
+        delete_orphans_parser = subparsers.add_parser('delete-orphans', help="Delete orphaned files from storage system.")
+        delete_orphans_parser.add_argument('slug', nargs='?', action='store', type=str)
+        delete_orphans_parser.add_argument('--dry-run', action='store_true', help="Show what would be deleted. Perform a dry run without erasing files from storage.")
+        delete_missing_parser = subparsers.add_parser('delete-missing', help="Delete missing files from database.")
+        delete_missing_parser.add_argument('--dry-run', action='store_true', help="Show what would be deleted. Perform a dry run without deleting files from database.")
 
     def handle(self, verbosity, *args, **options):
         self.verbosity = verbosity
@@ -60,6 +67,16 @@ class Command(BaseCommand):
                     self.delete_ambit(**options)
                 except Exception as exc:
                     self.stderr.write(f"Error while deleting ambit: ‘{exc}’")
+        elif subcommand == 'delete-orphans':
+            try:
+                self.delete_orphans(**options)
+            except Exception as exc:
+                self.stderr.write(f"Error while deleting orphans: ‘{exc}’")
+        elif subcommand == 'delete-missing':
+            try:
+                self.delete_missing(**options)
+            except Exception as exc:
+                self.stderr.write(f"Error while deleting missing files: ‘{exc}’")
         else:
             self.stderr.write(f"Unknown subcommand ‘{subcommand}’")
 
@@ -179,3 +196,44 @@ class Command(BaseCommand):
         delete_recursive(ambit.root_folder)
         ambit.delete()
         self.stdout.write(f"Successfully deleted ambit with slug ‘{slug}’.")
+
+    def delete_orphans(self, **options):
+        def delete_orphans_in_ambit(directory=''):
+            directories, files = ambit.original_storage.listdir(directory)
+            for file_name in files:
+                try:
+                    file_obj = FinderFileModel.objects.get_inode(id=directory, is_folder=False, file_name=file_name)
+                    if file_obj.folder.get_ambit().id != ambit.id:
+                        self.stdout.write(f"File found in wrong ambit: {file_path}")
+                except ObjectDoesNotExist:
+                    file_path = f'{directory}/{file_name}' if directory else file_name
+                    if dry_run:
+                        self.stdout.write(f"Orphaned file: {file_path}")
+                    else:
+                        ambit.original_storage.delete(file_path)
+                        self.stdout.write(f"Deleted orphaned file: {file_path}")
+            for subdirectory in directories:
+                if match := UUID4_PATTERN.match(subdirectory):
+                    delete_orphans_in_ambit(match.group(0))
+                else:
+                    delete_orphans_in_ambit(f'{directory}/{subdirectory}' if directory else subdirectory)
+
+        dry_run = options.get('dry_run', False)
+        if slug := options.pop('slug'):
+            ambit = AmbitModel.objects.get(slug=slug)
+            delete_orphans_in_ambit()
+        else:
+            for ambit in AmbitModel.objects.all():
+                delete_orphans_in_ambit()
+
+    def delete_missing(self, **options):
+        dry_run = options.get('dry_run', False)
+        for entry in FinderFolderModel.objects.filter_unified(is_folder=False).iterator():
+            ambit = FinderFolderModel.objects.get(id=entry['parent']).get_ambit()
+            file_path = '{id}/{file_name}'.format(**entry)
+            if not ambit.original_storage.exists(file_path):
+                if dry_run:
+                    self.stdout.write(f"Missing entry in database: {file_path}")
+                else:
+                    entry.delete()
+                    self.stdout.write(f"Deleted missing entry from database: {file_path}")
