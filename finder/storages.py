@@ -1,4 +1,5 @@
 import logging
+import re
 import uuid
 from pathlib import Path
 
@@ -7,6 +8,8 @@ from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.files.temp import NamedTemporaryFile
 from django.utils.module_loading import import_string
+
+UUID4_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
 
 
 class FinderSystemStorage(FileSystemStorage):
@@ -19,7 +22,10 @@ class FinderSystemStorage(FileSystemStorage):
 
     def path(self, name):
         parts = name.split('/', 1)
-        id = str(uuid.UUID(parts[0]))  # enforce valid UUID
+        if match := UUID4_PATTERN.match(parts[0]):
+            id = str(uuid.UUID(match.group(0)))  # enforce valid UUID
+        else:
+            return super().path(name)
         filename = '' if len(parts) == 1 else parts[1]
         name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
         return super().path(name)
