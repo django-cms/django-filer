@@ -30,7 +30,7 @@
     "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "react-image-crop": "^11.0.10",
+    "react-image-crop": "^11.1.2",
     "react-intersection-observer": "^9.13.1",
     "react-player": "^2.16.1",
     "request": "^2.88.2",
