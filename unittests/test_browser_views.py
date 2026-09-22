@@ -295,8 +295,8 @@ def test_list_files_paginated(admin_client, ambit, admin_user, monkeypatch, api_
 
 def test_list_without_upload_permission(staff_client, ambit, sub_folder, api_url):
     response = staff_client.get(f'{api_url}{sub_folder.id}/list')
-    assert response.status_code == 200
-    assert response.json()['has_upload_permission'] is False
+    assert response.status_code == 403
+    assert response.content.decode() == "You do not have permission to browse this folder tree."
 
 
 def test_search_without_query(admin_client, ambit, api_url):

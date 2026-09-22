@@ -58,8 +58,9 @@ class TestWithoutPermission:
                                                       missing_inode_id):
         """The response must not reveal whether the inode exists."""
         unknown = client.get(f'{base_url}{missing_inode_id}/fetch')
-        assert unknown.status_code == 403
-        assert unknown.content.decode() == FORBIDDEN
+        assert unknown.status_code == 404
+        expected = f"No inode found matching the given lookup: {{'id': UUID('{missing_inode_id}')}}."
+        assert unknown.content.decode() == expected
 
 
 class TestWithReadPermission:
