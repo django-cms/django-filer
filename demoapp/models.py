@@ -5,7 +5,7 @@ from finder.models.fields import FinderFileField, FinderFolderField
 
 class DemoAppModel(models.Model):
     file = FinderFileField(
-        models.SET_DEFAULT,
+        models.PROTECT,
         verbose_name="Demo File",
         null=True,
         blank=True,

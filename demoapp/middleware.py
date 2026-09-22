@@ -8,7 +8,7 @@ class AutoLoginMiddleware(MiddlewareMixin):
     """
 
     def process_request(self, request):
-        admin_user = get_user_model().objects.first()
+        admin_user = get_user_model().objects.filter(is_staff=True).last()
         if not admin_user:
             admin_user = get_user_model().objects.create_user(
                 username='admin',

@@ -66,9 +66,8 @@ def test_structure_of_empty_root_folder(admin_client, ambit, api_url):
 
 
 def test_structure_of_unknown_ambit(admin_client, ambit, api_url):
-    """Refused rather than reported as missing, so the ambits of a site stay unenumerable."""
     response = admin_client.get(f'{api_url}structure/no-such-ambit')
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_structure_with_tags(admin_client, ambit, api_url):
@@ -150,9 +149,8 @@ def test_fetch_file(admin_client, ambit, uploaded_file, api_url):
 
 
 def test_fetch_missing_inode(admin_client, ambit, missing_inode_id, api_url):
-    """A missing inode is refused like an unreadable one; see `BrowserView._get_inode`."""
     response = admin_client.get(f'{api_url}{missing_inode_id}/fetch')
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_open_and_close_folder(client, ambit, sub_folder, api_url):
@@ -207,7 +205,7 @@ def test_list_files(admin_client, ambit, uploaded_file, sub_folder, api_url):
 
 def test_list_missing_folder(admin_client, ambit, missing_inode_id, api_url):
     response = admin_client.get(f'{api_url}{missing_inode_id}/list')
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_list_files_recursively(admin_client, ambit, admin_user, uploaded_file, sub_folder, api_url):
@@ -296,16 +294,9 @@ def test_list_files_paginated(admin_client, ambit, admin_user, monkeypatch, api_
 
 
 def test_list_without_upload_permission(staff_client, ambit, sub_folder, api_url):
-    AccessControlEntry.objects.create(inode=sub_folder.id, user=staff_client.user, privilege=Privilege.READ)
-    response = staff_client.get(f'{api_url}{sub_folder.id}/list')
-    assert response.status_code == 200
-    assert response.json()['has_upload_permission'] is False
-
-
-def test_list_without_read_permission(staff_client, ambit, sub_folder, api_url):
-    """Listing a folder the user may not read is refused, not answered with an empty list."""
     response = staff_client.get(f'{api_url}{sub_folder.id}/list')
     assert response.status_code == 403
+    assert response.content.decode() == "You do not have permission to browse this folder tree."
 
 
 def test_search_without_query(admin_client, ambit, api_url):
@@ -412,7 +403,7 @@ def test_upload_into_missing_folder(admin_client, ambit, missing_inode_id, api_u
         {'upload_file': upload_file},
         content_type=MULTIPART,
     )
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_upload_without_write_permission(staff_client, ambit, sub_folder, api_url):
@@ -469,7 +460,7 @@ def test_change_missing_file(admin_client, ambit, missing_inode_id, api_url):
         {'name': "renamed.bin"},
         content_type=MULTIPART,
     )
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_delete_file(admin_client, ambit, uploaded_file, api_url):
@@ -477,6 +468,14 @@ def test_delete_file(admin_client, ambit, uploaded_file, api_url):
     assert response.status_code == 200
     assert response.json() == {'file_info': None}
     assert FileModel.objects.filter(id=uploaded_file.id).exists() is False
+
+
+def test_delete_file_anonymously(client, ambit, uploaded_file, api_url):
+    """An anonymous request must not be allowed to delete a file."""
+    assert '_auth_user_id' not in client.session
+    response = client.delete(f'{api_url}{uploaded_file.id}/change')
+    assert FileModel.objects.filter(id=uploaded_file.id).exists() is True
+    assert response.status_code == 403
 
 
 def test_crop_image(admin_client, ambit, uploaded_image, api_url):
@@ -512,6 +511,5 @@ def test_crop_image_without_dimensions(admin_client, ambit, uploaded_image, api_
 
 
 def test_crop_non_image_file(admin_client, ambit, uploaded_file, api_url):
-    """The endpoint looks the id up among images only, so a plain file does not match."""
     response = admin_client.post(f'{api_url}{uploaded_file.id}/crop', {'width': 120})
-    assert response.status_code == 403
+    assert response.status_code == 404

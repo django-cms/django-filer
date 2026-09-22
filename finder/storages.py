@@ -1,4 +1,5 @@
 import logging
+import re
 import uuid
 from pathlib import Path
 
@@ -7,6 +8,8 @@ from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.files.temp import NamedTemporaryFile
 from django.utils.module_loading import import_string
+
+UUID4_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
 
 
 class FinderSystemStorage(FileSystemStorage):
@@ -19,7 +22,10 @@ class FinderSystemStorage(FileSystemStorage):
 
     def path(self, name):
         parts = name.split('/', 1)
-        id = str(uuid.UUID(parts[0]))  # enforce valid UUID
+        if match := UUID4_PATTERN.match(parts[0]):
+            id = str(uuid.UUID(match.group(0)))  # enforce valid UUID
+        else:
+            return super().path(name)
         filename = '' if len(parts) == 1 else parts[1]
         name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
         return super().path(name)
@@ -40,16 +46,30 @@ else:
         Custom S3 storage that caches the result of the exists()-method to prevent multiple HEAD requests
         to the S3 server for lookups of the same file.
         """
-        FILE_EXISTS_CACHE_TIMEOUT = 86400  # 1 day
+
+        def __init__(self, **settings):
+            self.file_exists_cache_timeout = settings.pop('file_exists_cache_timeout', 86400)
+            super().__init__(**settings)
 
         def exists(self, name):
-            key = f'{self.__class__.__name__}:{name}'
+            key = f'{self.__class__.__name__}.exists:{name}'
             result = cache.get(key)
             if result is None:
                 result = super().exists(name)
                 if result is True:
-                    cache.set(key, True, timeout=self.FILE_EXISTS_CACHE_TIMEOUT)
+                    cache.set(key, True, timeout=self.file_exists_cache_timeout)
             return result
+
+        def url(self, name):
+            if self.custom_domain:
+                url = super().url(name)
+            else:
+                key = f'{self.__class__.__name__}.url:{name}'
+                url = cache.get(key)
+                if url is None:
+                    if url := super().url(name):
+                        cache.set(key, url, timeout=self.file_exists_cache_timeout)
+            return url
 
 
 def delete_directory(storage, dir_path):

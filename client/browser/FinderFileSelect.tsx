@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
+import UploadFileCloudIcon from '../icons/upload-file-cloud.svg';
 
 
 interface SelectedFile {
@@ -103,7 +104,8 @@ const FilePreview = memo(({selectedFile, openDialog, removeFile}: {
 				</figcaption>
 			</> :
 				<div onClick={openDialog} onDragEnter={openDialog}>
-					<p>{gettext("Select File")}</p>
+					<UploadFileCloudIcon />
+					<strong>{gettext("Select File")}</strong>
 				</div>
 			}</figure>
 		</div>
