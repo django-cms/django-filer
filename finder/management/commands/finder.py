@@ -202,12 +202,12 @@ class Command(BaseCommand):
         def delete_orphans_in_ambit(directory=''):
             directories, files = ambit.original_storage.listdir(directory)
             for file_name in files:
+                file_path = f'{directory}/{file_name}' if directory else file_name
                 try:
                     file_obj = FinderFileModel.objects.get_inode(id=directory, is_folder=False, file_name=file_name)
                     if file_obj.folder.get_ambit().id != ambit.id:
                         self.stdout.write(f"File found in wrong ambit: {file_path}")
                 except ObjectDoesNotExist:
-                    file_path = f'{directory}/{file_name}' if directory else file_name
                     if dry_run:
                         self.stdout.write(f"Orphaned file: {file_path}")
                     else:
