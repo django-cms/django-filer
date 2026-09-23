@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
@@ -24,6 +25,23 @@ def is_anonymous(user):
     browser endpoints exist to edit it — files are served from storage, not from here.
     """
     return user is None or user.is_anonymous
+
+
+def is_excluded(user):
+    """
+    Whether no access control entry may grant anything to `user`.
+
+    Besides anonymous visitors this covers every signed in user who is not staff, unless
+    the project sets FINDER_STAFF_ONLY = False. The browser endpoints are deliberately not
+    mounted behind `admin_view()`, and the ambit created by default grants READ_WRITE to
+    “everyone”. Without this gate, every customer or subscriber account of a site could
+    read and write its whole media library.
+    """
+    if is_anonymous(user):
+        return True
+    if getattr(settings, 'FINDER_STAFF_ONLY', True):
+        return not (user.is_staff or user.is_superuser)
+    return False
 
 
 class AccessControlBase(models.Model):
@@ -114,7 +132,7 @@ class AccessControlManager(models.Manager):
     _everyone = Q(user__isnull=True, group__isnull=True)
 
     def get_privilege_queryset(self, user, privilege):
-        if is_anonymous(user):
+        if is_excluded(user):
             return self.get_queryset().none()
         group_ids = user.groups.values_list('id', flat=True)
         return self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
@@ -123,7 +141,7 @@ class AccessControlManager(models.Manager):
         )
 
     def privilege_subquery_exists(self, user, privilege):
-        if is_anonymous(user):
+        if is_excluded(user):
             return Value(False, output_field=BooleanField())
         group_ids = user.groups.values_list('id', flat=True)
         return Exists(self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(

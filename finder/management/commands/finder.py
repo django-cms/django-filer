@@ -150,7 +150,8 @@ class Command(BaseCommand):
         values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
         AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
-        # create ACL and default ACL with RW-permission for everyone
+        # create ACL and default ACL with RW-permission for everyone (restricted to staff
+        # users, unless FINDER_STAFF_ONLY is switched off)
         AccessControlEntry.objects.create(inode=root_folder.id, privilege=Privilege.READ_WRITE)
         DefaultAccessControlEntry.objects.create(folder=root_folder, privilege=Privilege.READ_WRITE)
         self.stdout.write(f"Successfully created ambit with slug ‘{slug}’.")
