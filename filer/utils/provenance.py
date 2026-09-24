@@ -380,7 +380,9 @@ def detect_content_credentials(file):
         if head[:6] in (b"GIF87a", b"GIF89a"):
             return _gif_has_c2pa(file)
     except (EOFError, OSError, ValueError, struct.error):
-        pass
+        # Best effort: malformed or unreadable files are treated as having no
+        # detectable content credentials.
+        return False
     return False
 
 
