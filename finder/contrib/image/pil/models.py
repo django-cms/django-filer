@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from finder.contrib.image.models import ImageFileModel
 from finder.models.file import digest_sha1
+from finder.utils.provenance import encode_image
 
 
 logger = getLogger(__name__)
@@ -30,6 +31,8 @@ class PILImageModel(ImageFileModel):
     def store_and_save(self, ambit, **kwargs):
         try:
             image = Image.open(ambit.original_storage.open(self.file_path))
+            # Pillow opens JPEGs with several pictures, as written by many cameras, as MPO
+            image_format = 'JPEG' if image.format == 'MPO' else image.format
             image, changed = self.orientate_top(image)
             if self.MAX_STORED_IMAGE_WIDTH and image.width > self.MAX_STORED_IMAGE_WIDTH:
                 # limit the width of the stored image to prevent excessive disk usage
@@ -37,8 +40,11 @@ class PILImageModel(ImageFileModel):
                 image = image.resize((self.MAX_STORED_IMAGE_WIDTH, height))
                 changed = True
             if changed:
+                # re-encoding drops all metadata, keep at least the digital source type
+                data = encode_image(image, image_format, self.provenance.digital_source_type)
                 with NamedTemporaryFile(suffix=Path(self.file_path).suffix) as tempfile:
-                    image.save(tempfile, image.format)
+                    tempfile.write(data)
+                    tempfile.seek(0)
                     ambit.original_storage.save(self.file_path, tempfile)
                 self.file_size = ambit.original_storage.size(self.file_path)
                 self.sha1 = digest_sha1(ambit.original_storage.open(self.file_path))

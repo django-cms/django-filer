@@ -108,6 +108,7 @@ class InodeManager(models.Manager):
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
         tags = lookup.pop('tags__in', None)
+        provenance = lookup.pop('provenance', None)
         can_view = lookup.pop('has_read_permission', None)
         can_change = lookup.pop('has_write_permission', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
@@ -137,6 +138,15 @@ class InodeManager(models.Manager):
         # query to filter by tags
         if tags and 'tags' in model_field_names:
             query &= Q(tags__in=tags)
+
+        # query to filter images by their provenance, see `ImageFileModel.set_provenance`
+        if provenance and not model.is_folder:
+            queries = []
+            if 'ai' in provenance:
+                queries.append(Q(meta_data__provenance__ai_generated=True))
+            if 'c2pa' in provenance:
+                queries.append(Q(meta_data__provenance__content_credentials=True))
+            query &= reduce(or_, queries, Q())
 
         return query
 

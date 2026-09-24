@@ -82,7 +82,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			</li>
 			<VolumeControl webAudio={webAudio} />
 			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
-			{tags && <FilterByTag refreshFilesList={refreshFilesList} tags={tags} root={rootNode} />}
+			<FilterByTag refreshFilesList={refreshFilesList} tags={tags ?? []} root={rootNode} />
 			{!fileUploadDisabled && <Tooltip>
 				<TooltipTrigger>
 					<li role="menuitem" onClick={openUploader}>

@@ -9,6 +9,7 @@ from finder.contrib.image.models import ImageFileModel as FinderImage
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFile
 from finder.models.folder import FolderModel as FinderFolder
+from finder.utils.provenance import Provenance, provenance_meta_data
 
 
 class Command(BaseCommand):
@@ -99,6 +100,13 @@ class Command(BaseCommand):
             meta_data['crop_size'] = crop_size
         except ValueError:
             pass
+        # django-filer detects the provenance of images since version 3.7
+        provenance = provenance_meta_data(Provenance(
+            digital_source_type=getattr(filer_image, 'digital_source_type', ''),
+            has_content_credentials=getattr(filer_image, 'has_content_credentials', False),
+        ))
+        if provenance:
+            meta_data['provenance'] = provenance
         try:
             finder_image = FinderImage.objects.get(id=inode_id)
         except FinderImage.DoesNotExist:

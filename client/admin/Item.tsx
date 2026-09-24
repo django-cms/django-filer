@@ -4,7 +4,7 @@ import FinderSettings from './FinderSettings';
 import DroppableArea from './DroppableArea';
 import {useSearchParam} from './SearchField';
 import {useSorting} from '../common/SortingOptions';
-import {useFilter} from '../common/FilterByTag';
+import {useFilter, useProvenanceFilter} from '../common/FilterByTag';
 import FileTags from '../common/FileTags';
 import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
@@ -29,10 +29,11 @@ export function DraggableItem(props) {
 	const [event, setEvent] = useState<PointerEvent>(null);
 	const [sorting] = useSorting();
 	const [filter] = useFilter();
+	const [provenanceFilter] = useProvenanceFilter();
 	const [searchQuery] = useSearchParam('q');
 	const ReOrdering = useMemo(() => {
 		return (props) => {
-			if (sortingDisabled || searchQuery || sorting || filter.some(v => v))
+			if (sortingDisabled || searchQuery || sorting || filter.some(v => v) || provenanceFilter)
 				return <div className="reordering"></div>;
 			return (
 				<DroppableArea
@@ -240,6 +241,7 @@ export function ListItem(props) {
 					<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 						{props.name}
 					</div>
+					{props.origin && <small className="inode-origin">{props.origin}</small>}
 				</div>
 				<div>
 					{props.owner}

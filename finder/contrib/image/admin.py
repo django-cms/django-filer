@@ -1,5 +1,6 @@
 from functools import cached_property
 
+from django.utils.html import format_html
 from django.utils.text import format_lazy
 
 from django.conf import settings
@@ -35,6 +36,23 @@ class ImageAdmin(FileAdmin):
             'fields': ImageFileForm._meta.fields + extra_fields,
         })
         return type(ImageFileForm.__name__, ImageFileForm.__mro__, attrs)
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and 'provenance' in obj.meta_data:
+            readonly_fields.append('provenance')
+        return readonly_fields
+
+    @admin.display(description=_("Provenance"))
+    def provenance(self, obj):
+        provenance = obj.provenance
+        return format_html(
+            '<table><tr><th>{0}</th><td>{1}</td></tr><tr><th>{2}</th><td>{3}</td></tr></table>',
+            _("Origin"),
+            obj.digital_source_type_label or '–',
+            _("Content Credentials"),
+            _("found on upload, not verified") if provenance.has_content_credentials else '–',
+        )
 
     def get_editor_settings(self, request, inode):
         return {

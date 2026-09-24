@@ -8,6 +8,13 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from finder.models.file import AbstractFileModel
+from finder.utils.provenance import (
+    Provenance,
+    detect_file_provenance,
+    get_digital_source_type_label,
+    is_ai_digital_source_type,
+    provenance_meta_data,
+)
 
 
 logger = getLogger(__name__)
@@ -61,6 +68,39 @@ class ImageFileModel(AbstractFileModel):
     @cached_property
     def summary(self):
         return "{width}×{height}px ({size})".format(size=super().summary, width=self.width, height=self.height)
+
+    def receive_file(self, ambit, uploaded_file):
+        # Detect the provenance on the file as uploaded: a sanitizing payload validator,
+        # or `store_and_save` when re-encoding the image, may remove it from the payload.
+        provenance = detect_file_provenance(uploaded_file)
+        super().receive_file(ambit, uploaded_file)
+        self.set_provenance(provenance)
+
+    def set_provenance(self, provenance):
+        """
+        Store the provenance of the image in `meta_data`. A replaced payload replaces it.
+        """
+        if data := provenance_meta_data(provenance):
+            self.meta_data['provenance'] = data
+        else:
+            self.meta_data.pop('provenance', None)
+
+    @property
+    def provenance(self):
+        data = self.meta_data.get('provenance') or {}
+        return Provenance(
+            digital_source_type=data.get('digital_source_type', ''),
+            has_content_credentials=data.get('content_credentials', False),
+        )
+
+    @property
+    def digital_source_type_label(self):
+        return get_digital_source_type_label(self.provenance.digital_source_type)
+
+    @property
+    def is_ai_generated(self):
+        """True if the image's metadata states it was created or edited using generative AI."""
+        return is_ai_digital_source_type(self.provenance.digital_source_type)
 
     def get_thumbnail_url(self, ambit):
         thumbnail_filename = self.get_cropped_filename(self.thumbnail_size, self.thumbnail_size)
@@ -185,4 +225,11 @@ class ImageFileModel(AbstractFileModel):
             if code != settings.LANGUAGE_CODE:
                 key = f'alt_text_{code}'
                 data[key] = self.meta_data.get(key, alt_text)
+        if 'provenance' in self.meta_data:
+            provenance = self.provenance
+            data['provenance'] = {
+                'origin': str(self.digital_source_type_label),
+                'ai_generated': self.is_ai_generated,
+                'content_credentials': provenance.has_content_credentials,
+            }
         return data

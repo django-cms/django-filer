@@ -11,7 +11,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_attribute
+from finder.lookups import annotate_unified_queryset, lookup_by_provenance, lookup_by_tag, sort_by_attribute
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
@@ -237,6 +237,7 @@ class BrowserView(View):
         recursive = 'recursive' in request.GET
         lookup = {
             **lookup_by_tag(request),
+            **lookup_by_provenance(request),
             'user': request.user,
             'can_view': True,
             'mime_types': request.GET.getlist('mimetypes'),
@@ -284,6 +285,7 @@ class BrowserView(View):
 
         ambit = starting_folder.get_ambit()
         lookup = {
+            **lookup_by_provenance(request),
             'parent_id__in': parent_ids,
             'name_lower__icontains': search_query,
         }
