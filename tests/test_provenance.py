@@ -13,15 +13,20 @@ from django.urls import reverse
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
 from filer.settings import FILER_IMAGE_MODEL
+from filer.utils import provenance
 from filer.utils.compatibility import PILImage, PILImageDraw
 from filer.utils.loader import load_model
 from filer.utils.provenance import (
     C2PA_ISOBMFF_UUID,
     IPTC_DIGITAL_SOURCE_TYPE_BASE,
+    build_xmp_packet,
     detect_content_credentials,
     detect_digital_source_type,
+    detect_file_provenance,
     detect_provenance,
     get_digital_source_type_label,
+    get_xmp_packet,
+    insert_jpeg_xmp,
     is_ai_digital_source_type,
     normalize_digital_source_type,
     read_xmp_packet,
@@ -287,6 +292,88 @@ class ContentCredentialsDetectionTests(TestCase):
         provenance = detect_provenance(file, PILImage.open(file))
         self.assertEqual(provenance.digital_source_type, AI_GENERATED)
         self.assertTrue(provenance.has_content_credentials)
+
+
+class ProvenanceEdgeCaseTests(TestCase):
+    def c2pa_segment(self):
+        return jpeg_segment(0xEB, b"JP" + b"\x00\x01" + b"\x00\x00\x00\x01" + jumbf_c2pa_box())
+
+    def test_xmp_packet_as_text(self):
+        image = mock.Mock(info={"XML:com.adobe.xmp": xmp_packet().decode()})
+        self.assertEqual(get_xmp_packet(image), xmp_packet().decode())
+        self.assertEqual(detect_digital_source_type(image), AI_GENERATED)
+        self.assertEqual(get_xmp_packet(object()), "")
+
+    def test_unparsable_digital_source_type(self):
+        xmp = b"<rdf:Description><Iptc4xmpExt:DigitalSourceType/></rdf:Description>"
+        self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(jpeg_bytes(xmp)))), "")
+
+    def test_insert_jpeg_xmp(self):
+        data = jpeg_bytes()
+        self.assertEqual(data[2:4], b"\xff\xe0")  # JFIF APP0
+        app0_end = 4 + struct.unpack(">H", data[4:6])[0]
+        without_app0 = data[:2] + data[app0_end:]
+        for jpeg, position in ((data, app0_end), (without_app0, 2)):
+            with self.subTest(position=position):
+                result = insert_jpeg_xmp(jpeg, build_xmp_packet(AI_EDITED))
+                self.assertEqual(result[position:position + 2], b"\xff\xe1")
+                self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(result))), AI_EDITED)
+
+    def test_jpeg_marker_handling(self):
+        soi = b"\xff\xd8"
+        for data, expected in (
+            (soi + b"\x00\x00", False),  # Not a marker
+            (soi + b"\xff" + self.c2pa_segment(), True),  # Fill byte
+            (soi + b"\xff\xd0" + self.c2pa_segment(), True),  # Marker without payload
+            (soi + b"\xff\xe0\x00\x01", False),  # Invalid segment length
+            (soi + jpeg_segment(0xEB, b"JPother") + self.c2pa_segment(), True),  # Other APP11 segment
+            (soi + jpeg_segment(0xEB, b"JPother") + b"\xff\xd9", False),
+        ):
+            with self.subTest(data=data[:8]):
+                self.assertIs(detect_content_credentials(io.BytesIO(data)), expected)
+
+    def test_isobmff_box_sizes(self):
+        ftyp = isobmff_box(b"ftyp", b"avif" + bytes(4) + b"mif1avif")
+        c2pa = isobmff_box(b"uuid", C2PA_ISOBMFF_UUID + jumbf_c2pa_box())
+        large_box = struct.pack(">I4sQ", 1, b"free", 16 + 4) + bytes(4)
+        to_end = struct.pack(">I4s", 0, b"mdat") + bytes(8)
+        self.assertTrue(detect_content_credentials(io.BytesIO(ftyp + large_box + c2pa)))
+        self.assertFalse(detect_content_credentials(io.BytesIO(ftyp + to_end + c2pa)))
+        self.assertFalse(detect_content_credentials(io.BytesIO(ftyp + struct.pack(">I4s", 4, b"free"))))
+
+    def test_block_limit(self):
+        # Each file needs more than one block to reach its provenance information
+        gif = gif_bytes(c2pa=True)
+        header_size = provenance._gif_header_size(gif)
+        gif = gif[:header_size] + b"!\xfe" + gif_sub_blocks(b"comment") + gif[header_size:]
+        with mock.patch.object(provenance, "MAX_BLOCKS", 1):
+            for data in (
+                jpeg_bytes(xmp_packet(), c2pa=True),
+                png_bytes(c2pa=True),
+                webp_bytes(c2pa=True),
+                avif_bytes(c2pa=True, other_uuid=True),
+                gif,
+            ):
+                with self.subTest(data=data[:12]):
+                    self.assertFalse(detect_content_credentials(io.BytesIO(data)))
+            for data in (png_bytes_with_late_xmp(xmp_packet()), gif_bytes(xmp_packet())):
+                with self.subTest(data=data[:12]):
+                    self.assertEqual(read_xmp_packet(io.BytesIO(data)), b"")
+
+    def test_detect_file_provenance(self):
+        file = io.BytesIO(jpeg_bytes(xmp_packet(), c2pa=True))
+        file.seek(10)
+        result = detect_file_provenance(file)
+        self.assertEqual(result.digital_source_type, AI_GENERATED)
+        self.assertTrue(result.has_content_credentials)
+        self.assertEqual(file.tell(), 0)
+
+    def test_detect_file_provenance_is_best_effort(self):
+        closed = io.BytesIO(jpeg_bytes())
+        closed.close()
+        for file in (io.BytesIO(b"not an image"), closed):
+            with self.subTest(file=file):
+                self.assertEqual(detect_file_provenance(file), provenance.Provenance())
 
 
 class ImageProvenanceTests(TestCase):
