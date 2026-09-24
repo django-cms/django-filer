@@ -256,6 +256,7 @@ def read_xmp_packet(file):
         if head[:6] in (b"GIF87a", b"GIF89a"):
             return _gif_xmp(file)
     except (EOFError, OSError, ValueError, struct.error, zlib.error):
+        # Best-effort parsing: malformed/unsupported input yields no XMP.
         pass
     finally:
         file.seek(position)
