@@ -33,6 +33,14 @@
                         <dt>{% translate "Size" %}</dt>
                         <dd>{{ original.width|floatformat }}x{{ original.height|floatformat }} px</dd>
                     {% endif %}
+                    {% if original.digital_source_type %}
+                        <dt>{% translate "Origin" %}</dt>
+                        <dd>{{ original.digital_source_type_label }}</dd>
+                    {% endif %}
+                    {% if original.has_content_credentials %}
+                        <dt>{% translate "Content Credentials" %}</dt>
+                        <dd>{% translate "C2PA manifest found on upload (not verified)" %}</dd>
+                    {% endif %}
                     {% if original.size %}
                         <dt>{% translate "File-size" %}</dt>
                         <dd>{{ original.size|filesizeformat }}</dd>

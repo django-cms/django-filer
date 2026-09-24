@@ -16,6 +16,12 @@ from ..utils import svg
 from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
+from ..utils.provenance import (
+    Provenance,
+    detect_provenance,
+    get_digital_source_type_label,
+    is_ai_digital_source_type,
+)
 from .filemodels import File
 
 
@@ -95,6 +101,24 @@ class BaseImage(File):
         default='',
     )
 
+    digital_source_type = models.CharField(
+        _("digital source type"),
+        max_length=255,
+        blank=True,
+        default='',
+        editable=False,
+        help_text=_("IPTC digital source type found in the image's metadata on upload, "
+                    "e.g., stating that it was created using generative AI."),
+    )
+
+    has_content_credentials = models.BooleanField(
+        _("has content credentials"),
+        default=False,
+        editable=False,
+        help_text=_("The uploaded image embeds C2PA Content Credentials. "
+                    "Their signature is not verified."),
+    )
+
     file_ptr = models.OneToOneField(
         to='filer.File',
         parent_link=True,
@@ -131,16 +155,19 @@ class BaseImage(File):
                 if self.mime_type == 'image/svg+xml':
                     self._width, self._height = svg.get_dimensions(imgfile)
                     self._transparent = True
+                    self._set_provenance(Provenance())
                 else:
                     pil_image = PILImage.open(imgfile)
                     self._width, self._height = pil_image.size
                     self._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                    self._set_provenance(detect_provenance(imgfile, pil_image))
             except Exception:
                 if post_init is False:
                     # in case `imgfile` could not be found, unset dimensions
                     # but only if not initialized by loading a fixture file
                     self._width, self._height = None, None
                     self._transparent = False
+                    self._set_provenance(Provenance())
             finally:
                 if imgfile is not None:
                     # The upload validators read from the same file object, so
@@ -154,6 +181,19 @@ class BaseImage(File):
                             exc_info=exc,
                         )
         return attrs_updated
+
+    def _set_provenance(self, provenance):
+        self.digital_source_type = provenance.digital_source_type
+        self.has_content_credentials = provenance.has_content_credentials
+
+    @property
+    def digital_source_type_label(self):
+        return get_digital_source_type_label(self.digital_source_type)
+
+    @property
+    def is_ai_generated(self):
+        """True if the image's metadata states it was created or edited using generative AI."""
+        return is_ai_digital_source_type(self.digital_source_type)
 
     def clean(self):
         # We check the Image size and calculate the pixel before

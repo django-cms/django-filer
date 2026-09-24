@@ -215,3 +215,11 @@ See :ref:`validation`.
 
 List of default file validators to be ignored.
 See :ref:`validation`.
+
+``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE``
+---------------------------------------------
+
+Defaults to ``True``: the ``strip_exif`` upload sanitizer writes the IPTC digital
+source type of an image, which e.g. marks images created using generative AI, back
+into the sanitized file. Set it to ``False`` to strip it, too.
+See :ref:`validation`.

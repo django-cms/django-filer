@@ -42,6 +42,7 @@ from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
+from ..utils.provenance import ai_digital_source_type_q
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
@@ -60,6 +61,11 @@ from .tools import (
 
 
 Image = load_model(FILER_IMAGE_MODEL)
+
+PROVENANCE_FILTERS = {
+    'ai': _('Created or edited using generative AI'),
+    'content_credentials': _('Uploaded with Content Credentials'),
+}
 
 
 class AddFolderPopupForm(forms.ModelForm):
@@ -318,8 +324,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
+        # Filter images by their provenance information
+        provenance_filter = request.GET.get('provenance', '')
+        if provenance_filter not in PROVENANCE_FILTERS:
+            provenance_filter = ''
 
-        if len(search_terms) > 0:
+        if len(search_terms) > 0 or provenance_filter:
             if folder and limit_search_to_folder and not folder.is_root:
                 desc_folder_ids = folder.get_descendants_ids()
                 # Do not include current folder itself in search results.
@@ -332,6 +342,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 file_qs = File.objects.all()
             folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
             file_qs = self.filter_file(file_qs, search_terms)
+            if provenance_filter:
+                # Folders have no provenance
+                folder_qs = folder_qs.none()
+                file_qs = self.filter_file_provenance(file_qs, provenance_filter)
 
             show_result_count = True
         else:
@@ -487,6 +501,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'folder_files': file_qs,
             'thumbnail_size': FILER_TABLE_ICON_SIZE if list_type == TABLE_LIST_TYPE else FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
+            'provenance_filter': provenance_filter,
+            'provenance_filters': PROVENANCE_FILTERS.items(),
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
             # needed in the admin/base.html template for logout links
@@ -504,6 +520,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
         })
         return TemplateResponse(request, self.directory_listing_template, context)
+
+    def filter_file_provenance(self, qs, provenance_filter):
+        if provenance_filter == 'ai':
+            images = Image.objects.filter(ai_digital_source_type_q())
+        else:
+            images = Image.objects.filter(has_content_credentials=True)
+        return qs.filter(pk__in=images.values('pk'))
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa
