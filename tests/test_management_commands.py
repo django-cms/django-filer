@@ -65,6 +65,17 @@ class ImportFilesTestCase(TestCase):
         self.assertEqual(Folder.objects.count(), 2)
         self.assertEqual(File.objects.count(), 2)
 
+    def test_import_with_existing_duplicates(self):
+        # duplicates left behind by earlier versions of the command
+        folder = Folder.objects.create(name='assets')
+        for _ in range(2):
+            File.objects.create(original_filename='readme.txt', folder=folder, file=ContentFile(b'old', 'readme.txt'))
+
+        self.import_files()
+
+        self.assertEqual(File.objects.filter(original_filename='readme.txt').count(), 2)
+        self.assertEqual(Image.objects.filter(original_filename='pic.jpg').count(), 1)
+
 
 class GenerateThumbnailsTestCase(TestCase):
     def setUp(self):
