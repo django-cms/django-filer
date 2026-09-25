@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from contextlib import redirect_stdout
 from io import BytesIO, StringIO
 
 from django.core.files.base import ContentFile
@@ -33,7 +34,8 @@ class ImportFilesTestCase(TestCase):
         shutil.rmtree(self.tmp_dir)
 
     def import_files(self, **options):
-        call_command('import_files', path=self.src, verbosity=0, **options)
+        options.setdefault('verbosity', 0)
+        call_command('import_files', path=self.src, **options)
 
     def test_import_directory_structure(self):
         self.import_files()
@@ -69,13 +71,43 @@ class ImportFilesTestCase(TestCase):
         # duplicates left behind by earlier versions of the command
         folder = Folder.objects.create(name='assets')
         for _ in range(2):
-            File.objects.create(original_filename='readme.txt', folder=folder, file=ContentFile(b'old', 'readme.txt'))
+            File.objects.create(original_filename='readme.txt', folder=folder, file=ContentFile(b'hello', 'readme.txt'))
 
         self.import_files()
 
         self.assertEqual(File.objects.filter(original_filename='readme.txt').count(), 2)
         self.assertEqual(Image.objects.filter(original_filename='pic.jpg').count(), 1)
 
+    def test_import_changed_file_again(self):
+        self.import_files()
+        with open(os.path.join(self.src, 'readme.txt'), 'w') as f:
+            f.write('hello again')
+
+        self.import_files()
+
+        readmes = File.objects.filter(original_filename='readme.txt').order_by('pk')
+        self.assertEqual(readmes.count(), 2)
+        with readmes.last().file.open('rb') as f:
+            self.assertEqual(f.read(), b'hello again')
+        self.assertEqual(Image.objects.filter(original_filename='pic.jpg').count(), 1)
+
+    def test_import_does_not_skip_different_file_with_same_name(self):
+        # e.g. a file with the same name that was uploaded through the admin
+        folder = Folder.objects.create(name='assets')
+        File.objects.create(original_filename='readme.txt', folder=folder, file=ContentFile(b'other', 'readme.txt'))
+
+        self.import_files()
+
+        self.assertEqual(File.objects.filter(original_filename='readme.txt').count(), 2)
+
+    def test_import_logs_skipped_files(self):
+        self.import_files()
+        output = StringIO()
+        with redirect_stdout(output):
+            self.import_files(verbosity=1)
+
+        self.assertIn('Skipped readme.txt: already imported into /assets', output.getvalue())
+        self.assertIn('Skipped pic.jpg: already imported into /assets/photos', output.getvalue())
 
 class GenerateThumbnailsTestCase(TestCase):
     def setUp(self):

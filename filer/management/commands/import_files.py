@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 from django.core.files import File as DjangoFile
@@ -31,10 +32,17 @@ class FileImporter:
         except:  # noqa
             iext = ''
         model = Image if iext in IMAGE_EXTENSIONS else File
-        # earlier versions of this command created duplicates on every run, so
-        # reuse the oldest existing file instead of expecting a single match
-        obj = model.objects.filter(original_filename=file_obj.name, folder=folder).order_by('pk').first()
+        # Skip files that were already imported with the same content. Earlier
+        # versions of this command created duplicates on every run, so reuse the
+        # oldest match instead of expecting a single one.
+        obj = model.objects.filter(
+            original_filename=file_obj.name,
+            folder=folder,
+            sha1=self.get_sha1(file_obj),
+        ).order_by('pk').first()
         created = obj is None
+        if not created and self.verbosity >= 1:
+            print("Skipped %s: already imported into %s" % (file_obj.name, folder))
         if created:
             obj = model.objects.create(
                 original_filename=file_obj.name,
@@ -50,6 +58,15 @@ class FileImporter:
                                                         self.image_created,
                                                         obj, created))
         return obj
+
+    @staticmethod
+    def get_sha1(file_obj):
+        sha = hashlib.sha1()
+        file_obj.seek(0)
+        for chunk in file_obj.chunks():
+            sha.update(chunk)
+        file_obj.seek(0)
+        return sha.hexdigest()
 
     def get_or_create_folder(self, folder_names):
         """
