@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 from django.core.files import File as DjangoFile
@@ -30,27 +31,42 @@ class FileImporter:
             iext = os.path.splitext(file_obj.name)[1].lower()
         except:  # noqa
             iext = ''
-        if iext in IMAGE_EXTENSIONS:
-            obj, created = Image.objects.get_or_create(
+        model = Image if iext in IMAGE_EXTENSIONS else File
+        # Skip files that were already imported with the same content. Earlier
+        # versions of this command created duplicates on every run, so reuse the
+        # oldest match instead of expecting a single one.
+        obj = model.objects.filter(
+            original_filename=file_obj.name,
+            folder=folder,
+            sha1=self.get_sha1(file_obj),
+        ).order_by('pk').first()
+        created = obj is None
+        if not created and self.verbosity >= 1:
+            print("Skipped %s: already imported into %s" % (file_obj.name, folder))
+        if created:
+            obj = model.objects.create(
                 original_filename=file_obj.name,
-                file=file_obj,
                 folder=folder,
+                file=file_obj,
                 is_public=FILER_IS_PUBLIC_DEFAULT)
-            if created:
+            if model is Image:
                 self.image_created += 1
-        else:
-            obj, created = File.objects.get_or_create(
-                original_filename=file_obj.name,
-                file=file_obj,
-                folder=folder,
-                is_public=FILER_IS_PUBLIC_DEFAULT)
-            if created:
+            else:
                 self.file_created += 1
         if self.verbosity >= 2:
             print("file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
                                                         self.image_created,
                                                         obj, created))
         return obj
+
+    @staticmethod
+    def get_sha1(file_obj):
+        sha = hashlib.sha1()
+        file_obj.seek(0)
+        for chunk in file_obj.chunks():
+            sha.update(chunk)
+        file_obj.seek(0)
+        return sha.hexdigest()
 
     def get_or_create_folder(self, folder_names):
         """
