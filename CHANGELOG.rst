@@ -2,6 +2,33 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* feat: Detect provenance information of uploaded images (#1636). The IPTC
+  digital source type stated in an image's XMP metadata (e.g.,
+  ``trainedAlgorithmicMedia`` for images created using generative AI) is stored in
+  the new ``digital_source_type`` field, the presence of embedded C2PA Content
+  Credentials in ``has_content_credentials``. Their signature is not verified.
+  Both are shown in the admin, and ``Image.is_ai_generated`` tells whether an
+  image was created or edited using generative AI. The directory listing's search
+  options can filter for either. Run ``manage.py filer_detect_provenance`` to scan
+  images uploaded before upgrading.
+* feat: The ``strip_exif`` upload sanitizer keeps the IPTC digital source type.
+  Set ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to strip it, too.
+* fix: ``strip_exif`` left a JPEG's XMP, IPTC and C2PA segments in place with
+  Pillow < 11 if the image had no EXIF data.
+* fix: ``strip_exif`` reduced animated GIFs and WebPs to their first frame. It now
+  keeps all frames with their durations, loop count and (GIF) disposal.
+* fix: ``strip_exif`` re-encoded lossless WebPs lossy: Pillow does not report
+  whether a WebP is lossless, so it is now read from the file.
+* fix: ``strip_exif`` kept GIF comments and XMP.
+
+.. note::
+
+   The new fields are added to ``BaseImage``. If you use a custom image model
+   (``FILER_IMAGE_MODEL``), run ``makemigrations`` for its app.
+
 3.6.0 (2026-09-12)
 ==================
 
