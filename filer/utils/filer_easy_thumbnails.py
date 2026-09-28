@@ -1,3 +1,4 @@
+import logging
 import os
 from io import StringIO
 
@@ -8,6 +9,11 @@ from easy_thumbnails.exceptions import EasyThumbnailsError, InvalidImageFormatEr
 from easy_thumbnails.files import Thumbnailer, ThumbnailFile
 
 from . import svg
+from .compatibility import PILImage
+from .provenance import build_xmp_packet, embed_xmp, xmp_save_options
+
+
+logger = logging.getLogger(__name__)
 
 
 def thumbnail_to_original_filename(thumbnail_name):
@@ -194,11 +200,64 @@ class SvgThumbnailerMixin:
         return thumbnail
 
 
-class FilerThumbnailer(SvgThumbnailerMixin, ThumbnailerNameMixin, Thumbnailer):
+class ProvenanceThumbnailerMixin:
+    """
+    Write the IPTC digital source type of the source image into the thumbnails
+    generated from it, e.g. to keep images created using generative AI marked
+    as such (EU AI Act, Art. 50).
+
+    Thumbnails are re-encoded and lose all metadata of the source. Only the
+    digital source type is written back, in a minimal XMP packet. C2PA Content
+    Credentials cannot be kept: their signature covers the original bytes.
+    """
+    digital_source_type = ''
+
+    def __init__(self, *args, digital_source_type='', **kwargs):
+        super().__init__(*args, **kwargs)
+        self.digital_source_type = digital_source_type
+
+    def get_digital_source_type(self):
+        return self.digital_source_type
+
+    def generate_thumbnail(self, thumbnail_options, silent_template_exception=False):
+        thumbnail = super().generate_thumbnail(
+            thumbnail_options,
+            silent_template_exception=silent_template_exception)
+        digital_source_type = self.get_digital_source_type()
+        if digital_source_type and not svg.is_svg(thumbnail.name):
+            try:
+                self._add_digital_source_type(thumbnail, digital_source_type)
+            except Exception as exc:
+                # A thumbnail without the XMP packet is better than none
+                logger.warning(
+                    "Failed to write the digital source type into thumbnail %s.",
+                    thumbnail.name, exc_info=exc)
+        return thumbnail
+
+    @staticmethod
+    def _add_digital_source_type(thumbnail, digital_source_type):
+        xmp = build_xmp_packet(digital_source_type)
+        # Determine the format like easy-thumbnails does when saving
+        PILImage.init()
+        image_format = PILImage.EXTENSION.get(os.path.splitext(thumbnail.name)[1].lower(), 'JPEG')
+        thumbnail.file.seek(0)
+        data = embed_xmp(thumbnail.file.read(), image_format, xmp)
+        if data is None:
+            # The format takes the XMP packet at encoding time only: encode again
+            options = thumbnail.thumbnail_options
+            data = engine.save_pil_image(
+                thumbnail.image, filename=thumbnail.name, quality=options['quality'],
+                subsampling=options['subsampling'],
+                keep_icc_profile=options.get('keep_icc_profile', False),
+                **xmp_save_options(image_format, xmp)).read()
+        thumbnail.file = ContentFile(data)
+
+
+class FilerThumbnailer(ProvenanceThumbnailerMixin, SvgThumbnailerMixin, ThumbnailerNameMixin, Thumbnailer):
     def __init__(self, *args, **kwargs):
         self.thumbnail_basedir = kwargs.pop('thumbnail_basedir', '')
         super().__init__(*args, **kwargs)
 
 
-class FilerActionThumbnailer(SvgThumbnailerMixin, ActionThumbnailerMixin, Thumbnailer):
+class FilerActionThumbnailer(ProvenanceThumbnailerMixin, SvgThumbnailerMixin, ActionThumbnailerMixin, Thumbnailer):
     pass

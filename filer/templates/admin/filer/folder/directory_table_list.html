@@ -141,6 +141,9 @@
                                         {% endif %}
                                     </strong>
                                 </div>
+                                {% if file.is_ai_generated %}
+                                    <div>{% translate "Origin" %}: {{ file.digital_source_type_label }}</div>
+                                {% endif %}
                                 {% if enable_permissions %}
                                     <div>{% translate "Permissions" %}: {% if file.is_public %}{% translate "disabled" %}{% else %}{% translate "enabled" %}{% endif %}</div>
                                 {% endif %}
@@ -225,7 +228,7 @@
 
     <div class="nav-pages paginator">
         {% if paginated_items.has_previous %}
-            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% if provenance_filter %}&amp;provenance={{ provenance_filter }}{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "previous" %}
             </a>
         {% endif %}
@@ -235,7 +238,7 @@
         </span>
 
         {% if paginated_items.has_next %}
-            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% if provenance_filter %}&amp;provenance={{ provenance_filter }}{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "next" %}
             </a>
         {% endif %}
