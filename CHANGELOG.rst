@@ -16,6 +16,10 @@ unreleased
   images uploaded before upgrading.
 * feat: The ``strip_exif`` upload sanitizer keeps the IPTC digital source type.
   Set ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to strip it, too.
+* feat: Thumbnails and images resized with the admin's resize action carry the
+  image's IPTC digital source type in a minimal XMP packet, so that files filer
+  generates stay marked, e.g., as created using generative AI. Thumbnails
+  generated before upgrading keep no metadata until they are regenerated.
 * fix: ``strip_exif`` left a JPEG's XMP, IPTC and C2PA segments in place with
   Pillow < 11 if the image had no EXIF data.
 * fix: ``strip_exif`` reduced animated GIFs and WebPs to their first frame. It now

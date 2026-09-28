@@ -127,8 +127,11 @@ What happens to the metadata in files
    * - Original, sanitized by ``strip_exif``
      - kept (unless disabled)
      - removed
-   * - Thumbnails and other variants
+   * - Original, resized by the admin's resize action
+     - kept
      - removed
+   * - Thumbnails and other variants
+     - kept
      - removed
    * - Database fields of the image
      - kept
@@ -152,11 +155,32 @@ Originals
     had them; the admin says "found on upload".
 
 Thumbnails and variants
-    Thumbnails are re-encoded by easy-thumbnails and carry no metadata. This
-    is intended for C2PA: a manifest signed for the original would not match a
-    resized, cropped or converted image, and cannot simply be copied. The
-    provenance of a thumbnail is that of its image, which the database fields
-    record.
+    Thumbnails are re-encoded by easy-thumbnails, which drops all metadata of
+    the original. django-filer writes the image's digital source type back into
+    every thumbnail it generates, in the same minimal XMP packet ``strip_exif``
+    uses, so that a thumbnail served on its own is still marked, e.g., as
+    created using generative AI. The value comes from the database field,
+    which also makes this work for images whose stored original no longer
+    carries it. This covers JPEG, PNG, GIF and WebP thumbnails, and AVIF and
+    HEIF where Pillow can write XMP into them. SVG thumbnails carry none.
+
+    This applies to thumbnails generated through django-filer: the admin's
+    icons and previews, the ``thumbnail`` template tag of easy-thumbnails used
+    with a filer image or its ``file``, and thumbnail options. Thumbnails
+    generated before upgrading keep no metadata until they are regenerated.
+    To have them regenerated, delete them, e.g., for AI-generated images::
+
+        for image in Image.objects.filter(ai_digital_source_type_q()):
+            image.file.delete_thumbnails()
+
+    C2PA manifests are not copied: a manifest signed for the original would not
+    match a resized, cropped or converted image.
+
+Resize action
+    The admin's "Resize selected images" action replaces the original with a
+    re-encoded, resized file. Like thumbnails, it keeps the digital source type
+    and loses the Content Credentials. The database fields keep describing the
+    uploaded image: ``has_content_credentials`` stays set.
 
 
 In the admin

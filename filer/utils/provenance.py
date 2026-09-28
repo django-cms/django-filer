@@ -244,6 +244,43 @@ def insert_gif_xmp(data, xmp):
     return data[:position] + extension + data[position:]
 
 
+def insert_png_xmp(data, xmp):
+    """Return the PNG ``data`` with an uncompressed iTXt chunk holding the XMP
+    packet inserted after the IHDR chunk."""
+    chunk_data = PNG_XMP_KEYWORD + b"\x00\x00" + b"\x00\x00" + xmp
+    chunk = (
+        struct.pack(">I", len(chunk_data)) + b"iTXt" + chunk_data
+        + struct.pack(">I", zlib.crc32(b"iTXt" + chunk_data))
+    )
+    position = 8 + 12 + struct.unpack(">I", data[8:12])[0]  # Signature, IHDR chunk
+    return data[:position] + chunk + data[position:]
+
+
+def xmp_save_options(image_format, xmp):
+    """Return the options that make Pillow's ``save()`` write the XMP packet,
+    for the formats ``embed_xmp()`` does not handle."""
+    if image_format in ("JPEG", "PNG", "GIF"):
+        return {}
+    if image_format == "TIFF":
+        return {"tiffinfo": {700: xmp}}  # XMP tag
+    # WebP, AVIF, HEIF
+    return {"xmp": xmp}
+
+
+def embed_xmp(data, image_format, xmp):
+    """Return the encoded image ``data`` with the XMP packet inserted, or
+    ``None`` if the format needs the packet at encoding time (see
+    ``xmp_save_options()``). Pillow < 11 cannot write XMP into a JPEG, nor any
+    version into a GIF, so these are handled on the encoded data."""
+    if image_format == "JPEG":
+        return insert_jpeg_xmp(data, xmp)
+    if image_format == "PNG":
+        return insert_png_xmp(data, xmp)
+    if image_format == "GIF":
+        return insert_gif_xmp(data, xmp)
+    return None
+
+
 def read_xmp_packet(file):
     """Return the XMP packet of a PNG or GIF file where Pillow does not expose
     it without decoding the image, or ``b""``. The file position is restored."""

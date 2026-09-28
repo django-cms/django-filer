@@ -42,7 +42,7 @@ from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
-from ..utils.provenance import ai_digital_source_type_q
+from ..utils.provenance import Provenance, ai_digital_source_type_q
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
@@ -1281,7 +1281,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _resize_image(self, image, form_data):
         original_width = float(image.width)
         original_height = float(image.height)
-        thumbnailer = FilerActionThumbnailer(file=image.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
+        thumbnailer = FilerActionThumbnailer(
+            file=image.file, name=image.file.name, source_storage=image.file.source_storage,
+            thumbnail_storage=image.file.source_storage, digital_source_type=image.digital_source_type)
         # This should overwrite the original image
         new_image = thumbnailer.get_thumbnail({
             'size': tuple(int(form_data[d] or 0) for d in ('width', 'height')),
@@ -1290,9 +1292,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'subject_location': image.subject_location,
         })
         image.file.file = new_image.file
+        # The provenance describes the uploaded image: keep it, although the
+        # resized file cannot carry the Content Credentials of the original.
+        provenance = Provenance(image.digital_source_type, image.has_content_credentials)
         # Since only file data was changed, there is no way for file field to know about the change.
         # To update size, sha1, width and height fields let's call file_data_changed callback directly.
         image.file_data_changed()
+        image._set_provenance(provenance)
         image.save()
 
         subject_location = normalize_subject_location(image.subject_location)

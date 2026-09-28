@@ -4,11 +4,14 @@ import zlib
 from unittest import mock
 
 from django.apps import apps
+from django.contrib.admin import helpers
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+
+from easy_thumbnails.files import get_thumbnailer
 
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
@@ -24,6 +27,7 @@ from filer.utils.provenance import (
     detect_digital_source_type,
     detect_file_provenance,
     detect_provenance,
+    embed_xmp,
     get_digital_source_type_label,
     get_xmp_packet,
     insert_jpeg_xmp,
@@ -664,6 +668,166 @@ class StripExifUploadTests(TestCase):
         self.assertTrue(image.has_content_credentials)
         with image.file.open("rb") as fh:
             self.assertFalse(detect_content_credentials(fh))
+
+
+class ThumbnailProvenanceTests(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+
+    def tearDown(self):
+        for image in Image.objects.all():
+            image.file.delete_thumbnails()
+            image.delete()
+
+    def create(self, data, name="image.jpg"):
+        return Image.objects.create(
+            owner=self.superuser,
+            original_filename=name,
+            file=DjangoFile(io.BytesIO(data), name=name),
+        )
+
+    def read(self, thumbnail):
+        with thumbnail.storage.open(thumbnail.name, "rb") as fh:
+            return fh.read()
+
+    def detect(self, data):
+        file = io.BytesIO(data)
+        return detect_digital_source_type(PILImage.open(file), file)
+
+    def test_thumbnailers_keep_digital_source_type(self):
+        image = self.create(jpeg_bytes(xmp_packet(AI_EDITED), c2pa=True))
+        # Different sizes, so that each thumbnailer generates its own thumbnail
+        for name, thumbnailer, width in (
+            ("field file", image.file, 20),
+            ("model", get_thumbnailer(image), 24),
+        ):
+            with self.subTest(name):
+                thumbnail = thumbnailer.get_thumbnail({"size": (width, width)}, generate=True)
+                data = self.read(thumbnail)
+                self.assertTrue(thumbnail.name.endswith(".jpg"))
+                self.assertEqual(self.detect(data), AI_EDITED)
+                self.assertFalse(detect_content_credentials(io.BytesIO(data)))
+                self.assertEqual(PILImage.open(io.BytesIO(data)).size[0], width)
+
+    def test_admin_icons_keep_digital_source_type(self):
+        image = self.create(jpeg_bytes(xmp_packet()))
+        self.assertTrue(image.icons)
+        for thumbnail in image.file.get_thumbnails():
+            self.assertEqual(self.detect(self.read(thumbnail)), AI_GENERATED)
+
+    def test_transparent_png(self):
+        buffer = io.BytesIO()
+        create_image(mode="RGBA", size=(40, 30)).save(buffer, "PNG")
+        image = self.create(buffer.getvalue(), name="ai.png")
+        # The upload had no XMP; the digital source type in the database counts
+        Image.objects.filter(pk=image.pk).update(digital_source_type=AI_GENERATED)
+        image.refresh_from_db()
+        thumbnail = image.file.get_thumbnail({"size": (20, 20)}, generate=True)
+        self.assertTrue(thumbnail.name.endswith(".png"))
+        self.assertEqual(self.detect(self.read(thumbnail)), AI_GENERATED)
+
+    def test_webp(self):
+        buffer = io.BytesIO()
+        create_image(size=(40, 30)).save(buffer, "WEBP", xmp=xmp_packet())
+        image = self.create(buffer.getvalue(), name="ai.webp")
+        with override_settings(THUMBNAIL_PRESERVE_EXTENSIONS=("webp",)):
+            # The thumbnailer reads the setting when it is created
+            thumbnail = Image.objects.get(pk=image.pk).file.get_thumbnail({"size": (20, 20)}, generate=True)
+        self.assertTrue(thumbnail.name.endswith(".webp"))
+        data = self.read(thumbnail)
+        self.assertEqual(self.detect(data), AI_GENERATED)
+        self.assertEqual(PILImage.open(io.BytesIO(data)).size, (20, 15))
+
+    def test_gif(self):
+        image = self.create(gif_bytes(xmp_packet()), name="ai.gif")
+        with override_settings(THUMBNAIL_PRESERVE_EXTENSIONS=("gif",)):
+            # The thumbnailer reads the setting when it is created
+            thumbnail = Image.objects.get(pk=image.pk).file.get_thumbnail({"size": (20, 20)}, generate=True)
+        self.assertTrue(thumbnail.name.endswith(".gif"))
+        self.assertEqual(self.detect(self.read(thumbnail)), AI_GENERATED)
+
+    def test_without_digital_source_type_no_xmp_is_added(self):
+        image = self.create(jpeg_bytes())
+        data = self.read(image.file.get_thumbnail({"size": (20, 20)}, generate=True))
+        self.assertNotIn(b"http://ns.adobe.com/xap/1.0/", data)
+
+    def test_failure_keeps_thumbnail(self):
+        image = self.create(jpeg_bytes(xmp_packet()))
+        with mock.patch("filer.utils.filer_easy_thumbnails.embed_xmp", side_effect=ValueError), \
+                self.assertLogs("filer.utils.filer_easy_thumbnails", "WARNING"):
+            thumbnail = image.file.get_thumbnail({"size": (20, 20)}, generate=True)
+        self.assertEqual(PILImage.open(io.BytesIO(self.read(thumbnail))).size, (20, 15))
+
+    def test_embed_xmp(self):
+        xmp = build_xmp_packet(AI_GENERATED)
+        for image_format, data in (
+            ("JPEG", jpeg_bytes()),
+            ("PNG", png_bytes()),
+            ("GIF", gif_bytes()),
+        ):
+            with self.subTest(image_format):
+                result = embed_xmp(data, image_format, xmp)
+                self.assertEqual(self.detect(result), AI_GENERATED)
+                PILImage.open(io.BytesIO(result)).load()
+        self.assertIsNone(embed_xmp(b"", "WEBP", xmp))
+
+
+class ResizeProvenanceTests(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username="admin", password="secret")
+        self.folder = Folder.objects.create(name="foo")
+
+    def tearDown(self):
+        self.client.logout()
+        for image in Image.objects.all():
+            image.delete()
+
+    def resize(self, data, name):
+        image = Image.objects.create(
+            owner=self.superuser,
+            original_filename=name,
+            folder=self.folder,
+            file=DjangoFile(io.BytesIO(data), name=name),
+        )
+        response = self.client.post(
+            reverse("admin:filer-directory_listing", kwargs={"folder_id": self.folder.pk}),
+            {
+                "action": "resize_images",
+                "post": "yes",
+                "width": 20,
+                "height": 20,
+                "crop": False,
+                "upscale": False,
+                helpers.ACTION_CHECKBOX_NAME: f"file-{image.pk}",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        image.refresh_from_db()
+        with image.file.open("rb") as fh:
+            return image, fh.read()
+
+    def test_resized_original_keeps_digital_source_type(self):
+        image, data = self.resize(jpeg_bytes(xmp_packet(), c2pa=True), "ai.jpg")
+        self.assertEqual((image.width, image.height), (20, 15))
+        file = io.BytesIO(data)
+        self.assertEqual(detect_digital_source_type(PILImage.open(file), file), AI_GENERATED)
+        # The Content Credentials cannot survive, but the database still
+        # records that the upload had them
+        self.assertFalse(detect_content_credentials(io.BytesIO(data)))
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertTrue(image.has_content_credentials)
+
+    def test_resized_png(self):
+        image, data = self.resize(png_bytes(xmp_packet(AI_EDITED)), "ai.png")
+        self.assertEqual((image.width, image.height), (20, 15))
+        self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(data))), AI_EDITED)
+        self.assertEqual(image.digital_source_type, AI_EDITED)
+
+    def test_resized_image_without_digital_source_type(self):
+        image, data = self.resize(jpeg_bytes(), "plain.jpg")
+        self.assertNotIn(b"http://ns.adobe.com/xap/1.0/", data)
+        self.assertEqual(image.digital_source_type, "")
 
 
 class DetectProvenanceCommandTests(TestCase):

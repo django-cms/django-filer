@@ -169,9 +169,9 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
         build_xmp_packet,
         detect_content_credentials,
         detect_digital_source_type,
-        insert_gif_xmp,
-        insert_jpeg_xmp,
+        embed_xmp,
         read_xmp_packet,
+        xmp_save_options,
     )
 
     has_content_credentials = detect_content_credentials(file)
@@ -227,16 +227,7 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
         digital_source_type = detect_digital_source_type(image, file)
         if digital_source_type:
             xmp = build_xmp_packet(digital_source_type)
-    if xmp and image_format == "PNG":
-        from PIL.PngImagePlugin import PngInfo
-
-        save_kwargs["pnginfo"] = PngInfo()
-        save_kwargs["pnginfo"].add_itxt("XML:com.adobe.xmp", xmp.decode())
-    elif xmp and image_format == "TIFF":
-        save_kwargs["tiffinfo"] = {700: xmp}  # XMP tag
-    elif xmp and image_format not in ("JPEG", "GIF"):
-        # WebP, AVIF, HEIF; Pillow < 11 cannot write XMP into a JPEG, nor into a GIF
-        save_kwargs["xmp"] = xmp
+            save_kwargs.update(xmp_save_options(image_format, xmp))
 
     try:
         if getattr(image, "is_animated", False):
@@ -264,10 +255,8 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
     buffer = io.BytesIO()
     image.save(buffer, **save_kwargs)
     data = buffer.getvalue()
-    if xmp and image_format == "JPEG":
-        data = insert_jpeg_xmp(data, xmp)
-    elif xmp and image_format == "GIF":
-        data = insert_gif_xmp(data, xmp)
+    if xmp:
+        data = embed_xmp(data, image_format, xmp) or data
     file.seek(0)
     file.truncate()
     file.write(data)
