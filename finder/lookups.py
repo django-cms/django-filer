@@ -18,6 +18,9 @@ def annotate_unified_queryset(ambit, queryset):
             summary=proxy_obj.summary,
             folderitem_component=proxy_obj.folderitem_component,
         )
+        if getattr(proxy_obj, 'is_ai_generated', False):
+            # images created or edited using generative AI show their origin in the list
+            entry['origin'] = str(proxy_obj.digital_source_type_label)
         if tag_ids := entry.pop('tag_ids', None):
             tag_ids = list(map(int, tag_ids.split(',')))
             entry['tags'] = [
@@ -36,6 +39,18 @@ def lookup_by_tag(request):
                 lookup['tags__in'] = tag_ids
         except ValueError:
             pass
+    return lookup
+
+
+def lookup_by_provenance(request):
+    """
+    Filter images created or edited using generative AI (`ai`) and/or uploaded with
+    C2PA Content Credentials (`c2pa`).
+    """
+    lookup = {}
+    if filter := request.COOKIES.get('django-finder-provenance'):
+        if provenance := [v for v in filter.split(',') if v in ('ai', 'c2pa')]:
+            lookup['provenance'] = provenance
     return lookup
 
 
