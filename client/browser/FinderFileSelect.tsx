@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
+import {useDialogHost} from './DialogHost';
 import UploadFileCloudIcon from '../icons/upload-file-cloud.svg';
 
 
@@ -140,27 +141,7 @@ export default function FinderFileSelect(props) {
 		};
 	}, []);
 
-	useEffect(() => {
-		const handleEscape = (event) => {
-			if (event.key === 'Escape') {
-				selectRef.current.dismissAndClose();
-			}
-		};
-		const preventDefault = (event) => {
-			event.preventDefault();
-		};
-		window.addEventListener('keydown', handleEscape);
-
-		// prevent browser from loading a drag-and-dropped file
-		window.addEventListener('dragover', preventDefault, false);
-		window.addEventListener('drop', preventDefault, false);
-
-		return () => {
-			window.removeEventListener('keydown', handleEscape);
-			window.removeEventListener('dragover', preventDefault);
-			window.removeEventListener('drop', preventDefault);
-		}
-	}, []);
+	const renderDialog = useDialogHost(styleUrl, dialogRef, () => selectRef.current.dismissAndClose());
 
 	async function valueChanged(event) {
 		const fileId = event.target.value;
@@ -211,18 +192,20 @@ export default function FinderFileSelect(props) {
 	return (<>
 		<slot ref={slotRef} />
 		<FilePreview selectedFile={selectedFile} openDialog={openDialog} removeFile={removeFile} />
-		<dialog ref={dialogRef}>
-			<FileSelectDialog
-				ref={selectRef}
-				ambit={props.ambit}
-				baseUrl={baseUrl}
-				mimeTypes={mimeTypes}
-				csrfToken={csrfToken}
-				selectFile={selectFile}
-				selectedFileId={selectedFile?.id}
-				selectedFolderId={selectedFile?.parent}
-				dialogRef={dialogRef}
-			/>
-		</dialog>
+		{renderDialog(
+			<dialog ref={dialogRef}>
+				<FileSelectDialog
+					ref={selectRef}
+					ambit={props.ambit}
+					baseUrl={baseUrl}
+					mimeTypes={mimeTypes}
+					csrfToken={csrfToken}
+					selectFile={selectFile}
+					selectedFileId={selectedFile?.id}
+					selectedFolderId={selectedFile?.parent}
+					dialogRef={dialogRef}
+				/>
+			</dialog>
+		)}
 	</>);
 }

@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
+import {useDialogHost} from './DialogHost';
 import UploadFolderCloudIcon from '../icons/upload-folder-cloud.svg';
 
 
@@ -112,27 +113,7 @@ export default function FinderFolderSelect(props) {
 		};
 	}, []);
 
-	useEffect(() => {
-		const handleEscape = (event) => {
-			if (event.key === 'Escape') {
-				selectRef.current.dismissAndClose();
-			}
-		};
-		const preventDefault = (event) => {
-			event.preventDefault();
-		};
-		window.addEventListener('keydown', handleEscape);
-
-		// prevent browser from loading a drag-and-dropped file
-		window.addEventListener('dragover', preventDefault, false);
-		window.addEventListener('drop', preventDefault, false);
-
-		return () => {
-			window.removeEventListener('keydown', handleEscape);
-			window.removeEventListener('dragover', preventDefault);
-			window.removeEventListener('drop', preventDefault);
-		}
-	}, []);
+	const renderDialog = useDialogHost(styleUrl, dialogRef, () => selectRef.current.dismissAndClose());
 
 	async function valueChanged(event) {
 		const folderId = event.target.value;
@@ -192,16 +173,18 @@ export default function FinderFolderSelect(props) {
 	return (<>
 		<slot ref={slotRef} />
 		<FolderPreview selectedFolder={selectedFolder} folderIconUrl={folderIconUrl} openDialog={openDialog} removeFolder={removeFolder} />
-		<dialog ref={dialogRef}>
-			<FileSelectDialog
-				ref={selectRef}
-				ambit={props.ambit}
-				baseUrl={baseUrl}
-				csrfToken={csrfToken}
-				selectFolder={selectFolder}
-				selectedFolderId={selectedFolder?.id}
-				dialogRef={dialogRef}
-			/>
-		</dialog>
+		{renderDialog(
+			<dialog ref={dialogRef}>
+				<FileSelectDialog
+					ref={selectRef}
+					ambit={props.ambit}
+					baseUrl={baseUrl}
+					csrfToken={csrfToken}
+					selectFolder={selectFolder}
+					selectedFolderId={selectedFolder?.id}
+					dialogRef={dialogRef}
+				/>
+			</dialog>
+		)}
 	</>);
 }

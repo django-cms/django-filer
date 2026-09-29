@@ -8,11 +8,13 @@ function EditorForm(props) {
 	const [formHtml, setFormHtml] = useState(props.form_html);
 
 	useEffect(() => {
+		// compare with the classes of the window the dialog is rendered in, see `useDialogHost`
+		const view = mainContent.ownerDocument.defaultView;
 		const shadowRoot = mainContent.getRootNode();
-		if (!(shadowRoot instanceof ShadowRoot))
+		if (!(shadowRoot instanceof view.ShadowRoot))
 			return;
 		const tagsElement = shadowRoot.getElementById('id_tags');
-		if (!(tagsElement instanceof HTMLSelectElement))
+		if (!(tagsElement instanceof view.HTMLSelectElement))
 			return;
 		if (settings.tags) {
 			// extract selected values from the original <select multiple name="tags"> element
@@ -41,7 +43,7 @@ function EditorForm(props) {
 	function handleSave() {
 		const changeUrl = `${settings.baseUrl}${file_info.id}/change`;
 		const form = mainContent.querySelector('form');
-		if (!(form instanceof HTMLFormElement))
+		if (!(form instanceof mainContent.ownerDocument.defaultView.HTMLFormElement))
 			throw new Error('Form not found');
 		const formData = new FormData(form);
 		fetch(changeUrl, {
