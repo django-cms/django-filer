@@ -108,7 +108,7 @@ What happens to the metadata in files
      - kept
      - removed
    * - Thumbnails and other renditions
-     - removed
+     - kept
      - removed
    * - ``meta_data`` of the image
      - kept
@@ -127,9 +127,12 @@ Payload validators
     removes it from the stored file, but not from ``meta_data``.
 
 Thumbnails and renditions
-    Renditions in the sample storage are re-encoded without metadata. This is intended for
-    C2PA: a manifest signed for the original would not match a resized or cropped image. The
-    provenance of a rendition is that of its image.
+    Renditions in the sample storage are re-encoded. Like a re-encoded original, a rendition
+    of a web image gets a minimal XMP packet with the digital source type of its image, so
+    that a thumbnail shared on its own still states that it was e.g. created using generative
+    AI. It carries no C2PA manifest: one signed for the original would not match a resized or
+    cropped image. Renditions generated before django-finder wrote the digital source type
+    into them lack it; since the sample storage is disposable, clear it to regenerate them.
 
 
 In the admin
@@ -179,4 +182,9 @@ what it finds, without changing their modification date. ``--dry-run`` reports w
 updated, ``-v 2`` lists the images. It can only find what the stored files still contain: if
 an original was re-encoded or sanitized on upload, its Content Credentials are gone.
 
-``filer_to_finder`` copies the provenance django-filer recorded for its images.
+``filer_to_finder`` copies the provenance django-filer (3.7 and later) recorded for its images,
+also for a custom ``FILER_IMAGE_MODEL``. Like ``detect-provenance`` it only adds information,
+and it does so on every run, so provenance recorded by ``filer_detect_provenance`` after an
+earlier migration is carried over, too. Since django-filer's ``strip_exif`` may have removed the
+provenance from the stored files, run ``filer_detect_provenance`` before ``filer_to_finder``,
+and ``finder detect-provenance`` afterwards for anything left.

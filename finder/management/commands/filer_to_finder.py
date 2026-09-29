@@ -3,13 +3,18 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 
 from filer.models.filemodels import Folder as FilerFolder
-from filer.models.imagemodels import Image as FilerImage
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
 
 from finder.contrib.image.models import ImageFileModel as FinderImage
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFile
 from finder.models.folder import FolderModel as FinderFolder
 from finder.utils.provenance import Provenance, provenance_meta_data
+
+
+# a custom image model inherits the fields of filer's `BaseImage`, including its provenance
+FilerImage = load_model(FILER_IMAGE_MODEL)
 
 
 class Command(BaseCommand):
@@ -45,7 +50,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"Create folder “{finder_folder}” in “{finder_parent}”.")
 
-        allowed_image_types = ['image/gif', 'image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
+        allowed_image_types = ['image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
         for filer_file in filer_folder.files.all():
             if isinstance(filer_file, FilerImage) and filer_file.mime_type in allowed_image_types:
                 self.migrate_image(filer_file, finder_folder)
@@ -100,19 +105,20 @@ class Command(BaseCommand):
             meta_data['crop_size'] = crop_size
         except ValueError:
             pass
-        # django-filer detects the provenance of images since version 3.7
-        provenance = provenance_meta_data(Provenance(
+        # django-filer records the provenance of images since version 3.7. Its database fields are
+        # authoritative: `strip_exif` may have removed the provenance from the stored file.
+        provenance = Provenance(
             digital_source_type=getattr(filer_image, 'digital_source_type', ''),
             has_content_credentials=getattr(filer_image, 'has_content_credentials', False),
-        ))
-        if provenance:
-            meta_data['provenance'] = provenance
+        )
         try:
             finder_image = FinderImage.objects.get(id=inode_id)
         except FinderImage.DoesNotExist:
             if not filer_image._file_size:
                 self.stderr.write(f"Image {filer_image} has no file size.")
                 return
+            if data := provenance_meta_data(provenance):
+                meta_data['provenance'] = data
             FinderImage.objects.create(
                 id=inode_id,
                 name=filer_image.name if filer_image.name else filer_image.original_filename,
@@ -140,4 +146,9 @@ class Command(BaseCommand):
                 finder_image.width = filer_image.width
                 finder_image.height = filer_image.height
                 finder_image.meta_data.update(meta_data)
+                finder_image.merge_provenance(provenance)
                 finder_image.save()
+            elif finder_image.merge_provenance(provenance):
+                # `filer_detect_provenance` leaves the modification date of filer's images untouched,
+                # so provenance recorded after an earlier migration must be merged regardless of it
+                FinderImage.objects.filter(id=finder_image.id).update(meta_data=finder_image.meta_data)

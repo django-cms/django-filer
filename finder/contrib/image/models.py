@@ -85,6 +85,21 @@ class ImageFileModel(AbstractFileModel):
         else:
             self.meta_data.pop('provenance', None)
 
+    def merge_provenance(self, provenance):
+        """
+        Add provenance found elsewhere, e.g. recorded by django-filer, without clearing what is
+        known already: the stored payload may have lost it since. Return True if it changed.
+        """
+        existing = self.provenance
+        merged = Provenance(
+            digital_source_type=existing.digital_source_type or provenance.digital_source_type,
+            has_content_credentials=existing.has_content_credentials or provenance.has_content_credentials,
+        )
+        if merged == existing:
+            return False
+        self.set_provenance(merged)
+        return True
+
     @property
     def provenance(self):
         data = self.meta_data.get('provenance') or {}

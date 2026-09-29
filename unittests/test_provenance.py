@@ -2,10 +2,15 @@
 Tests for detecting and keeping the provenance of images: the IPTC digital source type,
 which e.g. marks images created using generative AI, and embedded C2PA Content Credentials.
 """
+import importlib
 import pytest
 import struct
+import sys
 import zlib
+from datetime import timedelta
 from io import BytesIO, StringIO
+from types import SimpleNamespace
+from uuid import uuid4
 
 from PIL import ExifTags, Image
 
@@ -386,6 +391,29 @@ def test_copy_keeps_provenance(ambit, admin_user, sub_folder):
     assert PILImageModel.objects.get(pk=copy.pk).is_ai_generated
 
 
+@pytest.mark.parametrize('data, name, mime_type', [
+    (jpeg_bytes(xmp_packet(), c2pa=True, size=(400, 300)), 'picture.jpg', 'image/jpeg'),
+    (png_bytes(xmp_packet(), c2pa=True, size=(400, 300)), 'picture.png', 'image/png'),
+    (gif_bytes(xmp_packet(), c2pa=True), 'picture.gif', 'image/gif'),
+])
+def test_thumbnail_keeps_digital_source_type(ambit, admin_user, data, name, mime_type):
+    image = upload(ambit, admin_user, data, name=name, mime_type=mime_type)
+    image.get_thumbnail_url(ambit)
+    thumbnail_path = f'{image.id}/{image.get_cropped_filename(image.thumbnail_size, image.thumbnail_size)}'
+    with ambit.sample_storage.open(thumbnail_path, 'rb') as handle:
+        thumbnail = BytesIO(handle.read())
+    assert Image.open(thumbnail).format == Image.open(BytesIO(data)).format
+    assert detect_file_provenance(thumbnail) == Provenance(AI_GENERATED, False)
+
+
+def test_thumbnail_without_provenance_has_no_xmp(ambit, admin_user):
+    image = upload(ambit, admin_user, png_bytes(size=(400, 300)), name='plain.png', mime_type='image/png')
+    image.get_thumbnail_url(ambit)
+    thumbnail_path = f'{image.id}/{image.get_cropped_filename(image.thumbnail_size, image.thumbnail_size)}'
+    with ambit.sample_storage.open(thumbnail_path, 'rb') as handle:
+        assert b'XML:com.adobe.xmp' not in handle.read()
+
+
 # admin
 
 def replace_file(admin_client, image, data, name='picture.jpg', mime_type='image/jpeg'):
@@ -509,3 +537,109 @@ def test_admin_fetch_shows_origin_of_ai_images(admin_client, ambit, images):
     # other digital source types are shown on the change form only
     assert origins[str(images['capture'].id)] is None
     assert origins[str(images['plain'].id)] is None
+
+
+# merging provenance recorded elsewhere
+
+def test_merge_provenance_only_adds(ambit, admin_user):
+    image = upload(ambit, admin_user, jpeg_bytes(xmp_packet(CAPTURE)))
+    assert image.merge_provenance(Provenance()) is False
+    assert image.merge_provenance(Provenance(CAPTURE)) is False
+    # a known digital source type is kept, the Content Credentials flag is added
+    assert image.merge_provenance(Provenance(AI_GENERATED, True)) is True
+    assert image.provenance == Provenance(CAPTURE, True)
+
+    plain = upload(ambit, admin_user, jpeg_bytes(), name='plain.jpg')
+    assert plain.merge_provenance(Provenance(AI_EDITED)) is True
+    assert plain.meta_data['provenance']['ai_generated'] is True
+
+
+# filer_to_finder, run against stand-ins for django-filer, which the unit tests do not install
+
+@pytest.fixture
+def filer_to_finder(monkeypatch):
+    module_name = 'finder.management.commands.filer_to_finder'
+    stubs = {
+        'filer.models': SimpleNamespace(),
+        'filer.models.filemodels': SimpleNamespace(Folder=None),
+        'filer.settings': SimpleNamespace(FILER_IMAGE_MODEL='filer.Image'),
+        'filer.utils.loader': SimpleNamespace(load_model=lambda model_name: SimpleNamespace),
+    }
+    for name, stub in stubs.items():
+        monkeypatch.setitem(sys.modules, name, stub)
+    sys.modules.pop(module_name, None)
+    yield importlib.import_module(module_name).Command(stdout=StringIO(), stderr=StringIO())
+    sys.modules.pop(module_name, None)
+
+
+def filer_image(inode_id, modified_at, mime_type='image/jpeg', **provenance):
+    return SimpleNamespace(
+        file=SimpleNamespace(name=f'{inode_id}/picture.jpg'),
+        default_alt_text="Robot",
+        subject_location='',
+        name="Picture",
+        original_filename='picture.jpg',
+        uploaded_at=modified_at,
+        modified_at=modified_at,
+        sha1='0' * 40,
+        mime_type=mime_type,
+        _file_size=1234,
+        owner_id=None,
+        width=40,
+        height=30,
+        **provenance,
+    )
+
+
+def test_filer_to_finder_copies_provenance(ambit, filer_to_finder):
+    from django.utils.timezone import now
+
+    inode_id = uuid4()
+    source = filer_image(inode_id, now(), digital_source_type=AI_GENERATED, has_content_credentials=True)
+    filer_to_finder.migrate_image(source, ambit.root_folder)
+    image = ImageFileModel.objects.get(id=inode_id)
+    assert image.provenance == Provenance(AI_GENERATED, True)
+    assert image.meta_data['alt_text'] == "Robot"
+
+
+def test_filer_to_finder_without_provenance_fields(ambit, filer_to_finder):
+    """django-filer before version 3.7 records no provenance."""
+    from django.utils.timezone import now
+
+    inode_id = uuid4()
+    filer_to_finder.migrate_image(filer_image(inode_id, now(), mime_type='image/avif'), ambit.root_folder)
+    image = ImageFileModel.objects.get(id=inode_id)
+    assert image.mime_type == 'image/avif'
+    assert 'provenance' not in image.meta_data
+
+
+def test_filer_to_finder_merges_provenance_recorded_later(ambit, filer_to_finder):
+    """`filer_detect_provenance` does not touch the modification date of filer's images."""
+    from django.utils.timezone import now
+
+    inode_id = uuid4()
+    filer_to_finder.migrate_image(filer_image(inode_id, now() - timedelta(days=1)), ambit.root_folder)
+    last_modified_at = ImageFileModel.objects.get(id=inode_id).last_modified_at
+
+    source = filer_image(inode_id, now() - timedelta(days=1), digital_source_type=AI_EDITED)
+    filer_to_finder.migrate_image(source, ambit.root_folder)
+    image = ImageFileModel.objects.get(id=inode_id)
+    assert image.provenance == Provenance(AI_EDITED, False)
+    assert image.last_modified_at == last_modified_at
+
+
+def test_filer_to_finder_does_not_clear_provenance(ambit, filer_to_finder):
+    from django.utils.timezone import now
+
+    inode_id = uuid4()
+    filer_to_finder.migrate_image(filer_image(inode_id, now() - timedelta(days=1)), ambit.root_folder)
+    image = ImageFileModel.objects.get(id=inode_id)
+    image.set_provenance(Provenance(CAPTURE, True))  # e.g. by `finder detect-provenance`
+    image.save()
+
+    # a newer filer image without, or with other provenance information
+    source = filer_image(inode_id, now() + timedelta(days=1), digital_source_type=AI_GENERATED)
+    filer_to_finder.migrate_image(source, ambit.root_folder)
+    image = ImageFileModel.objects.get(id=inode_id)
+    assert image.provenance == Provenance(CAPTURE, True)
+    assert image.meta_data['alt_text'] == "Robot"
