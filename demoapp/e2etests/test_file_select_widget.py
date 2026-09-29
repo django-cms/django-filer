@@ -88,7 +88,7 @@ def test_remove_the_selected_file(demoapp_page, image_file):
     page.wait_for_selector(f'{FILE_SELECT} .remove-file-button')
 
     page.locator(f'{FILE_SELECT} .remove-file-button').click()
-    page.wait_for_selector(f'{FILE_SELECT} .finder-file-select figure p')
+    page.wait_for_selector(f'{FILE_SELECT} .finder-file-select figure strong')
 
     assert page.locator('input#id_file').input_value() == ''
     assert page.locator(f'{FILE_SELECT} .finder-file-select figure').inner_text() == "Select File"
