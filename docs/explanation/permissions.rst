@@ -58,6 +58,22 @@ The two could not be one model. Regular entries must apply only to the object th
 attached to, template entries must apply to descendants, and a single table cannot mean both.
 
 
+Who an entry can apply to
+=========================
+
+No entry grants anything to an anonymous visitor: "everyone" means every *signed in* user.
+
+By default, entries are further restricted to staff. With ``FINDER_STAFF_ONLY = True`` (the
+default), an entry grants nothing to a user whose ``is_staff`` flag is unset, regardless of
+whether it names that user, one of their groups, or everyone. The browser endpoints are not
+behind ``admin_view()``, because the ``<finder-file-select>`` widget renders on ordinary forms,
+and a new ambit grants ``READ_WRITE`` to everyone. Without this restriction, every customer or
+subscriber account of a site could read and write its media library.
+
+Set ``FINDER_STAFF_ONLY = False`` only if non-staff users need to browse or upload through the
+widget, and narrow the "everyone" entries of your ambits before doing so.
+
+
 Ownership
 =========
 

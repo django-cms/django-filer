@@ -14,6 +14,15 @@ FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'public'
 # `finder.management.create_default_ambit`, so that tests can override it.
 
 
+# FINDER_STAFF_ONLY (default True) makes every access control entry grant nothing to a
+# signed in user who is not staff, whether the entry names that user, one of their groups
+# or everyone. The browser endpoints are reachable outside the admin, because the
+# <finder-file-select> widget renders on ordinary forms. Set it to False only if non-staff
+# users need to browse or upload through that widget, and restrict the ACLs accordingly.
+# It is read at call time by `finder.models.permission.is_excluded`, so that tests can
+# override it.
+
+
 # The validators run against every uploaded payload unless a project opts out of them.
 # They cover the formats a browser executes in the media origin, which is where an uploaded
 # file turns into stored XSS against the site's own staff and visitors.

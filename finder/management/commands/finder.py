@@ -150,7 +150,8 @@ class Command(BaseCommand):
         values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
         AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
-        # create ACL and default ACL with RW-permission for everyone
+        # create ACL and default ACL with RW-permission for everyone (restricted to staff
+        # users, unless FINDER_STAFF_ONLY is switched off)
         AccessControlEntry.objects.create(inode=root_folder.id, privilege=Privilege.READ_WRITE)
         DefaultAccessControlEntry.objects.create(folder=root_folder, privilege=Privilege.READ_WRITE)
         self.stdout.write(f"Successfully created ambit with slug ‘{slug}’.")
@@ -201,12 +202,12 @@ class Command(BaseCommand):
         def delete_orphans_in_ambit(directory=''):
             directories, files = ambit.original_storage.listdir(directory)
             for file_name in files:
+                file_path = f'{directory}/{file_name}' if directory else file_name
                 try:
                     file_obj = FinderFileModel.objects.get_inode(id=directory, is_folder=False, file_name=file_name)
                     if file_obj.folder.get_ambit().id != ambit.id:
                         self.stdout.write(f"File found in wrong ambit: {file_path}")
                 except ObjectDoesNotExist:
-                    file_path = f'{directory}/{file_name}' if directory else file_name
                     if dry_run:
                         self.stdout.write(f"Orphaned file: {file_path}")
                     else:
