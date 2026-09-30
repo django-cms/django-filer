@@ -264,7 +264,7 @@ class BrowserView(View):
         unified_queryset = sort_by_attribute(request, unified_queryset)
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': list(unified_queryset[offset:offset + self.limit]),
+            'files': unified_queryset[offset:offset + self.limit],
             'has_upload_permission': current_folder.has_permission(request.user, Privilege.WRITE),
             'offset': next_offset,
             'recursive': recursive,
@@ -311,7 +311,7 @@ class BrowserView(View):
             next_offset = None
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': list(unified_queryset[offset:offset + self.limit]),
+            'files': unified_queryset[offset:offset + self.limit],
             'offset': next_offset,
         }
 
