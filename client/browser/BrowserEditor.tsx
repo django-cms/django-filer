@@ -1,6 +1,6 @@
 import React, {lazy, Suspense, useEffect, useMemo, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import SelectTags from '../common/SelectTags';
+import SelectLabelTags from '../common/SelectTags';
 
 
 function EditorForm(props) {
@@ -14,12 +14,12 @@ function EditorForm(props) {
 		const tagsElement = shadowRoot.getElementById('id_tags');
 		if (!(tagsElement instanceof HTMLSelectElement))
 			return;
-		if (settings.tags) {
+		if (settings.label_tags) {
 			// extract selected values from the original <select multiple name="tags"> element
 			// this only happens if a user sets a tag but the form is rejected by the server
 			const initial = [];
 			for (const option of tagsElement.selectedOptions) {
-				const found = settings.tags.find(tag => tag.value == option.value);
+				const found = settings.label_tags.find(tag => tag.value == option.value);
 				if (found) {
 					initial.push(found);
 				}
@@ -33,7 +33,7 @@ function EditorForm(props) {
 			divElement.classList.add('select-container');
 			tagsElement.insertAdjacentElement('afterend', divElement);
 			const root = createRoot(divElement);
-			root.render(<SelectTags tags={settings.tags} initial={initial} original={tagsElement}/>);
+			root.render(<SelectLabelTags tags={settings.label_tags} initial={initial} original={tagsElement} />);
 		}
 		tagsElement.style.display = 'none';
 	}, [formHtml]);

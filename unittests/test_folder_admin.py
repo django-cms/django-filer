@@ -4,6 +4,7 @@ import pytest
 import uuid
 
 from bs4 import BeautifulSoup
+from datetime import datetime
 from enum import Enum, auto
 from time import sleep
 
@@ -13,12 +14,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import F
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
-from django.utils.timezone import datetime
 
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME, TRASH_FOLDER_NAME
 from finder.models.inode import DiscardedInode
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 from .testapp.models import SampleAppModel1, SampleAppModel2, SampleAppModel3, SampleAppModel4, SampleAppModel5, SampleAppModel6
@@ -34,11 +34,11 @@ class AccessControl(Enum):
 @pytest.fixture(autouse=True)
 def file_tags(django_db_blocker, ambit):
     with django_db_blocker.unblock():
-        if not FileTag.objects.filter(ambit=ambit).exists():
-            FileTag.objects.bulk_create([
-                FileTag(ambit=ambit, label="Red", color='#ff0000'),
-                FileTag(ambit=ambit, label="Green", color='#00ff00'),
-                FileTag(ambit=ambit, label="Blue", color='#0000ff'),
+        if not LabelTag.objects.filter(ambit=ambit).exists():
+            LabelTag.objects.bulk_create([
+                LabelTag(ambit=ambit, label="Red", color='#ff0000'),
+                LabelTag(ambit=ambit, label="Green", color='#00ff00'),
+                LabelTag(ambit=ambit, label="Blue", color='#0000ff'),
             ])
 
 
@@ -89,7 +89,7 @@ def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, pr
         'is_root': True,
         'is_trash': False,
         'folder_url': root_folder_url,
-        'tags': list(FileTag.objects.filter(ambit=ambit).values('label', 'color').annotate(value=F('id'))),
+        'tags': list(LabelTag.objects.filter(ambit=ambit).values('label', 'color').annotate(value=F('id'))),
         'is_admin': admin_user.is_superuser,
         'can_change': True,
         'base_url': reverse('admin:finder_foldermodel_changelist'),
@@ -1235,8 +1235,8 @@ def test_copy_folder_into_self(admin_client, ambit, uploaded_file, sub_folder):
 
 def test_update_file_tags(admin_client, ambit, principal_kwargs):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
-    existing_tag = FileTag.objects.create(ambit=ambit, label="Alpha", color='#111111')
-    stale_tag = FileTag.objects.create(ambit=ambit, label="Stale", color='#222222')
+    existing_tag = LabelTag.objects.create(ambit=ambit, label="Alpha", color='#111111')
+    stale_tag = LabelTag.objects.create(ambit=ambit, label="Stale", color='#222222')
     AccessControlEntry.objects.all().delete()
     if principal_kwargs:
         if 'user' in principal_kwargs:
@@ -1258,10 +1258,10 @@ def test_update_file_tags(admin_client, ambit, principal_kwargs):
     existing_tag.refresh_from_db()
     assert existing_tag.label == "Alpha Renamed"
     assert existing_tag.color == '#333333'
-    assert FileTag.objects.filter(id=stale_tag.id).exists() is False
+    assert LabelTag.objects.filter(id=stale_tag.id).exists() is False
     expected = {
         (existing_tag.id, "Alpha Renamed", '#333333'),
-        (FileTag.objects.get(label="New Tag", ambit=ambit).id, "New Tag", '#444444'),
+        (LabelTag.objects.get(label="New Tag", ambit=ambit).id, "New Tag", '#444444'),
     }
     actual = {(entry['value'], entry['label'], entry['color']) for entry in response_tags}
     assert actual == expected

@@ -7,11 +7,15 @@ from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import connections, models
+from django.db import connections
+from django.db.models import CASCADE, F, Model, NOT_PROVIDED, Q, SET_NULL, Value
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import F, Q, Value
-from django.db.models.fields import BooleanField, CharField
+from django.db.models.base import ModelBase
+from django.db.models.fields import BooleanField, CharField, DateTimeField, PositiveIntegerField, UUIDField
+from django.db.models.fields.json import JSONField
+from django.db.models.fields.related import ForeignKey
 from django.db.models.functions import Cast, Lower
+from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -52,7 +56,7 @@ NUMERIC_FIELD_TYPES = [
 FOLDER_MIME_TYPE = 'inode/directory'
 
 
-class InodeMetaModel(models.base.ModelBase):
+class InodeMetaModel(ModelBase):
     _inode_models = {}
     _mime_types_mapping = {}
 
@@ -99,7 +103,7 @@ class InodeMetaModel(models.base.ModelBase):
                 yield model
 
 
-class InodeManager(models.Manager):
+class InodeManager(Manager):
     """
     Model manager for models ineriting from `Inode`.
     """
@@ -107,7 +111,8 @@ class InodeManager(models.Manager):
     def get_query(self, model, **lookup):
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
-        tags = lookup.pop('tags__in', None)
+        tags_included = lookup.pop('tags__in', None)
+        tags_excluded = lookup.pop('tags__not_in', None)
         can_view = lookup.pop('has_read_permission', None)
         can_change = lookup.pop('has_write_permission', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
@@ -135,8 +140,10 @@ class InodeManager(models.Manager):
             query &= reduce(or_, queries, Q())
 
         # query to filter by tags
-        if tags and 'tags' in model_field_names:
-            query &= Q(tags__in=tags)
+        if tags_included and 'tags' in model_field_names:
+            query &= Q(tags__in=tags_included)
+        if tags_excluded and 'tags' in model_field_names:
+            query &= ~Q(tags__in=tags_excluded)
 
         return query
 
@@ -191,7 +198,7 @@ class InodeManager(models.Manager):
                 elif name == 'mime_type' and model.is_folder:
                     expressions[name] = Value(FOLDER_MIME_TYPE, output_field=field)
                 elif name not in model_field_names:
-                    if field.default is models.NOT_PROVIDED:
+                    if field.default is NOT_PROVIDED:
                         if field.get_internal_type() in NUMERIC_FIELD_TYPES:
                             value = 0
                         elif field.empty_strings_allowed:
@@ -228,7 +235,7 @@ class InodeManager(models.Manager):
         elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
             return folder_qs.get()
         try:
-            values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
+            values = folder_qs.values('id', mime_type=Value(None, output_field=CharField())).union(*[
                 model.objects.values('id', 'mime_type').filter(self.get_query(model, **lookup))
                 for model in FileModel.get_models()
             ]).get()
@@ -260,56 +267,56 @@ def filename_validator(value):
         raise ValidationError(msg.format(filename=value))
 
 
-class InodeModel(models.Model, metaclass=InodeMetaModel):
+class InodeModel(Model, metaclass=InodeMetaModel):
     is_folder = False
     data_fields = ['id', 'name', 'parent', 'created_at', 'last_modified_at']
 
-    id = models.UUIDField(
+    id = UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
     )
-    parent = models.ForeignKey(
+    parent = ForeignKey(
         'finder.FolderModel',
         verbose_name=_("Folder"),
         related_name='+',
         editable=False,
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=CASCADE,
     )
-    owner = models.ForeignKey(
+    owner = ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='+',
-        on_delete=models.SET_NULL,
+        on_delete=SET_NULL,
         editable=False,
         null=True,
         blank=True,
         verbose_name=_("Owner"),
     )
-    name = models.CharField(
+    name = CharField(
         max_length=255,
         verbose_name=_("Name"),
         db_index=True,
         validators=[filename_validator],
     )
-    created_at = models.DateTimeField(
+    created_at = DateTimeField(
         _("Created at"),
         auto_now_add=True,
         editable=False,
     )
-    last_modified_at = models.DateTimeField(
+    last_modified_at = DateTimeField(
         _("Modified at"),
         auto_now=True,
         editable=False,
     )
-    ordering = models.PositiveIntegerField(
+    ordering = PositiveIntegerField(
         _("Ordering index"),
         default=0,
         editable=False,
         db_index=True,
     )
-    meta_data = models.JSONField(
+    meta_data = JSONField(
         default=dict,
         blank=True,
     )
@@ -352,8 +359,6 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             return str(data)
         if field_name in ['created_at', 'last_modified_at']:
             return data.isoformat()
-        if field_name == 'tags':
-            return list(self.tags.values('id', 'label', 'color'))
         return data
 
     def get_meta_data(self):
@@ -423,24 +428,24 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         current_acl_qs.exclude(id__in=entry_ids).delete()
 
 
-class DiscardedInode(models.Model):
+class DiscardedInode(Model):
     """
     Store information about inodes that have been moved to the trash folder so that they can be restored again.
     """
-    inode = models.UUIDField(
+    inode = UUIDField(
         primary_key=True,
     )
-    previous_parent = models.ForeignKey(
+    previous_parent = ForeignKey(
         'finder.FolderModel',
         related_name='+',
-        on_delete=models.CASCADE,
+        on_delete=CASCADE,
     )
-    trash_folder = models.ForeignKey(
+    trash_folder = ForeignKey(
         'finder.FolderModel',
         related_name='+',
-        on_delete=models.CASCADE,
+        on_delete=CASCADE,
     )
-    deleted_at = models.DateTimeField(
+    deleted_at = DateTimeField(
         _("Deleted at"),
         auto_now_add=True,
     )

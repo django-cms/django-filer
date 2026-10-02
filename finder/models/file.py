@@ -13,7 +13,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext, gettext_lazy as _
 
 from finder import settings
-from finder.models.filetag import FileTag
+from finder.models.filetag import FileTag, LabelTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 from finder.storages import delete_directory
@@ -189,7 +189,7 @@ class AbstractFileModel(InodeModel):
             'download_url': self.get_download_url(ambit),
             'thumbnail_url': self.get_thumbnail_url(ambit),
             'sample_url': self.get_sample_url(ambit),
-            'tags': self.serializable_value('tags'),
+            'label_tags': self.serialize_label_tags(),
         }
 
     def get_download_url(self, ambit):
@@ -215,6 +215,18 @@ class AbstractFileModel(InodeModel):
         Hook to return a sample for a given file.
         """
         return None
+
+
+    def serialize_label_tags(self):
+        return list(
+            self.tags
+            .filter(labeltag__isnull=False)
+            .values(
+                'id',
+                label=models.F('labeltag__label'),
+                color=models.F('labeltag__color'),
+            )
+        )
 
     @cached_property
     def mime_maintype(self):

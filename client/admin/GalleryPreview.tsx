@@ -1,13 +1,13 @@
 import React, {lazy, Suspense, useContext, useMemo, useRef} from 'react';
 import FinderSettings from './FinderSettings';
-import FileTags from '../common/FileTags';
+import {LabelTags} from '../common/LabelTags';
 
 
 function StaticFigure(props) {
 	return (
-		<FileTags tags={props.tags}>
+		<LabelTags tags={props.label_tags}>
 			{props.children}
-		</FileTags>
+		</LabelTags>
 	);
 }
 

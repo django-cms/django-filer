@@ -22,7 +22,7 @@ from finder.models.fields import FinderBaseModelField
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, RENAMED_SUFFIX
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.permission import Privilege, AccessControlEntry
 
 
@@ -147,11 +147,10 @@ class FolderAdmin(InodeAdmin):
                 is_admin=inode.has_permission(request.user, Privilege.ADMIN),
                 can_change=inode.has_permission(request.user, Privilege.WRITE),
             )
-            if FileTag.objects.exists():  # pragma: no branch
-                settings['tags'] = [
-                    {'value': id, 'label': label, 'color': color}
-                    for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
-                ]
+            if LabelTag.objects.exists():  # pragma: no branch
+                settings['label_tags'] = list(
+                    LabelTag.objects.filter(ambit=ambit).values('id', 'label', 'color')
+                )
             request.session['finder_last_folder_id'] = str(inode.id)
         else:  # editor settings for the trash folder
             folder_url = self.get_inode_url(ambit.slug, str(self.get_fallback_folder(request).id))
@@ -438,30 +437,27 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         preserved_tag_ids = []
         with transaction.atomic():
-            for tag in body['tags']:
+            for tag in body['label_tags']:
                 id = tag.get('value', CREATE_TAG)
                 if id is CREATE_TAG:
                     create_kwargs = {'ambit': ambit, 'label': tag['label'], 'color': tag['color']}
-                    created_entry = FileTag.objects.create(**create_kwargs)
+                    created_entry = LabelTag.objects.create(**create_kwargs)
                     preserved_tag_ids.append(created_entry.id)
-                else:
-                    update_entry = FileTag.objects.get(id=id, ambit=ambit)
+                elif LabelTag.objects.filter(id=id, ambit=ambit).exists():
+                    update_entry = LabelTag.objects.get(id=id, ambit=ambit)
                     update_fields = []
                     if update_entry.label != tag['label']:
                         update_entry.label = tag['label']
-                        update_fields.append('label')
+                    update_fields.append('label')
                     if update_entry.color != tag['color']:
                         update_entry.color = tag['color']
                         update_fields.append('color')
                     if update_fields:
                         update_entry.save(update_fields=update_fields)
                     preserved_tag_ids.append(update_entry.id)
-            FileTag.objects.filter(ambit=ambit).exclude(id__in=preserved_tag_ids).delete()
+            LabelTag.objects.filter(ambit=ambit).exclude(id__in=preserved_tag_ids).delete()
         return JsonResponse({
-            'tags': [
-                {'value': id, 'label': label, 'color': color}
-                for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
-            ],
+            'label_tags': list(LabelTag.objects.filter(ambit=ambit).values('id', 'label', 'color')),
         })
 
     def undo_discarded_inodes(self, request, trash_folder_id):

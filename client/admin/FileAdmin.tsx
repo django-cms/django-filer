@@ -5,7 +5,7 @@ import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
 import FileDetails from './FileDetails';
 import PermissionEditor from './PermissionEditor';
-import SelectTags from '../common/SelectTags';
+import SelectLabelTags from '../common/SelectTags';
 import ShieldFileIcon from '../icons/shield-file.svg';
 
 
@@ -39,13 +39,13 @@ export default function FileAdmin() {
 	const editorRef = useRef(null);
 
 	useEffect(() => {
-		if (settings.tags) {
-			const tagsElement = document.getElementById('id_tags');
+		if (settings.label_tags) {
+			const tagsElement = document.getElementById('id_label_tags');
 			if (tagsElement instanceof HTMLSelectElement) {
-				// extract selected values from the original <select multiple name="tags"> element
+				// extract selected values from the original <select multiple name="label_tags"> element
 				const initial = [];
 				for (const option of tagsElement.selectedOptions) {
-					const found = settings.tags.find(label => label.value == option.value);
+					const found = settings.label_tags.find(label => label.id == option.value);
 					if (found) {
 						initial.push(found);
 					}
@@ -57,7 +57,7 @@ export default function FileAdmin() {
 				tagsElement.insertAdjacentElement('afterend', divElement);
 				tagsElement.style.display = 'none';
 				const root = createRoot(divElement);
-				root.render(<SelectTags tags={settings.tags} initial={initial} original={tagsElement} />);
+				root.render(<SelectLabelTags tags={settings.label_tags} initial={initial} original={tagsElement} />);
 			}
 		}
 	}, []);
