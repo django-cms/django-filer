@@ -28,11 +28,11 @@ export function DraggableItem(props) {
 	});
 	const [event, setEvent] = useState<PointerEvent>(null);
 	const [sorting] = useSorting();
-	const [filter] = useFilter();
+	const [filtered] = useFilter();
 	const [searchQuery] = useSearchParam('q');
 	const ReOrdering = useMemo(() => {
 		return (props) => {
-			if (sortingDisabled || searchQuery || sorting || filter.some(v => v))
+			if (sortingDisabled || searchQuery || sorting || Object.keys(filtered).length)
 				return <div className="reordering"></div>;
 			return (
 				<DroppableArea

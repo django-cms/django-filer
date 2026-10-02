@@ -1,0 +1,60 @@
+@use "colors";
+
+@mixin tristate-checkbox {
+	[role="checkbox"] {
+		display: inline-block;
+		color: colors.$body-fg-color;
+		width: 16px;
+		height: 16px;
+		border: 1px solid colors.$border-color;
+		border-radius: 2px;
+		cursor: pointer;
+		position: relative;
+		vertical-align: text-top;
+
+		&::before, &::after {
+			content: '';
+			position: absolute;
+		}
+
+		&[aria-checked="true"] {
+			color: colors.$default-button-fg-color;
+			background: colors.$default-button-bg-color;
+			border-color: color-mix(in oklab, colors.$default-button-bg-color 50%, colors.$border-color);
+
+			&::after {
+				margin-left: 2px;
+				margin-top: 2px;
+				width: 10px;
+				height: 6px;
+				border-bottom: solid 2px currentColor;
+				border-left: solid 2px currentColor;
+				transform: rotate(-45deg);
+			}
+		}
+
+		&[aria-checked="false"] {
+			color: colors.$delete-button-fg-color;
+			background: colors.$delete-button-bg-color;
+			border-color: color-mix(in oklab, colors.$delete-button-bg-color 50%, colors.$border-color);
+
+			&::before {
+				margin-left: 1px;
+				margin-top: 7px;
+				width: 14px;
+				height: 2px;
+				background-color: currentColor;
+				transform: rotate(45deg);
+			}
+			&::after {
+				margin-left: 1px;
+				margin-top: 7px;
+				width: 14px;
+				height: 2px;
+				background-color: currentColor;
+				transform: rotate(-45deg);
+			}
+		}
+
+	}
+}

@@ -1,23 +1,27 @@
 import React from 'react';
 import DropDownMenu from './DropDownMenu';
 import {useCookie} from './Storage';
+import TriStateCheckbox from './TriStateCheckbox';
 import FilterIcon from '../icons/filter.svg';
 
-export const useFilter = () => useCookie('django-finder-filter', []);
+export const useFilter = () => useCookie('django-finder-filter', {});
 
 
 export default function FilterByTag(props: any) {
 	const {tags, refreshFilesList} = props;
-	const [filter, setFilter] = useFilter();
+	const [filtered, setFiltered] = useFilter();
 
-	function changeFilter(value) {
-		if (value === null) {
-			setFilter([]);
-		} else if (filter.includes(value)) {
-			setFilter(filter.filter(v => v !== value));
+	function changeFiltered(name, value) {
+		if (typeof value === 'boolean') {
+			setFiltered({...filtered, [name]: value});
 		} else {
-			setFilter([...filter, value]);
+			setFiltered(Object.fromEntries(Object.entries(filtered).filter(([key]) => key != name)));
 		}
+		refreshFilesList();
+	}
+
+	function clearFiltered() {
+		setFiltered({});
 		refreshFilesList();
 	}
 
@@ -25,22 +29,20 @@ export default function FilterByTag(props: any) {
 		<DropDownMenu
 			icon={<FilterIcon/>}
 			role="menuitem"
-			aria-selected={filter.length}
+			ariaSelected={Object.keys(filtered).length ? 'true' : 'false'}
 			className="filter-by-tag with-caret"
 			tooltip={gettext("Filter by file tag")}
 			root={props.root}
 		>
-			<li role="option"><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
+			<li role="option"><span onClick={clearFiltered}>{gettext("Clear all")}</span></li>
 			<hr/>
 			{tags.map((tag, index) => (
 			<li key={tag.value} role="option" aria-multiselectable={true}>
 				<label htmlFor={`filter-${tag.value}`}>
-					<input
-						type="checkbox"
+					<TriStateCheckbox
 						id={`filter-${tag.value}`}
-						name={tag.value}
-						checked={filter.includes(tag.value)}
-						onChange={() => changeFilter(tag.value)}
+						checked={filtered[tag.value]}
+						onChange={(state) => changeFiltered(tag.value, state)}
 					/>
 					<span className="tag-dot" style={{backgroundColor: tag.color}}></span>
 					{tag.label}
