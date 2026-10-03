@@ -17,7 +17,12 @@ from django.utils.html import format_html
 from django.utils.translation import gettext
 
 from finder.admin.inode import InodeAdmin
-from finder.lookups import lookup_by_provenance, lookup_by_read_permission, lookup_by_tag
+from finder.lookups import (
+    is_provenance_filter_enabled,
+    lookup_by_provenance,
+    lookup_by_read_permission,
+    lookup_by_tag,
+)
 from finder.models.fields import FinderBaseModelField
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, RENAMED_SUFFIX
@@ -167,6 +172,7 @@ class FolderAdmin(InodeAdmin):
             menu_extensions=self.get_menu_extension_settings(request),
             folder_url=folder_url,
             ancestors=ancestors,
+            provenance_filter=is_provenance_filter_enabled(),
             open_folder_icon_url=staticfiles_storage.url('finder/icons/folder-open.svg'),
         )
         return settings

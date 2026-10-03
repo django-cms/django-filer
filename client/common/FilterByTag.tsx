@@ -14,7 +14,7 @@ const provenanceOptions = [
 
 
 export default function FilterByTag(props: any) {
-	const {tags, refreshFilesList} = props;
+	const {tags, refreshFilesList, provenanceFilter: provenanceFilterEnabled} = props;
 	const [filter, setFilter] = useFilter();
 	const [provenanceFilter, setProvenanceFilter] = useProvenanceFilter();
 	const provenance = provenanceFilter ? provenanceFilter.split(',') : [];
@@ -44,9 +44,9 @@ export default function FilterByTag(props: any) {
 		<DropDownMenu
 			icon={<FilterIcon/>}
 			role="menuitem"
-			aria-selected={filter.length + provenance.length}
+			aria-selected={filter.length + (provenanceFilterEnabled ? provenance.length : 0)}
 			className="filter-by-tag with-caret"
-			tooltip={gettext("Filter by file tag or image provenance")}
+			tooltip={provenanceFilterEnabled ? gettext("Filter by file tag or image provenance") : gettext("Filter by file tag")}
 			root={props.root}
 		>
 			<li role="option"><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
@@ -66,8 +66,8 @@ export default function FilterByTag(props: any) {
 				</label>
 			</li>
 			))}
-			{tags.length > 0 && <hr/>}
-			{provenanceOptions.map(option => (
+			{provenanceFilterEnabled && tags.length > 0 && <hr/>}
+			{provenanceFilterEnabled && provenanceOptions.map(option => (
 			<li key={option.value} role="option" aria-multiselectable={true}>
 				<label htmlFor={`filter-provenance-${option.value}`}>
 					<input

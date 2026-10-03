@@ -98,6 +98,7 @@ interface FileStructure {
 	recursive: boolean;
 	search_query: string;
 	tags: any[];
+	provenance_filter: boolean;
 }
 
 
@@ -116,6 +117,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 			recursive: false,
 			search_query: '',
 			tags: [],
+			provenance_filter: false,
 		};
 		structureRef.current = initial;
 		return initial;
@@ -351,6 +353,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					ref={menuBarRef}
 					openUploader={() => uploaderRef.current.openUploader()}
 					tags={structure.tags}
+					provenanceFilter={structure.provenance_filter}
 					refreshFilesList={refreshFilesList}
 					setDirty={setDirty}
 					setSearchQuery={setSearchQuery}

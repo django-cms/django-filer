@@ -418,13 +418,13 @@ def detect_file_provenance(file):
 
 def provenance_meta_data(provenance):
     """Return the provenance as stored in an image's ``meta_data['provenance']``, or
-    ``None`` if there is none. ``ai_generated`` is kept to make it easy to filter on."""
+    ``None`` if there is none. Whether it denotes generative AI is derived from the
+    digital source type, see ``ai_digital_source_type_q``, and hence not stored."""
     if not (provenance.digital_source_type or provenance.has_content_credentials):
         return None
     return {
         "digital_source_type": provenance.digital_source_type,
         "content_credentials": provenance.has_content_credentials,
-        "ai_generated": is_ai_digital_source_type(provenance.digital_source_type),
     }
 
 

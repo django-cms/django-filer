@@ -1,4 +1,6 @@
+from functools import reduce
 from logging import getLogger
+from operator import or_
 from pathlib import Path
 
 from django.conf import settings
@@ -10,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from finder.models.file import AbstractFileModel
 from finder.utils.provenance import (
     Provenance,
+    ai_digital_source_type_q,
     detect_file_provenance,
     get_digital_source_type_label,
     is_ai_digital_source_type,
@@ -99,6 +102,19 @@ class ImageFileModel(AbstractFileModel):
             return False
         self.set_provenance(merged)
         return True
+
+    @classmethod
+    def get_provenance_query(cls, provenance):
+        """
+        Return the query filtering images created or edited using generative AI (`ai`) and/or
+        uploaded with C2PA Content Credentials (`c2pa`), as stored by `set_provenance`.
+        """
+        queries = []
+        if 'ai' in provenance:
+            queries.append(ai_digital_source_type_q('meta_data__provenance__digital_source_type'))
+        if 'c2pa' in provenance:
+            queries.append(models.Q(meta_data__provenance__content_credentials=True))
+        return reduce(or_, queries, models.Q())
 
     @property
     def provenance(self):

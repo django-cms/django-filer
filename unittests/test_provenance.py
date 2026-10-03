@@ -283,7 +283,6 @@ def test_provenance_meta_data():
     assert provenance_meta_data(Provenance(CAPTURE)) == {
         'digital_source_type': CAPTURE,
         'content_credentials': False,
-        'ai_generated': False,
     }
     assert provenance_meta_data(Provenance('', True))['content_credentials'] is True
 
@@ -296,7 +295,6 @@ def test_upload_detects_provenance(ambit, admin_user):
     assert image.meta_data['provenance'] == {
         'digital_source_type': AI_GENERATED,
         'content_credentials': True,
-        'ai_generated': True,
     }
     assert image.is_ai_generated
     assert str(image.digital_source_type_label) == "Created using generative AI"
@@ -453,6 +451,11 @@ def test_change_view_without_provenance(admin_client, ambit, uploaded_image):
 # filtering
 
 @pytest.fixture
+def provenance_filter(settings):
+    settings.FINDER_PROVENANCE_FILTER = True
+
+
+@pytest.fixture
 def images(ambit, admin_user, sub_folder):
     return {
         'ai': upload(ambit, admin_user, jpeg_bytes(xmp_packet()), name='ai.jpg'),
@@ -468,7 +471,7 @@ def images(ambit, admin_user, sub_folder):
     ('ai,c2pa', {'ai', 'c2pa'}),
     ('unknown', {'ai', 'c2pa', 'capture', 'plain'}),
 ])
-def test_browser_list_filtered_by_provenance(admin_client, ambit, images, cookie, expected):
+def test_browser_list_filtered_by_provenance(admin_client, ambit, images, provenance_filter, cookie, expected):
     admin_client.cookies['django-finder-provenance'] = cookie
     api_url = reverse('finder-api:base-url')
     response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
@@ -476,19 +479,41 @@ def test_browser_list_filtered_by_provenance(admin_client, ambit, images, cookie
     assert ids == {str(images[key].id) for key in expected}
 
 
-def test_browser_search_filtered_by_provenance(admin_client, ambit, images):
+def test_browser_search_filtered_by_provenance(admin_client, ambit, images, provenance_filter):
     admin_client.cookies['django-finder-provenance'] = 'ai'
     api_url = reverse('finder-api:base-url')
     response = admin_client.get(f'{api_url}{ambit.root_folder.id}/search?q=.jpg')
     assert [entry['id'] for entry in response.json()['files']] == [str(images['ai'].id)]
 
 
-def test_admin_fetch_filtered_by_provenance_keeps_folders(admin_client, ambit, images, sub_folder):
+def test_admin_fetch_filtered_by_provenance_keeps_folders(admin_client, ambit, images, sub_folder, provenance_filter):
     admin_client.cookies['django-finder-provenance'] = 'c2pa'
     base_url = reverse('admin:finder_inodemodel_change', args=(ambit.root_folder_id,))
     response = admin_client.get(f'{base_url}/fetch')
     ids = {inode['id'] for inode in response.json()['inodes']}
     assert ids == {str(sub_folder.id), str(images['c2pa'].id)}
+
+
+def test_ai_filter_derives_from_digital_source_type(admin_client, ambit, images, provenance_filter):
+    """Images stored before `ai_generated` was dropped from `meta_data` still match."""
+    legacy = images['plain']
+    legacy.meta_data['provenance'] = {'digital_source_type': AI_EDITED, 'content_credentials': False, 'ai_generated': False}
+    PILImageModel.objects.filter(pk=legacy.pk).update(meta_data=legacy.meta_data)
+    admin_client.cookies['django-finder-provenance'] = 'ai'
+    api_url = reverse('finder-api:base-url')
+    response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
+    ids = {entry['id'] for entry in response.json()['files']}
+    assert ids == {str(images['ai'].id), str(legacy.id)}
+
+
+def test_provenance_filter_disabled_by_default(admin_client, ambit, images):
+    admin_client.cookies['django-finder-provenance'] = 'ai'
+    api_url = reverse('finder-api:base-url')
+    response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
+    ids = {entry['id'] for entry in response.json()['files']}
+    assert ids == {str(image.id) for image in images.values()}
+    response = admin_client.get(f'{api_url}structure/{ambit.slug}')
+    assert response.json()['provenance_filter'] is False
 
 
 # management command
@@ -551,7 +576,7 @@ def test_merge_provenance_only_adds(ambit, admin_user):
 
     plain = upload(ambit, admin_user, jpeg_bytes(), name='plain.jpg')
     assert plain.merge_provenance(Provenance(AI_EDITED)) is True
-    assert plain.meta_data['provenance']['ai_generated'] is True
+    assert plain.is_ai_generated
 
 
 # filer_to_finder, run against stand-ins for django-filer, which the unit tests do not install

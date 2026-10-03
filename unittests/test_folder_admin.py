@@ -94,6 +94,7 @@ def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, pr
         'can_change': True,
         'base_url': reverse('admin:finder_foldermodel_changelist'),
         'ancestors': [{'id': str(ambit.root_folder.id), 'can_change': True, 'can_view': True}],
+        'provenance_filter': False,
         'open_folder_icon_url': staticfiles_storage.url('finder/icons/folder-open.svg'),
     }
 
@@ -153,6 +154,7 @@ def test_access_trash_folder(admin_client, admin_user, root_folder_url, ambit, p
         'can_change': True,
         'base_url': reverse('admin:finder_foldermodel_changelist'),
         'ancestors': [{'id': str(trash_folder.id), 'can_change': True, 'can_view': True}],
+        'provenance_filter': False,
         'open_folder_icon_url': staticfiles_storage.url('finder/icons/folder-open.svg'),
     }
     assert finder_settings == expected

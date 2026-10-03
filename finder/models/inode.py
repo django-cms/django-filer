@@ -139,14 +139,9 @@ class InodeManager(models.Manager):
         if tags and 'tags' in model_field_names:
             query &= Q(tags__in=tags)
 
-        # query to filter images by their provenance, see `ImageFileModel.set_provenance`
+        # query to filter files by their provenance, see `ImageFileModel.get_provenance_query`
         if provenance and not model.is_folder:
-            queries = []
-            if 'ai' in provenance:
-                queries.append(Q(meta_data__provenance__ai_generated=True))
-            if 'c2pa' in provenance:
-                queries.append(Q(meta_data__provenance__content_credentials=True))
-            query &= reduce(or_, queries, Q())
+            query &= model.get_provenance_query(provenance)
 
         return query
 

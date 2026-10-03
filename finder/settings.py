@@ -14,6 +14,12 @@ FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'public'
 # `finder.management.create_default_ambit`, so that tests can override it.
 
 
+# FINDER_PROVENANCE_FILTER (default False) offers to filter the files list by image provenance:
+# images created or edited using generative AI, and images uploaded with C2PA Content
+# Credentials. It is read at call time by `finder.lookups.is_provenance_filter_enabled`, so that
+# tests can override it. Provenance is detected and stored regardless of this setting.
+
+
 # The validators run against every uploaded payload unless a project opts out of them.
 # They cover the formats a browser executes in the media origin, which is where an uploaded
 # file turns into stored XSS against the site's own staff and visitors.

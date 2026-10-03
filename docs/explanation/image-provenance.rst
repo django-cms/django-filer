@@ -70,10 +70,9 @@ digital source type or embeds Content Credentials:
     image.meta_data['provenance'] == {
         'digital_source_type': 'http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia',
         'content_credentials': True,
-        'ai_generated': True,
     }
 
-``ai_generated`` is true for the IPTC terms ``trainedAlgorithmicMedia`` ("Created using
+An image counts as AI-generated (``is_ai_generated``) for the IPTC terms ``trainedAlgorithmicMedia`` ("Created using
 generative AI") and ``compositeWithTrainedAlgorithmicMedia`` ("Edited using generative AI").
 Other terms, e.g. ``algorithmicMedia`` or ``compositeSynthetic``, do not count.
 
@@ -82,10 +81,13 @@ Image models offer the properties ``provenance`` (a ``Provenance`` with the fiel
 ``digital_source_type_label``, a human-readable, translatable label such as "Original digital
 capture".
 
-Since ``meta_data`` is a field of every inode, filtering on it works across the unified
-queryset of all file models::
+Whether an image is AI-generated is derived from its digital source type rather than stored,
+so it follows the list of AI terms of the installed version. To query for such images, use
+``ai_digital_source_type_q`` with the path of the stored digital source type::
 
-    ImageFileModel.objects.filter(meta_data__provenance__ai_generated=True)
+    from finder.utils.provenance import ai_digital_source_type_q
+
+    ImageFileModel.objects.filter(ai_digital_source_type_q('meta_data__provenance__digital_source_type'))
     ImageFileModel.objects.filter(meta_data__provenance__content_credentials=True)
 
 The information stays with the image when it is copied, and whatever renditions are
@@ -142,7 +144,8 @@ In the admin
   digital source type, and whether Content Credentials were found on upload.
 * The list view shows the origin of AI-generated and AI-edited images below their name.
   Other digital source types are shown on the change form only.
-* The filter menu, next to the tags, offers to list only images created or edited using
+* With ``FINDER_PROVENANCE_FILTER = True`` (off by default, see :doc:`../reference/settings`),
+  the filter menu, next to the tags, offers to list only images created or edited using
   generative AI, or only images uploaded with Content Credentials. The filter is kept in the
   cookie ``django-finder-provenance`` and applies to the admin and to the file select dialog,
   including their search.

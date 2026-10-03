@@ -29,11 +29,12 @@ export function DraggableItem(props) {
 	const [event, setEvent] = useState<PointerEvent>(null);
 	const [sorting] = useSorting();
 	const [filter] = useFilter();
+	const settings = useContext(FinderSettings);
 	const [provenanceFilter] = useProvenanceFilter();
 	const [searchQuery] = useSearchParam('q');
 	const ReOrdering = useMemo(() => {
 		return (props) => {
-			if (sortingDisabled || searchQuery || sorting || filter.some(v => v) || provenanceFilter)
+			if (sortingDisabled || searchQuery || sorting || filter.some(v => v) || (settings.provenance_filter && provenanceFilter))
 				return <div className="reordering"></div>;
 			return (
 				<DroppableArea

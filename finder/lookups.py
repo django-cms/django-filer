@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from finder.models.inode import InodeManager
 from finder.models.filetag import FileTag
 
@@ -42,12 +44,18 @@ def lookup_by_tag(request):
     return lookup
 
 
+def is_provenance_filter_enabled():
+    return getattr(settings, 'FINDER_PROVENANCE_FILTER', False)
+
+
 def lookup_by_provenance(request):
     """
     Filter images created or edited using generative AI (`ai`) and/or uploaded with
-    C2PA Content Credentials (`c2pa`).
+    C2PA Content Credentials (`c2pa`), unless disabled by `FINDER_PROVENANCE_FILTER`.
     """
     lookup = {}
+    if not is_provenance_filter_enabled():
+        return lookup
     if filter := request.COOKIES.get('django-finder-provenance'):
         if provenance := [v for v in filter.split(',') if v in ('ai', 'c2pa')]:
             lookup['provenance'] = provenance
