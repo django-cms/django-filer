@@ -401,10 +401,11 @@ def detect_provenance(file, pil_image):
 
 def detect_file_provenance(file):
     """Detect provenance information of an image file object. The file
-    position is reset to its start."""
-    from PIL import Image
-
+    position is reset to its start. Without Pillow, an optional dependency,
+    nothing is detected."""
     try:
+        from PIL import Image
+
         file.seek(0)
         return detect_provenance(file, Image.open(file))
     except Exception:

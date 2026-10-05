@@ -75,9 +75,12 @@ class ImageFileModel(AbstractFileModel):
     def receive_file(self, ambit, uploaded_file):
         # Detect the provenance on the file as uploaded: a sanitizing payload validator,
         # or `store_and_save` when re-encoding the image, may remove it from the payload.
-        provenance = detect_file_provenance(uploaded_file)
+        provenance = self.detect_provenance(uploaded_file)
         super().receive_file(ambit, uploaded_file)
         self.set_provenance(provenance)
+
+    def detect_provenance(self, uploaded_file):
+        return detect_file_provenance(uploaded_file)
 
     def set_provenance(self, provenance):
         """

@@ -336,6 +336,24 @@ def test_svg_has_no_provenance(ambit, admin_user):
     assert 'provenance' not in image.meta_data
 
 
+def test_detection_without_pillow(monkeypatch):
+    """Pillow is optional: `django-finder[svg]` does not install it."""
+    file = BytesIO(jpeg_bytes(xmp_packet(), c2pa=True))
+    monkeypatch.setitem(sys.modules, 'PIL', None)
+    assert detect_file_provenance(file) == Provenance()
+
+
+def test_svg_upload_without_pillow(ambit, admin_user, monkeypatch):
+    monkeypatch.setitem(sys.modules, 'PIL', None)
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>'
+    uploaded_file = SimpleUploadedFile('drawing.svg', svg, content_type='image/svg+xml')
+    image = ImageFileModel.objects.create_from_upload(
+        ambit, uploaded_file, folder=ambit.root_folder, owner=admin_user, mime_type='image/svg+xml',
+    )
+    assert image.mime_type == 'image/svg+xml'
+    assert 'provenance' not in image.meta_data
+
+
 def strip_everything(file_name, file, owner, mime_type):
     image = Image.open(file)
     image.load()
