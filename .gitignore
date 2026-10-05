@@ -48,3 +48,4 @@ workdir*/
 finder/static/finder/css/
 finder/static/finder/js/
 tsconfig.tsbuildinfo
+coverage.xml

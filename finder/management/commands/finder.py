@@ -12,6 +12,7 @@ from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_N
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 from finder.storages import UUID4_PATTERN
+from finder.utils.provenance import detect_file_provenance, provenance_meta_data
 
 
 class Command(BaseCommand):
@@ -38,6 +39,8 @@ class Command(BaseCommand):
         delete_orphans_parser.add_argument('--dry-run', action='store_true', help="Show what would be deleted. Perform a dry run without erasing files from storage.")
         delete_missing_parser = subparsers.add_parser('delete-missing', help="Delete missing files from database.")
         delete_missing_parser.add_argument('--dry-run', action='store_true', help="Show what would be deleted. Perform a dry run without deleting files from database.")
+        detect_provenance_parser = subparsers.add_parser('detect-provenance', help="Detect the provenance (IPTC digital source type, C2PA Content Credentials) of images uploaded before finder detected it.")
+        detect_provenance_parser.add_argument('--dry-run', action='store_true', help="Show what would be updated. Perform a dry run without changing the database.")
 
     def handle(self, verbosity, *args, **options):
         self.verbosity = verbosity
@@ -77,6 +80,8 @@ class Command(BaseCommand):
                 self.delete_missing(**options)
             except Exception as exc:
                 self.stderr.write(f"Error while deleting missing files: ‘{exc}’")
+        elif subcommand == 'detect-provenance':
+            self.detect_provenance(**options)
         else:
             self.stderr.write(f"Unknown subcommand ‘{subcommand}’")
 
@@ -237,3 +242,37 @@ class Command(BaseCommand):
                 else:
                     entry.delete()
                     self.stdout.write(f"Deleted missing entry from database: {file_path}")
+
+    def detect_provenance(self, **options):
+        from finder.contrib.image.models import ImageFileModel
+
+        dry_run = options.get('dry_run', False)
+        # Only images without provenance: the stored file may have been re-encoded since
+        # it was uploaded, so it can hold less than was recorded.
+        pks = list(
+            ImageFileModel.objects.exclude(meta_data__has_key='provenance')
+            .exclude(mime_type='image/svg+xml')
+            .values_list('pk', flat=True)
+        )
+        updated = failed = 0
+        for pk in pks:
+            image = ImageFileModel.objects.get(pk=pk)
+            try:
+                storage = image.folder.get_ambit().original_storage
+                with storage.open(image.file_path, 'rb') as handle:
+                    provenance = provenance_meta_data(detect_file_provenance(handle))
+            except Exception as exc:
+                failed += 1
+                self.stderr.write(f"Failed to read image ‘{image}’ ({image.pk}): {exc}")
+                continue
+            if provenance:
+                updated += 1
+                if self.verbosity > 1:
+                    self.stdout.write(f"Image ‘{image}’ ({image.pk}): {provenance}")
+                if not dry_run:
+                    image.meta_data['provenance'] = provenance
+                    # update() leaves the modification date untouched
+                    ImageFileModel.objects.filter(pk=pk).update(meta_data=image.meta_data)
+        self.stdout.write(
+            f"Scanned {len(pks)} images, {'would update' if dry_run else 'updated'} {updated}, failed {failed}."
+        )

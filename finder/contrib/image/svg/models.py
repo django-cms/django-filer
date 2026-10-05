@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from finder.contrib.image.models import ImageFileModel
 from finder.exceptions import FileValidationError
 from finder.utils import svg
+from finder.utils.provenance import Provenance
 
 
 logger = getLogger(__name__)
@@ -24,6 +25,10 @@ class SVGImageModel(ImageFileModel):
         app_label = 'finder'
         verbose_name = _("SVG Image")
         verbose_name_plural = _("SVG Images")
+
+    def detect_provenance(self, uploaded_file):
+        # SVG documents carry neither XMP nor C2PA, and Pillow, which reads them, is not required
+        return Provenance()
 
     def store_and_save(self, ambit, **kwargs):
         try:

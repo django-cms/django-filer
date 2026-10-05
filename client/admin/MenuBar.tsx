@@ -494,7 +494,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 						<GalleryIcon/>
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
-					{settings.tags?.length > 0 && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}
+					{(settings.tags?.length > 0 || settings.provenance_filter) && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags ?? []} provenanceFilter={settings.provenance_filter} />}
 					<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 						<CutIcon/>
 					</MenuItem>
