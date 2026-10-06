@@ -199,6 +199,10 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 			}
 			return;
 		}
+		if (event.key === 'Enter') {
+			openDetailView(preselectedInode);
+			return;
+		}
 		const nextIndex = nextPreselectionIndex({
 			key: event.key,
 			index,
@@ -212,60 +216,6 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 			setPreselectedInode(nextPreselectedInode);
 		}
 	}
-
-	// const selectInode = useCallback(function selectInode(event: PointerEvent|KeyboardEvent, inode) {
-	// 	if (inode.disabled)
-	// 		return;
-	// 	let modifier, selectedIndex = -1;
-	// 	if (event.detail === 2) {
-	// 		// double click
-	// 		if (!settings.is_trash) {
-	// 			// prevent editing files in trash folder
-	// 			window.location.assign(inode.change_url);
-	// 		}
-	// 		return;
-	// 	}
-	// 	if (event.shiftKey) {
-	// 		// shift click
-	// 		const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
-	// 		if (selectedInodeIndex < lastSelectedIndex) {
-	// 			modifier = (f, k) => ({...f, selected: k >= selectedInodeIndex && k <= lastSelectedIndex || f.selected});
-	// 		} else if (lastSelectedIndex !== -1 && selectedInodeIndex > lastSelectedIndex) {
-	// 			modifier = (f, k) => ({...f, selected: k >= lastSelectedIndex && k <= selectedInodeIndex || f.selected});
-	// 		} else {
-	// 			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
-	// 		}
-	// 	} else if (event.altKey || event.ctrlKey || event.metaKey) {
-	// 		// alt/ctrl/meta click
-	// 		if (inode.selected) {
-	// 			modifier = f => ({...f, selected: f.selected && f.id !== inode.id});
-	// 		} else {
-	// 			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
-	// 			selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
-	// 		}
-	// 	} else {
-	// 		// simple click
-	// 		if (inode.selected) {
-	// 			modifier = f => ({...f, selected: false});
-	// 		} else {
-	// 			if (!(event.target as HTMLElement)?.classList.contains('inode-name')) {
-	// 				// prevent selecting the inode when clicking on the name field to edit it
-	// 				modifier = f => ({...f, selected: f.id === inode.id});
-	// 				selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
-	// 			} else {
-	// 				modifier = f => f;
-	// 			}
-	// 		}
-	// 	}
-	// 	if (selectedIndex !== -1) {
-	// 		clearClipboard();
-	// 	}
-	// 	const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
-	// 	setInodes(modifiedInodes);
-	// 	setCurrentFolder(folderId);
-	// 	menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
-	// 	setSelectedIndex(selectedIndex);
-	// }, [inodes]);
 
 	const selectMultipleInodes = useCallback(function selectMultipleInodes(selectedInodeIds: Array<string>, extend: boolean = false) {
 		if (selectedInodeIds.length) {

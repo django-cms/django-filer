@@ -233,7 +233,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 				pasteInodes();
 			} else if (['Backspace', 'Delete'].includes(event.key) && event.target instanceof HTMLElement && event.target.closest('ul.inode-list')) {
 				deleteInodes();
-			} else if (['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', ' '].includes(event.key)) {
+			} else if ([' ', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'Enter'].includes(event.key) && event.target.contentEditable !== 'true') {
 				event.preventDefault();
 				navigatePreselection(event);
 			}
