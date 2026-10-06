@@ -242,6 +242,25 @@ stroke="#004400"/>
         self.assertFalse(stripped.getexif())
         self.assertNotIn("exif", stripped.info)
 
+    def test_strip_exif_keeps_webp_lossless(self):
+        # Pillow does not report whether a WebP is lossless
+        image = Image.linear_gradient("L").convert("RGB").resize((64, 64))
+        exif = image.getexif()
+        exif[0x010F] = "DjangoFiler"  # Make
+        for lossless in (True, False):
+            with self.subTest(lossless=lossless):
+                buffer = io.BytesIO()
+                image.save(buffer, format="WEBP", lossless=lossless, exif=exif.tobytes())
+                buffer.seek(0)
+
+                strip_exif("photo.webp", buffer, self.superuser, "image/webp")
+
+                data = buffer.getvalue()
+                self.assertEqual(b"VP8L" in data, lossless)
+                self.assertNotIn(b"DjangoFiler", data)
+                if lossless:
+                    self.assertEqual(list(Image.open(buffer).getdata()), list(image.getdata()))
+
     def test_strip_exif_preserves_progressive_jpeg(self):
         image = Image.new("RGB", (8, 8), color=(0, 0, 255))
         exif = image.getexif()

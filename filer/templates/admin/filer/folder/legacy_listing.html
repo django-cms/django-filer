@@ -123,6 +123,21 @@
                                             {% trans "Limit the search to current folder" %}
                                         </label>
                                     </li>
+                                    <li>
+                                        <p>{% trans "Filter" %}</p>
+                                        <label>
+                                            <input type="radio" name="provenance" value=""
+                                                {% if not provenance_filter %}checked="checked"{% endif %}>
+                                            {% trans "All files" %}
+                                        </label>
+                                        {% for value, label in provenance_filters %}
+                                            <label>
+                                                <input type="radio" name="provenance" value="{{ value }}"
+                                                    {% if provenance_filter == value %}checked="checked"{% endif %}>
+                                                {{ label }}
+                                            </label>
+                                        {% endfor %}
+                                    </li>
                                 </ul>
                             </div>
                         </div>
