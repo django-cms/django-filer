@@ -32,7 +32,7 @@ export default function FileAdmin() {
 		return (props) => (<>
 			<PermissionDialogButton />
 			<FileDetails {...props}>
-				<img src={props.settings.thumbnail_url} />
+				<img src={props.settings.thumbnail_url} draggable={false} />
 			</FileDetails>
 		</>);
 	}, []);

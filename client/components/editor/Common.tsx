@@ -6,7 +6,7 @@ export default function Common(props) {
 	return (<>
 		{props.children}
 		<FileDetails {...props}>
-			<img src={props.settings.thumbnail_url} />
+			<img src={props.settings.thumbnail_url} draggable={false} />
 		</FileDetails>
 	</>);
 }

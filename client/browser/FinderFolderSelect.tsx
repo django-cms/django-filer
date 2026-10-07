@@ -51,7 +51,7 @@ const FolderPreview = memo(({selectedFolder, folderIconUrl, openDialog, removeFo
 		<div className="finder-file-select">
 			<figure>{selectedFolder ? <>
 				<div>
-					<img src={folderIconUrl} alt={selectedFolder.name} onClick={openDialog} onDragEnter={openDialog} />
+					<img src={folderIconUrl} alt={selectedFolder.name} onClick={openDialog} onDragEnter={openDialog} draggable={false} />
 				</div>
 				<figcaption>
 					<dl>
