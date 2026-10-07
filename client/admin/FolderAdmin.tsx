@@ -122,16 +122,19 @@ export default function FolderAdmin() {
 					offsetY = (firstClientRect.top - activeClientRect.top) * itemScaleWhenDragging;
 				}
 			} else if (activeDraggedElement) {
-				if (layout === 'tiles') {
-					if (activeDraggedElement.querySelector('figure img')?.getAttribute('src').endsWith('svg')) {
-						offsetX = offsetY = -30;
-					} else {
-						offsetX = offsetY = -20;
-					}
-				} else if (layout === 'mosaic') {
-					offsetX = offsetY = -23;
-				} else if (layout === 'gallery') {
-					offsetX = offsetY = -15;
+				switch (layout) {
+					case 'tiles':
+						offsetX = -10;
+						offsetY = -10;
+						break;
+					case 'mosaic':
+						offsetX = -7.5;
+						offsetY = -7.5;
+						break;
+					default:
+						offsetX = -10;
+						offsetY = -10;
+						break;
 				}
 			}
 		}
