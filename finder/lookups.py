@@ -33,10 +33,11 @@ def lookup_by_tag(request):
         try:
             for key, value in json.loads(filter).items():
                 if int(key) in allowed_tags:
-                    if value:
+                    if value is True:
                         include_tags.append(int(key))
-                    else:
+                    elif value is False:
                         exclude_tags.append(int(key))
+                    # non-Booleans are ignored
         except ValueError:
             pass
         if include_tags:

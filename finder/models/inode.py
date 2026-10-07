@@ -359,6 +359,8 @@ class InodeModel(Model, metaclass=InodeMetaModel):
             return str(data)
         if field_name in ['created_at', 'last_modified_at']:
             return data.isoformat()
+        if field_name in ['tags']:
+            return list(data.values_list('id', flat=True))
         return data
 
     def get_meta_data(self):

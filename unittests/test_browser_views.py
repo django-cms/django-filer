@@ -59,7 +59,7 @@ def test_structure_of_empty_root_folder(admin_client, ambit, api_url):
     assert root_folder['is_root'] is True
     assert root_folder['is_open'] is False
     assert root_folder['children'] is None
-    assert payload['tags'] == []
+    assert payload['label_tags'] == []
     assert payload['last_folder'] == str(ambit.root_folder.id)
     assert payload['files'] == []
     assert payload['has_upload_permission'] is True
@@ -73,7 +73,7 @@ def test_structure_of_unknown_ambit(admin_client, ambit, api_url):
 def test_structure_with_tags(admin_client, ambit, api_url):
     tag = LabelTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
     response = admin_client.get(f'{api_url}structure/{ambit.slug}')
-    assert response.json()['tags'] == [{'value': tag.id, 'label': "Red", 'color': '#ff0000'}]
+    assert response.json()['label_tags'] == [{'id': tag.id, 'label': "Red", 'color': '#ff0000'}]
 
 
 def test_structure_opens_ancestors_of_the_requested_folder(admin_client, ambit, nested_folder, api_url):
@@ -241,7 +241,7 @@ def test_list_files_filtered_by_tag(admin_client, ambit, uploaded_file, uploaded
     response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
     files = response.json()['files']
     assert [entry['id'] for entry in files] == [str(uploaded_file.id)]
-    assert files[0]['tags'] == [{'id': red_tag.id, 'label': "Red", 'color': '#ff0000'}]
+    assert files[0]['label_tags'] == [{'id': red_tag.id, 'label': "Red", 'color': '#ff0000'}]
 
     admin_client.cookies['django-finder-filter'] = json.dumps({blue_tag.id: True})
     response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
@@ -249,9 +249,28 @@ def test_list_files_filtered_by_tag(admin_client, ambit, uploaded_file, uploaded
 
     # unparsable and unknown tag filters are ignored
     for invalid_filter in ['not-a-number', str(blue_tag.id + 100)]:
-        admin_client.cookies['django-finder-filter'] = invalid_filter
-        response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
-        assert len(response.json()['files']) == 2
+        for yesno in [True, False]:
+            admin_client.cookies['django-finder-filter'] = json.dumps({invalid_filter: yesno})
+            response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
+            assert len(response.json()['files']) == 2
+
+
+def test_list_files_excluded_by_tag(admin_client, ambit, uploaded_file, uploaded_image, api_url):
+    red_tag = LabelTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
+    blue_tag = LabelTag.objects.create(ambit=ambit, label="Blue", color='#0000ff')
+    uploaded_file.tags.add(red_tag)
+
+    admin_client.cookies['django-finder-filter'] = json.dumps({red_tag.id: False})
+    response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
+    files = response.json()['files']
+    assert [entry['id'] for entry in files] == [str(uploaded_image.id)]
+    assert not files[0].get('label_tags')
+
+    admin_client.cookies['django-finder-filter'] = json.dumps({blue_tag.id: False})
+    response = admin_client.get(f'{api_url}{ambit.root_folder.id}/list')
+    files = response.json()['files']
+    assert len(files) == 2
+    assert {entry['id'] for entry in files} == {str(uploaded_file.id), str(uploaded_image.id)}
 
 
 def test_list_files_sorted(admin_client, ambit, admin_user, api_url):
@@ -421,7 +440,7 @@ def test_change_file(admin_client, ambit, uploaded_file, api_url):
     tag = LabelTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
     response = admin_client.post(
         f'{api_url}{uploaded_file.id}/change',
-        {'name': "renamed.bin", 'tags': [tag.id]},
+        {'name': "renamed.bin", 'label_tags': [tag.id]},
         content_type=MULTIPART,
     )
     assert response.status_code == 200
