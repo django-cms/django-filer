@@ -1,5 +1,6 @@
 import json
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
@@ -111,12 +112,15 @@ class FolderAdmin(InodeAdmin):
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"InodeModel<{inode_id}> not found.")
 
+        extra_context = {
+            "base_site_template": f"finder/admin/base_site{'.legacy' if DJANGO_VERSION < (6, 1) else ''}.html"
+        }
         if inode_obj.is_folder:
-            return super().change_view(request, str(inode_id), **kwargs)
+            return super().change_view(request, str(inode_id), extra_context=extra_context, **kwargs)
 
         # inode_obj is a file and hence we look for the specialized model admin
         model_admin = self.get_model_admin(inode_obj.mime_type)
-        return model_admin.change_view(request, str(inode_id), **kwargs)
+        return model_admin.change_view(request, str(inode_id), extra_context=extra_context, **kwargs)
 
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
