@@ -15,6 +15,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
+from django.template import Context, Template
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -1070,7 +1071,23 @@ class FilerClipboardAdminUrlsTests(TestCase):
             image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
             image_obj.save()
         url = file_icon_url(image_obj)
-        self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
+        self.assertEqual(url, '/static/filer/icons/file-unknown.svg')
+
+    def test_templatetag_file_icon_url_is_html_escaped_only(self):
+        # The URL ends up in a data attribute read via ``dataset``, so it must be
+        # HTML-escaped, not JS-escaped (#1645)
+        file_obj = File.objects.create(name='test.pdf')
+        icon_url = 'https://cdn.example-test.de/a1621890-6d4b.svg?a=1&b="2"'
+        template = Template('{% load filer_admin_tags %}<img data-icon-url="{% file_icon_url file %}">')
+        with unittest.mock.patch(
+            'filer.templatetags.filer_admin_tags.file_icon_context',
+            return_value={'icon_url': icon_url},
+        ):
+            html = template.render(Context({'file': file_obj}))
+        self.assertEqual(
+            html,
+            '<img data-icon-url="https://cdn.example-test.de/a1621890-6d4b.svg?a=1&amp;b=&quot;2&quot;">',
+        )
 
 
 class BulkOperationsMixin:
