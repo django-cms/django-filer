@@ -442,7 +442,7 @@ class FolderAdmin(InodeAdmin):
         preserved_tag_ids = []
         with transaction.atomic():
             for tag in body['label_tags']:
-                id = tag.get('value', CREATE_TAG)
+                id = tag.get('id', CREATE_TAG)
                 if id is CREATE_TAG:
                     create_kwargs = {'ambit': ambit, 'label': tag['label'], 'color': tag['color']}
                     created_entry = LabelTag.objects.create(**create_kwargs)

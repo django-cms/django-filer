@@ -11,7 +11,6 @@ from time import sleep
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import F
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
@@ -35,11 +34,9 @@ class AccessControl(Enum):
 def file_tags(django_db_blocker, ambit):
     with django_db_blocker.unblock():
         if not LabelTag.objects.filter(ambit=ambit).exists():
-            LabelTag.objects.bulk_create([
-                LabelTag(ambit=ambit, label="Red", color='#ff0000'),
-                LabelTag(ambit=ambit, label="Green", color='#00ff00'),
-                LabelTag(ambit=ambit, label="Blue", color='#0000ff'),
-            ])
+            LabelTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
+            LabelTag.objects.create(ambit=ambit, label="Green", color='#00ff00')
+            LabelTag.objects.create(ambit=ambit, label="Blue", color='#0000ff')
 
 
 def test_root_folder_exists(admin_client, ambit):
@@ -80,7 +77,7 @@ def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, pr
     finder_settings.pop('csrf_token')
     finder_settings.pop('favorite_folders')
     finder_settings.pop('menu_extensions')
-    assert finder_settings == {
+    expected = {
         'name': ROOT_FOLDER_NAME,
         'is_folder': True,
         'folder_id': str(ambit.root_folder.id),
@@ -89,13 +86,14 @@ def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, pr
         'is_root': True,
         'is_trash': False,
         'folder_url': root_folder_url,
-        'tags': list(LabelTag.objects.filter(ambit=ambit).values('label', 'color').annotate(value=F('id'))),
+        'label_tags': list(LabelTag.objects.filter(ambit=ambit).values('id', 'label', 'color')),
         'is_admin': admin_user.is_superuser,
         'can_change': True,
         'base_url': reverse('admin:finder_foldermodel_changelist'),
         'ancestors': [{'id': str(ambit.root_folder.id), 'can_change': True, 'can_view': True}],
         'open_folder_icon_url': staticfiles_storage.url('finder/icons/folder-open.svg'),
     }
+    assert finder_settings == expected
 
 
 def test_access_folder_not_found(admin_client, ambit, missing_inode_id):
@@ -1244,8 +1242,8 @@ def test_update_file_tags(admin_client, ambit, principal_kwargs):
         AccessControlEntry.objects.create(inode=ambit.root_folder_id, **principal_kwargs)
 
     payload = {
-        'tags': [
-            {'value': existing_tag.id, 'label': "Alpha Renamed", 'color': '#333333'},
+        'label_tags': [
+            {'id': existing_tag.id, 'label': "Alpha Renamed", 'color': '#333333'},
             {'label': "New Tag", 'color': '#444444'},
         ],
     }
@@ -1254,7 +1252,7 @@ def test_update_file_tags(admin_client, ambit, principal_kwargs):
         assert response.status_code == 403
         return
     assert response.status_code == 200
-    response_tags = response.json()['tags']
+    response_tags = response.json()['label_tags']
     existing_tag.refresh_from_db()
     assert existing_tag.label == "Alpha Renamed"
     assert existing_tag.color == '#333333'
@@ -1263,7 +1261,7 @@ def test_update_file_tags(admin_client, ambit, principal_kwargs):
         (existing_tag.id, "Alpha Renamed", '#333333'),
         (LabelTag.objects.get(label="New Tag", ambit=ambit).id, "New Tag", '#444444'),
     }
-    actual = {(entry['value'], entry['label'], entry['color']) for entry in response_tags}
+    actual = {(entry['id'], entry['label'], entry['color']) for entry in response_tags}
     assert actual == expected
 
 

@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from finder.contrib.common.models import CodeFileModel, PDFFileModel, SpreadsheetModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -15,14 +15,12 @@ def setup(ambit, admin_user, staff_users):
     file_name = 'small_file.bin'
     with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
         uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
-    red_tag, green_tag, yellow_tag, cyan_tag, blue_tag, magenta_tag = FileTag.objects.bulk_create([
-        FileTag(label='red', ambit=ambit, color='FF0000'),
-        FileTag(label='green', ambit=ambit, color='00FF00'),
-        FileTag(label='yellow', ambit=ambit, color='FFFF00'),
-        FileTag(label='cyan', ambit=ambit, color='00FFFF'),
-        FileTag(label='blue', ambit=ambit, color='0000FF'),
-        FileTag(label='magenta', ambit=ambit, color='FF00FF'),
-    ])
+    red_tag = LabelTag.objects.create(label='red', ambit=ambit, color='FF0000')
+    green_tag = LabelTag.objects.create(label='green', ambit=ambit, color='00FF00')
+    yellow_tag = LabelTag.objects.create(label='yellow', ambit=ambit, color='FFFF00')
+    cyan_tag = LabelTag.objects.create(label='cyan', ambit=ambit, color='00FFFF')
+    blue_tag = LabelTag.objects.create(label='blue', ambit=ambit, color='0000FF')
+    magenta_tag = LabelTag.objects.create(label='magenta', ambit=ambit, color='FF00FF')
     file_obj = FileModel.objects.create_from_upload(
         ambit,
         uploaded_file,
@@ -65,10 +63,10 @@ def setup(ambit, admin_user, staff_users):
 
 def test_unified_query(ambit):
     red_tag, green_tag, blue_tag, magenta_tag = (
-        FileTag.objects.get(label='red'),
-        FileTag.objects.get(label='green'),
-        FileTag.objects.get(label='blue'),
-        FileTag.objects.get(label='magenta'),
+        LabelTag.objects.get(label='red'),
+        LabelTag.objects.get(label='green'),
+        LabelTag.objects.get(label='blue'),
+        LabelTag.objects.get(label='magenta'),
     )
     assert len(ambit.root_folder.listdir()) == 4
     assert len(ambit.root_folder.listdir(is_folder=True)) == 1
