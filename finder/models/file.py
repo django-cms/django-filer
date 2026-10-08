@@ -13,7 +13,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext, gettext_lazy as _
 
 from finder import settings
-from finder.models.filetag import FileTag, LabelTag
+from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 from finder.storages import delete_directory
@@ -215,7 +215,6 @@ class AbstractFileModel(InodeModel):
         Hook to return a sample for a given file.
         """
         return None
-
 
     def serialize_label_tags(self):
         return list(
