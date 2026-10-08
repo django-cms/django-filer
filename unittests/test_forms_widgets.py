@@ -16,7 +16,7 @@ from finder.forms.fields import TagChoiceField
 from finder.forms.file import FileForm
 from finder.forms.widgets import FinderFileSelect, FinderFolderSelect
 from finder.models.file import FileModel
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.folder import FolderModel
 
 from .testapp.models import SampleAppModel1, SampleAppModel3, SampleAppModel4
@@ -172,8 +172,8 @@ def test_folder_select_widget_renders_web_component(public_ambit, public_folder)
 
 
 def test_tag_choice_field_prepare_value(db, ambit):
-    tag = FileTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
-    field = TagChoiceField(queryset=FileTag.objects.all(), required=False)
+    tag = LabelTag.objects.create(ambit=ambit, label="Red", color='#ff0000')
+    field = TagChoiceField(queryset=LabelTag.objects.all(), required=False)
     assert field.prepare_value([tag.id, None]) == [tag.id]
     assert field.prepare_value(None) is None
     assert field.prepare_value(tag.id) == tag.id

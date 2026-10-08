@@ -2,17 +2,17 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-	<a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a>
-	&rsaquo; <a href="{% url 'admin:app_list' app_label='finder' %}" title="{% translate 'Go back to' %} {% translate 'Finder' %}"> {% translate "Finder" %}</a>
+<ol class="breadcrumbs">
+	<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+	<li><a href="{% url 'admin:app_list' app_label='finder' %}">{% translate "Finder" %}</a></li>
 	{% for breadcrumb in breadcrumbs %}
-	&rsaquo; {% if forloop.last %}
-		{{ breadcrumb.name }}
+		{% if forloop.last %}
+	<li aria-current="page">{{ breadcrumb.name }}</li>
 		{% else %}
-		<a href="{{ breadcrumb.link }}">{{ breadcrumb.name }}</a>
+	<li><a href="{{ breadcrumb.link }}">{{ breadcrumb.name }}</a></li>
 		{% endif %}
 	{% endfor %}
-</div>
+</ol>
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
@@ -22,6 +22,6 @@
 
 {% block coltype %}{% endblock %}
 
-{% block footer %}
+{% block extrabody %}
 {{ finder_settings|json_script:"finder-settings" }}
 {% endblock %}

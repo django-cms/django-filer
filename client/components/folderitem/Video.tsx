@@ -1,5 +1,5 @@
-import React, {useRef, useState, useEffect} from 'react';
-import FileTags from '../../common/FileTags';
+import React, {useRef, useEffect} from 'react';
+import {LabelTags} from '../../common/LabelTags';
 
 
 export default function Video(props) {
@@ -47,7 +47,7 @@ export default function Video(props) {
 	}, [videoRef]);
 
 	return (
-		<FileTags tags={props.tags}>{
+		<LabelTags tags={props.label_tags}>{
 		props.sample_url ? (
 			<video
 				ref={videoRef}
@@ -60,6 +60,6 @@ export default function Video(props) {
 		) : (
 			<img src={props.thumbnail_url} />
 		)
-		}</FileTags>
+		}</LabelTags>
 	);
 }

@@ -4,6 +4,7 @@ The browser API is served by the admin, but without the admin's permission gate.
 
 import pytest
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
@@ -63,9 +64,14 @@ class TestFinderAppIndex:
 
     def test_the_breadcrumb_names_the_app(self, admin_client, ambit):
         html = admin_client.get(reverse('admin:app_list', kwargs={'app_label': 'finder'})).content.decode()
-        start = html.index('<div class="breadcrumbs">')
-        breadcrumb = ' '.join(html[start:html.index('</div>', start)].split())
-        assert breadcrumb == '<div class="breadcrumbs"> <a href="/admin/">Home</a> &rsaquo; Finder'
+        if DJANGO_VERSION < (6, 1):
+            start = html.index('<div class="breadcrumbs">')
+            breadcrumb = ' '.join(html[start:html.index('</div>', start)].split())
+            assert breadcrumb == '<div class="breadcrumbs"> <a href="/admin/">Home</a> &rsaquo; Finder'
+        else:
+            start = html.index('<ol class="breadcrumbs">')
+            breadcrumb = ' '.join(html[start:html.index('</ol>', start)].split())
+            assert breadcrumb == '<ol class="breadcrumbs"> <li><a href="/admin/">Home</a></li> <li aria-current="page"> Finder </li>'
 
     def test_another_app_index_is_left_alone(self, admin_client, ambit):
         """The Finder entry must not leak into the index of an unrelated application."""

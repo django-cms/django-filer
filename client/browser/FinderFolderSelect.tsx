@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
-import UploadFolderCloudIcon from '../icons/upload-folder-cloud.svg';
+import FolderCloudIcon from '../icons/folder-cloud.svg';
 
 
 interface SelectedFolder {
@@ -51,7 +51,7 @@ const FolderPreview = memo(({selectedFolder, folderIconUrl, openDialog, removeFo
 		<div className="finder-file-select">
 			<figure>{selectedFolder ? <>
 				<div>
-					<img src={folderIconUrl} alt={selectedFolder.name} onClick={openDialog} onDragEnter={openDialog} />
+					<img src={folderIconUrl} alt={selectedFolder.name} onClick={openDialog} onDragEnter={openDialog} draggable={false} />
 				</div>
 				<figcaption>
 					<dl>
@@ -74,7 +74,7 @@ const FolderPreview = memo(({selectedFolder, folderIconUrl, openDialog, removeFo
 				</figcaption>
 			</> :
 				<div onClick={openDialog} onDragEnter={openDialog}>
-					<UploadFolderCloudIcon />
+					<FolderCloudIcon />
 					<strong>{gettext("Select Folder")}</strong>
 				</div>
 			}</figure>

@@ -81,7 +81,7 @@ const FilePreview = memo(({selectedFile, openDialog, removeFile}: {
 		<div className="finder-file-select">
 			<figure>{selectedFile ? <>
 				<div>
-					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} />
+					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} draggable={false} />
 				</div>
 				<figcaption>
 					<dl>

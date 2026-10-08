@@ -15,7 +15,7 @@ from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_att
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -167,10 +167,7 @@ class BrowserView(View):
                 'is_open': is_open,
                 'children': children,
             },
-            'tags': [
-                {'value': id, 'label': label, 'color': color}
-                for id, label, color in FileTag.objects.values_list('id', 'label', 'color')
-            ],
+            'label_tags': list(LabelTag.objects.filter(ambit=ambit).values('id', 'label', 'color')),
             'last_folder': last_folder_id,
             **self.list(request, last_folder_id),
         }

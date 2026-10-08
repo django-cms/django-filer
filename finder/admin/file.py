@@ -12,7 +12,7 @@ from finder.forms.file import FileForm
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 from finder.models.inode import InodeModel
-from finder.models.filetag import FileTag
+from finder.models.filetag import LabelTag
 from finder.models.permission import Privilege
 
 
@@ -97,8 +97,10 @@ class FileAdmin(InodeAdmin):
 
     def get_fields(self, request, obj=None):
         fields = list(super().get_fields(request, obj))
-        if 'tags' in fields and not FileTag.objects.exists():
+        if 'tags' in fields:
             fields.remove('tags')
+        if 'label_tags' in fields and not LabelTag.objects.exists():
+            fields.remove('label_tags')
         return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -131,9 +133,6 @@ class FileAdmin(InodeAdmin):
             'file_mime_type': inode.mime_type,
             'editor_component': inode.editor_component,
         }
-        if inode.tags.model.objects.exists():
-            settings['tags'] = [
-                {'value': id, 'label': label, 'color': color}
-                for id, label, color in inode.tags.model.objects.values_list('id', 'label', 'color')
-            ]
+        if LabelTag.objects.exists():
+            settings['label_tags'] = list(LabelTag.objects.values('id', 'label', 'color'))
         return settings

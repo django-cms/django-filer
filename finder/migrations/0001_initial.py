@@ -212,14 +212,21 @@ class Migration(migrations.Migration):
             name='FileTag',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('label', models.CharField(max_length=255, verbose_name='Label')),
-                ('color', models.CharField(default='#000000', max_length=7, verbose_name='Color')),
                 ('ambit', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='tags', to='finder.ambitmodel')),
             ],
+        ),
+        migrations.CreateModel(
+            name='LabelTag',
+            fields=[
+                ('filetag_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='finder.filetag')),
+                ('label', models.CharField(max_length=255, verbose_name='Label')),
+                ('color', models.CharField(default='#000000', max_length=7, verbose_name='Color')),
+            ],
             options={
-                'verbose_name': 'Tag',
-                'verbose_name_plural': 'Tags',
+                'verbose_name': 'Label Tag',
+                'verbose_name_plural': 'Label Tags',
             },
+            bases=('finder.filetag',),
         ),
         migrations.AddField(
             model_name='filemodel',

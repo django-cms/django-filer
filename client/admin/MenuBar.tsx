@@ -16,7 +16,7 @@ import PermissionEditor from './PermissionEditor';
 import TagEditor from './TagEditor';
 import DropDownMenu from '../common/DropDownMenu';
 import VolumeControl from '../common/VolumeControl';
-import FilterByTag from '../common/FilterByTag';
+import {FilterByLabelTag} from '../common/LabelTags';
 import SortingOptions from '../common/SortingOptions';
 import {Tooltip, TooltipContent, TooltipTrigger} from '../common/Tooltip';
 import MoreVerticalIcon from '../icons/more-vertical.svg';
@@ -34,7 +34,7 @@ import EraseIcon from '../icons/erase.svg';
 import AddFolderIcon from '../icons/add-folder.svg';
 import ShieldFolderIcon from '../icons/shield-folder.svg';
 import FolderShieldIcon from '../icons/folder-shield.svg';
-import LabelIcon from '../icons/label.svg';
+import LabelTagIcon from '../icons/label-tag.svg';
 import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
 import UploadIcon from '../icons/upload.svg';
@@ -152,7 +152,7 @@ function ExtraMenu(props) {
 			</li>
 				{settings.is_root &&
 			<li role="option" onClick={() => openTagEditorDialog()}>
-				<LabelIcon/><span>{gettext("Edit tags")}</span>
+				<LabelTagIcon/><span>{gettext("Edit Label Tags")}</span>
 			</li>
 				}
 			</>}
@@ -233,7 +233,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 				pasteInodes();
 			} else if (['Backspace', 'Delete'].includes(event.key) && event.target instanceof HTMLElement && event.target.closest('ul.inode-list')) {
 				deleteInodes();
-			} else if (['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', ' '].includes(event.key)) {
+			} else if ([' ', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'Enter'].includes(event.key) && event.target.contentEditable !== 'true') {
 				event.preventDefault();
 				navigatePreselection(event);
 			}
@@ -494,7 +494,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 						<GalleryIcon/>
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
-					{settings.tags?.length > 0 && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}
+					{settings.label_tags?.length > 0 && <FilterByLabelTag refreshFilesList={refreshColumns} tags={settings.label_tags} />}
 					<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 						<CutIcon/>
 					</MenuItem>
