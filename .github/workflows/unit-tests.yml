@@ -87,7 +87,7 @@ jobs:
         python -m pip install django-storages[s3]
         docker run --name test-minio -p 9000:9000 -p 9001:9001 -d \
           -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
-          quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z server /data --console-address ":9001"
+          pgsty/minio:RELEASE.2026-08-04T00-00-00Z server /data --console-address ":9001"
         # wait until MinIO is ready (up to ~30s)
         for i in $(seq 1 30); do
           docker exec test-minio mc alias set local http://localhost:9000 minioadmin minioadmin && break || sleep 1
