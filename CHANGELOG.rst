@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* fix: Thumbnails picked through the file widget popup showed as broken images when
+  their URL contained a hyphen, e.g. UUID paths on S3 storage. ``file_icon_url`` JS-escaped
+  the URL although it is only used in an HTML ``data-`` attribute, turning ``-`` into
+  ``\u002D`` (#1645).
+
 3.6.0 (2026-09-12)
 ==================
 
