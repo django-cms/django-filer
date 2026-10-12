@@ -65,8 +65,8 @@ class FolderModel(InodeModel):
         if self.is_root:
             return self
         if isinstance(self.ancestors, QuerySet):  # pragma: with django-cte
-            count = self.ancestors.count()
-            return self.ancestors[count - 1]
+            # the recursive CTE has no defined row order, so select the root by its missing parent
+            return self.ancestors.get(parent__isnull=True)
         else:  # pragma: without django-cte
             return list(self.ancestors)[-1]
 
