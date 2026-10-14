@@ -2,6 +2,19 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
+{% if list_breadcrumbs %}{# Django >= 6.1 renders the breadcrumbs as an ordered list #}
+<ol class="breadcrumbs">
+	<li><a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a></li>
+	<li><a href="{% url 'admin:app_list' app_label='finder' %}" title="{% translate 'Go back to' %} {% translate 'Finder' %}">{% translate "Finder" %}</a></li>
+	{% for breadcrumb in breadcrumbs %}
+		{% if forloop.last %}
+		<li aria-current="page">{{ breadcrumb.name }}</li>
+		{% else %}
+		<li><a href="{{ breadcrumb.link }}">{{ breadcrumb.name }}</a></li>
+		{% endif %}
+	{% endfor %}
+</ol>
+{% else %}
 <div class="breadcrumbs">
 	<a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a>
 	&rsaquo; <a href="{% url 'admin:app_list' app_label='finder' %}" title="{% translate 'Go back to' %} {% translate 'Finder' %}"> {% translate "Finder" %}</a>
@@ -13,6 +26,7 @@
 		{% endif %}
 	{% endfor %}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
