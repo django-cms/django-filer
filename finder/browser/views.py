@@ -61,7 +61,8 @@ class BrowserView(View):
     @classmethod
     def _get_children(cls, ambit, can_view_subquery, open_folders, parent):
         children = []
-        for subfolder in parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True):
+        subfolders = parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True)
+        for subfolder in FolderModel.objects.with_child_counts(subfolders):
             child = subfolder.as_dict(ambit)
             if str(subfolder.id) in open_folders:
                 child.update(
@@ -262,9 +263,11 @@ class BrowserView(View):
 
         ambit = current_folder.get_ambit()
         unified_queryset = sort_by_attribute(request, unified_queryset)
+        # Bound serialization work to the requested page.
+        unified_queryset = unified_queryset[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': unified_queryset[offset:offset + self.limit],
+            'files': list(unified_queryset),
             'has_upload_permission': current_folder.has_permission(request.user, Privilege.WRITE),
             'offset': next_offset,
             'recursive': recursive,
@@ -309,9 +312,10 @@ class BrowserView(View):
             next_offset = offset + self.limit
         else:
             next_offset = None
+        unified_queryset = unified_queryset[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': unified_queryset[offset:offset + self.limit],
+            'files': list(unified_queryset),
             'offset': next_offset,
         }
 
