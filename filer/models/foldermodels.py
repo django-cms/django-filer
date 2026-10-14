@@ -17,21 +17,27 @@ from . import mixins
 PERMISSION_BATCH_SIZE = 1000
 
 
-def _descendant_ids(roots):
-    # Read only the given subtrees, one query per level, visiting overlaps once.
+def _descendant_rows(roots):
+    # Yield (id, parent_id) below the given subtrees, one query per level.
+    # Children come by name, and overlapping subtrees are visited once.
     visited = set(roots)
     pending = list(roots)
     max_params = connections[Folder.objects.db].features.max_query_params
     batch_size = min(PERMISSION_BATCH_SIZE, max_params or PERMISSION_BATCH_SIZE)
     while pending:
-        descendants = set()
+        level = []
         for offset in range(0, len(pending), batch_size):
-            descendants.update(Folder.objects.filter(
+            level.extend(Folder.objects.filter(
                 parent_id__in=pending[offset:offset + batch_size],
-            ).order_by().values_list('id', flat=True).iterator())
-        pending = list(descendants - visited)
-        visited.update(pending)
-    return visited
+            ).order_by('name').values_list('id', 'parent_id').iterator())
+        level = [(pk, parent_id) for pk, parent_id in level if pk not in visited]
+        visited.update(pk for pk, _ in level)
+        yield from level
+        pending = [pk for pk, _ in level]
+
+
+def _descendant_ids(roots):
+    return set(roots) | {pk for pk, _ in _descendant_rows(roots)}
 
 
 class FolderPermissionManager(models.Manager):
@@ -201,7 +207,18 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def get_descendants_ids(self):
         # Query per tree level instead of per folder.
-        return list(_descendant_ids([self.pk]) - {self.pk})
+        children = {}
+        for pk, parent_id in _descendant_rows([self.pk]):
+            children.setdefault(parent_id, []).append(pk)
+
+        # Keep the name-ordered, depth-first order of the recursive version.
+        ordered = []
+        pending = list(reversed(children.get(self.pk, [])))
+        while pending:
+            pk = pending.pop()
+            ordered.append(pk)
+            pending.extend(reversed(children.get(pk, [])))
+        return ordered
 
     @property
     def pretty_logical_path(self):
