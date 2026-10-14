@@ -19,6 +19,38 @@ from tests.helpers import create_clipboard_item, create_folder_structure, create
 Image = load_model(FILER_IMAGE_MODEL)
 
 
+class DuplicateQueryTests(TestCase):
+    def test_duplicate_group_queries(self):
+        for size in (5, 20):
+            with self.subTest(size=size):
+                File.objects.all().delete()
+                digest = str(size).zfill(40)
+                files = File.objects.bulk_create([
+                    File(name=f'file-{index}', sha1=digest, _file_size=1)
+                    for index in range(size)
+                ])
+
+                # One scan and one group query, independent of group size.
+                with self.assertNumQueries(2):
+                    duplicates = File.objects.find_all_duplicates()
+                    self.assertEqual(list(duplicates), [digest])
+                    self.assertCountEqual(duplicates[digest], files)
+
+    def test_duplicate_groups_match(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1=digest, _file_size=1)
+            for index, digest in enumerate(('', '', 'unique', 'first', 'first', 'second', 'second'))
+        ])
+
+        duplicates = File.objects.find_all_duplicates()
+
+        self.assertEqual(list(duplicates), ['first', 'second'])
+        self.assertCountEqual(duplicates['first'], files[3:5])
+        self.assertCountEqual(duplicates['second'], files[5:7])
+        # Keep queryset-valued results usable by existing callers.
+        self.assertEqual(duplicates['first'].filter(pk=files[3].pk).get(), files[3])
+
+
 class FilerApiTests(TestCase):
 
     def setUp(self):

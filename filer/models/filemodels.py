@@ -32,13 +32,18 @@ class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
-        r = {}
+        duplicates = {}
+        seen = set()
         for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
+            if not file_obj.sha1 or file_obj.sha1 in seen:
+                continue
+
+            # Each member shares the same result; load the group only once.
+            seen.add(file_obj.sha1)
+            matches = self.filter(sha1=file_obj.sha1)
+            if len(matches) > 1:
+                duplicates[file_obj.sha1] = matches
+        return duplicates
 
     def find_duplicates(self, file_obj):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
