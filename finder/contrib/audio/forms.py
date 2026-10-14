@@ -3,7 +3,7 @@ from django.forms.widgets import HiddenInput
 
 from entangled.forms import EntangledModelFormMixin
 
-from finder.contrib.audio.models import AudioFileModel, SAMPLE_DURATION
+from finder.contrib.audio.models import SAMPLE_DURATION, AudioFileModel
 from finder.forms.file import FileForm
 
 
@@ -20,4 +20,4 @@ class AudioFileForm(EntangledModelFormMixin, FileForm):
     class Meta:
         model = AudioFileModel
         entangled_fields = {'meta_data': ['sample_start', 'sample_duration']}
-        untangled_fields = ['name', 'tags']
+        untangled_fields = ['name', 'label_tags']

@@ -18,12 +18,12 @@ from ..utils.model_label import get_model_label
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
-    input_type = 'hidden'
+    input_type = "hidden"
     is_hidden = False
 
     def render(self, name, value, attrs=None, renderer=None):
         obj = self.obj_for_value(value)
-        css_id = attrs.get('id')
+        css_id = attrs.get("id")
         css_id_folder = "%s_folder" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
         if attrs is None:
@@ -37,38 +37,40 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             except Exception:
                 pass
         if not related_url:
-            related_url = reverse('admin:filer-directory_listing-last')
+            related_url = reverse("admin:filer-directory_listing-last")
         params = self.url_parameters()
-        params['_pick'] = 'folder'
+        params["_pick"] = "folder"
         if params:
-            url = '?' + urlencode(sorted(params.items()))
+            url = "?" + urlencode(sorted(params.items()))
         else:
-            url = ''
-        if 'class' not in attrs:
+            url = ""
+        if "class" not in attrs:
             # The JavaScript looks for this hook.
-            attrs['class'] = 'vForeignKeyRawIdAdminField'
+            attrs["class"] = "vForeignKeyRawIdAdminField"
         super_attrs = attrs.copy()
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)  # grandparent super
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(
+            name, value, super_attrs
+        )  # grandparent super
 
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         context = {
-            'hidden_input': hidden_input,
-            'lookup_url': f'{related_url}{url}',
-            'lookup_name': name,
-            'span_id': css_id_description_txt,
-            'object': obj,
-            'clear_id': '%s_clear' % css_id,
-            'descid': css_id_description_txt,
-            'foldid': css_id_folder,
-            'id': css_id,
+            "hidden_input": hidden_input,
+            "lookup_url": f"{related_url}{url}",
+            "lookup_name": name,
+            "span_id": css_id_description_txt,
+            "object": obj,
+            "clear_id": "%s_clear" % css_id,
+            "descid": css_id_description_txt,
+            "foldid": css_id_folder,
+            "id": css_id,
         }
-        html = render_to_string('admin/filer/widgets/admin_folder.html', context)
+        html = render_to_string("admin/filer/widgets/admin_folder.html", context)
         return mark_safe(html)
 
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
-        return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
+        return "&nbsp;<strong>%s</strong>" % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
         if not value:
@@ -81,8 +83,11 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        css = {"all": ('filer/css/admin_filer.css',) + ICON_CSS_LIB}
-        js = ('filer/js/addons/popup_handling.js',)
+        css = {"all": ("filer/css/admin_filer.css",) + ICON_CSS_LIB}
+        js = (
+            "filer/js/addons/popup_handling.js",
+            "filer/js/widgets/admin-folder-widget.js",
+        )
 
 
 class AdminFolderFormField(forms.ModelChoiceField):
@@ -91,12 +96,12 @@ class AdminFolderFormField(forms.ModelChoiceField):
     def __init__(self, rel, queryset, to_field_name, *args, **kwargs):
         self.rel = rel
         self.queryset = queryset
-        self.limit_choices_to = kwargs.pop('limit_choices_to', None)
+        self.limit_choices_to = kwargs.pop("limit_choices_to", None)
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
-        kwargs.pop('widget', None)
-        kwargs.pop('blank', None)
+        kwargs.pop("widget", None)
+        kwargs.pop("blank", None)
         forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
@@ -118,13 +123,13 @@ class FilerFolderField(models.ForeignKey):
                     self.__class__.__name__, dfl, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = dfl
+        kwargs["to"] = dfl
         super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
         defaults = {
-            'form_class': self.default_form_class,
-            'rel': self.remote_field,
+            "form_class": self.default_form_class,
+            "rel": self.remote_field,
         }
         defaults.update(kwargs)
         return super().formfield(**defaults)

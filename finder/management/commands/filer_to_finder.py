@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 
 from filer.models.filemodels import Folder as FilerFolder
 from filer.models.imagemodels import Image as FilerImage
-
 from finder.contrib.image.models import ImageFileModel as FinderImage
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFile

@@ -6,6 +6,7 @@ from django.contrib.admin.utils import unquote
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -22,7 +23,7 @@ from ..models import BaseImage, File
 from ..settings import DEFERRED_THUMBNAIL_SIZES
 from ..utils.loader import load_model
 from .permissions import PrimitivePermissionAwareModelAdmin
-from .tools import AdminContext, admin_url_params_encoded, popup_status
+from .tools import AdminContext, admin_url_params_encoded, has_admin_read_permission, popup_status
 
 
 Image = load_model(settings.FILER_IMAGE_MODEL)
@@ -129,16 +130,21 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        adminform = context.get('adminform')
         context.update({
             'show_delete': True,
             'history_url': admin_urlname(self.opts, 'history'),
             'expand_image_url': None,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
+            # The image preview only doubles as the focal point widget if this
+            # form offers a subject location to store it in (#1579)
+            'show_focal_point': bool(adminform and 'subject_location' in adminform.form.fields),
         })
         if obj and obj.mime_maintype == 'image' and obj.file.exists():
             if 'svg' in obj.mime_type:
-                context['expand_image_url'] = reverse(admin_urlname(Image._meta, 'expand'), args=(obj.pk,))
+                # Reverse this admin's own expand view: obj may be a plain File
+                context['expand_image_url'] = reverse(admin_urlname(self.opts, 'expand'), args=(obj.pk,))
             else:
                 context['expand_image_url'] = obj.file.url
         return super().render_change_form(
@@ -203,8 +209,31 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         return super().get_urls() + [
             path("icon/<int:file_id>/<int:size>",
                  self.admin_site.admin_view(self.icon_view),
-                 name=f"filer_{self.model._meta.model_name}_fileicon")
+                 name=f"filer_{self.model._meta.model_name}_fileicon"),
+            path("expand/<int:file_id>",
+                 self.admin_site.admin_view(self.expand_view),
+                 name=f"{self.opts.app_label}_{self.opts.model_name}_expand"),
         ]
+
+    def expand_view(self, request, file_id):
+        """Show a file (currently only SVG images) in its original size.
+
+        Registered on ``FileAdmin`` and not only on ``ImageAdmin``: SVGs are
+        not necessarily stored as ``Image`` instances (e.g. if uploaded before
+        ``image/svg+xml`` became part of ``FILER_IMAGE_MIME_TYPES``), and the
+        directory listing links to the expand view of whatever model the file
+        actually is.
+        """
+        file = get_object_or_404(self.model, pk=file_id)
+        if not has_admin_read_permission(request, file):
+            raise Http404()
+        return TemplateResponse(
+            request,
+            "admin/filer/image/expand.html",
+            context={
+                "original_url": file.url
+            },
+        )
 
     def icon_view(self, request, file_id: int, size: int) -> HttpResponse:
         if size not in DEFERRED_THUMBNAIL_SIZES:
@@ -212,6 +241,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             raise Http404
         file = get_object_or_404(File, pk=file_id)
         if not isinstance(file, BaseImage):
+            raise Http404()
+        if not has_admin_read_permission(request, file):
+            # Do not disclose the existence, name or storage path of files the
+            # user may not read. Http404 mirrors the other file serving views,
+            # see filer.server.views.serve_protected_thumbnail().
             raise Http404()
 
         try:
@@ -221,7 +255,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             # Touch thumbnail to allow it to be prefetched for directory listing
             EasyThumbnail.objects.filter(name=thumbnail.name).update(modified=now())
             return HttpResponseRedirect(thumbnail.url)
-        except (InvalidImageFormatError, NoSourceGenerator):
+        except (InvalidImageFormatError, NoSourceGenerator, OSError):
             return HttpResponseRedirect(staticfiles_storage.url('filer/icons/file-missing.svg'))
 
 

@@ -5,12 +5,13 @@ from functools import lru_cache, reduce
 from operator import or_
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models
 from django.template.defaultfilters import filesizeformat
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from finder import settings
 from finder.models.filetag import FileTag
@@ -189,7 +190,7 @@ class AbstractFileModel(InodeModel):
             'download_url': self.get_download_url(ambit),
             'thumbnail_url': self.get_thumbnail_url(ambit),
             'sample_url': self.get_sample_url(ambit),
-            'tags': self.serializable_value('tags'),
+            'label_tags': self.serialize_label_tags(),
         }
 
     def get_download_url(self, ambit):
@@ -215,6 +216,17 @@ class AbstractFileModel(InodeModel):
         Hook to return a sample for a given file.
         """
         return None
+
+    def serialize_label_tags(self):
+        return list(
+            self.tags
+            .filter(labeltag__isnull=False)
+            .values(
+                'id',
+                label=models.F('labeltag__label'),
+                color=models.F('labeltag__color'),
+            )
+        )
 
     @cached_property
     def mime_maintype(self):
