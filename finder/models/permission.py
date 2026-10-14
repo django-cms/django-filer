@@ -69,6 +69,15 @@ class AccessControlBase(models.Model):
     def everyone(self):
         return self.user_id is None and self.group_id is None
 
+    @property
+    def _principal_key(self):
+        # Matching ACLs needs IDs, not principal names or related-object queries.
+        if self.user_id is not None:
+            return 'user', self.user_id
+        if self.group_id is not None:
+            return 'group', self.group_id
+        return 'everyone', None
+
     def __eq__(self, other):
         entry = self.as_dict
         if isinstance(other, AccessControlBase):
@@ -120,6 +129,44 @@ class AccessControlBase(models.Model):
 
 
 class AccessControlQuerySet(models.QuerySet):
+    def replace_with(self, next_acl, **scope):
+        existing, duplicates = {}, set()
+        for entry in self:
+            key = entry._principal_key
+            if key in existing:
+                duplicates.add(key)
+            else:
+                existing[key] = entry
+
+        from_queryset = isinstance(next_acl, models.QuerySet)
+        entry_ids, updates, creates = [], [], []
+        for ace in next_acl:
+            key = ace._principal_key if from_queryset else (ace['type'], ace['principal'])
+            privilege = ace.privilege if from_queryset else ace['privilege']
+            if from_queryset and key in duplicates:
+                # Preserve get()'s ambiguity error for duplicate default entries.
+                raise self.model.MultipleObjectsReturned('Multiple access control entries for one principal.')
+            entry = existing.get(key)
+            if entry is None:
+                principal_type, principal_id = key
+                values = {**scope, 'privilege': privilege}
+                if principal_type in ('user', 'group'):
+                    values[f'{principal_type}_id'] = principal_id
+                elif principal_type != 'everyone':
+                    raise ValueError(f'Unknown access control type {principal_type}')
+                creates.append(self.model(**values))
+                continue
+
+            entry_ids.append(entry.id)
+            if entry.privilege != privilege:
+                entry.privilege = privilege
+                updates.append(entry)
+
+        self.model.objects.bulk_update(updates, ['privilege'])
+        self.model.objects.bulk_create(creates)
+        entry_ids.extend(entry.id for entry in creates)
+        self.exclude(id__in=entry_ids).delete()
+
     def _filter_or_exclude(self, negate, args, kwargs):
         if kwargs.pop('everyone', None) is True:
             kwargs['user__isnull'] = True

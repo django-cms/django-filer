@@ -423,48 +423,7 @@ class FolderModel(InodeModel):
         if user and not self.has_permission(user, Privilege.ADMIN):
             return
 
-        default_acl_qs = self.default_access_control_list.all()
-        entry_ids, update_entries, create_entries = [], [], []
-        if isinstance(next_acl, QuerySet):
-            for ace in next_acl:
-                try:
-                    entry = default_acl_qs.get(user=ace.user, group=ace.group)
-                except DefaultACE.DoesNotExist:
-                    entry = DefaultACE(folder=self, user=ace.user, group=ace.group, privilege=ace.privilege)
-                    create_entries.append(entry)
-                else:
-                    if entry.privilege != ace.privilege:
-                        entry.privilege = ace.privilege
-                        update_entries.append(entry)
-                    else:
-                        entry_ids.append(entry.id)
-        else:
-            for ace in next_acl:
-                if entry := next(filter(
-                    lambda e: e.as_dict['type'] == ace['type'] and e.as_dict['principal'] == ace['principal'],
-                    default_acl_qs
-                ), None):
-                    if entry.privilege != ace['privilege']:
-                        entry.privilege = ace['privilege']
-                        update_entries.append(entry)
-                    else:
-                        entry_ids.append(entry.id)
-                else:
-                    create_kwargs = {'folder': self, 'privilege': ace['privilege']}
-                    if ace['type'] == 'everyone':
-                        pass  # user and group are already None
-                    elif ace['type'] == 'group':
-                        create_kwargs['group_id'] = ace['principal']
-                    elif ace['type'] == 'user':
-                        create_kwargs['user_id'] = ace['principal']
-                    else:  # pragma: no cover
-                        raise ValueError(f"Unknown access control type {ace['type']}")
-                    create_entries.append(default_acl_qs.model(**create_kwargs))
-
-        DefaultACE.objects.bulk_update(update_entries, ['privilege'])
-        DefaultACE.objects.bulk_create(create_entries)
-        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
-        default_acl_qs.exclude(id__in=entry_ids).delete()
+        self.default_access_control_list.all().replace_with(next_acl, folder=self)
         if recursive:
             for subfolder in self.subfolders:
                 subfolder.apply_default_access_control_list(next_acl, user=user, recursive=True)
