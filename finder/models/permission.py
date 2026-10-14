@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -159,6 +161,9 @@ class AccessControlQuerySet(models.QuerySet):
 
             entry_ids.append(entry.id)
             if entry.privilege != privilege:
+                # Queryset matches previously returned independent get() instances.
+                if from_queryset:
+                    entry = copy(entry)
                 entry.privilege = privilege
                 updates.append(entry)
 

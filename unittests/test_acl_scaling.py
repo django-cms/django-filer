@@ -141,3 +141,19 @@ def test_permission_queries(acl_target, sub_folder, admin_user, staff_users, gro
         for entry in entries
     ]
     assert sorted(actual, key=str) == sorted(expected, key=str)
+
+
+@pytest.mark.parametrize('last_privilege', [Privilege.READ, Privilege.FULL])
+def test_duplicate_source_acl(acl_target, staff_users, ambit, last_privilege):
+    model, lookup, apply_acl = acl_target
+    model.objects.create(**lookup, user=staff_users[0], privilege=Privilege.READ)
+    DefaultAccessControlEntry.objects.bulk_create([
+        DefaultAccessControlEntry(folder=ambit.root_folder, user=staff_users[0], privilege=privilege)
+        for privilege in (Privilege.WRITE, last_privilege)
+    ])
+    source = ambit.root_folder.default_access_control_list.filter(user=staff_users[0]).order_by('id')
+
+    apply_acl(source)
+
+    # Queryset inputs historically retain the first differing duplicate privilege.
+    assert model.objects.get(**lookup, user=staff_users[0]).privilege == Privilege.WRITE
