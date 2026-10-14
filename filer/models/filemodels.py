@@ -341,8 +341,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
             return False
         elif user.is_superuser:
             return True
-        # Compare keys to avoid loading the owner row.
-        elif self.owner_id == user.pk:
+        # Compare keys to avoid loading the owner row; a missing owner never matches.
+        elif self.owner_id is not None and self.owner_id == user.pk:
             return True
         elif self.folder:
             return self.folder.has_generic_permission(request, permission_type)

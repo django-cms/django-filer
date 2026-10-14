@@ -188,6 +188,21 @@ class TreePermissionCheckTests(TestCase):
         with self.assertRaises(PermissionDenied):
             check_files_edit_permissions(self.request(), [other])
 
+    def test_ownerless_items_need_grants(self):
+        # An unsaved user has no key; that must not match a missing owner.
+        request = RequestFactory().post('/')
+        request.user = get_user_model()(username='unsaved', is_staff=True)
+        folder = Folder.objects.create(name='ownerless')
+        file_obj = File.objects.create(original_filename='ownerless.txt')
+
+        # Isolate the owner check: grant lookups find nothing.
+        no_grants = {f'get_{name}_id_list': lambda user: set() for name in ('read', 'edit', 'add_children')}
+        with patch.multiple(FolderPermission.objects, **no_grants):
+            for item in (folder, file_obj):
+                for permission in ('read', 'edit', 'add_children'):
+                    with self.subTest(item=type(item).__name__, permission=permission):
+                        self.assertFalse(item.has_generic_permission(request, permission))
+
     def test_owned_images_bypass_grants(self):
         folder = Folder.objects.create(name='ungranted images')
         buffer = io.BytesIO()
@@ -473,3 +488,4 @@ class TreeHelperTests(TestCase):
         child.parent_id = source.pk
         NestedObjects(using='default')._share_source(source, child)
         self.assertIs(child.parent, source)
+
