@@ -1,8 +1,10 @@
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
+from django.db import connections
 from django.utils.http import urlencode
 
 from .. import settings
+from ..models import File, Folder
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
@@ -15,11 +17,7 @@ def check_files_edit_permissions(request, files):
 
 
 def check_folder_edit_permissions(request, folders):
-    for f in folders:
-        if not f.has_edit_permission(request):
-            raise PermissionDenied
-        check_files_edit_permissions(request, f.files)
-        check_folder_edit_permissions(request, f.children.all())
+    _check_folder_tree(request, folders, 'has_edit_permission')
 
 
 def has_admin_read_permission(request, item):
@@ -45,11 +43,38 @@ def check_files_read_permissions(request, files):
 
 
 def check_folder_read_permissions(request, folders):
-    for f in folders:
-        if not f.has_read_permission(request):
-            raise PermissionDenied
-        check_files_read_permissions(request, f.files)
-        check_folder_read_permissions(request, f.children.all())
+    _check_folder_tree(request, folders, 'has_read_permission')
+
+
+def _check_folder_tree(request, folders, check):
+    # Walk one tree level at a time so queries grow with depth, not size.
+    # Per-object checks still decide, so model overrides keep working.
+    level = list(folders)
+    seen = set()
+    while level:
+        level_by_id = {}
+        for folder in level:
+            if not getattr(folder, check)(request):
+                raise PermissionDenied
+            level_by_id[folder.pk] = folder
+        seen.update(level_by_id)
+
+        for file_obj in filter_in_batches(File.objects.all(), 'folder_id', level_by_id):
+            # Reuse the loaded folder and its permission cache.
+            file_obj.folder = level_by_id[file_obj.folder_id]
+            if not getattr(file_obj, check)(request):
+                raise PermissionDenied
+
+        children = filter_in_batches(Folder.objects.all(), 'parent_id', level_by_id)
+        level = [child for child in children if child.pk not in seen]
+
+
+def filter_in_batches(queryset, field, ids):
+    # Stay below the database's query parameter limit, e.g. 999 on SQLite.
+    ids = list(ids)
+    batch_size = connections[queryset.db].features.max_query_params or len(ids) or 1
+    for offset in range(0, len(ids), batch_size):
+        yield from queryset.filter(**{f'{field}__in': ids[offset:offset + batch_size]})
 
 
 def userperms_for_request(item, request):

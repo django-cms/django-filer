@@ -14,6 +14,8 @@ from filer.admin.tools import (
     popup_status,
     userperms_for_request,
 )
+from filer.models import Folder
+from tests.helpers import create_superuser
 
 
 class CheckPermissionTests(TestCase):
@@ -39,21 +41,21 @@ class CheckPermissionTests(TestCase):
         with self.assertRaises(PermissionDenied):
             check_files_read_permissions(None, [mock_file])
 
+    def folder_request(self):
+        # The tree walk loads children and files, so it needs saved folders.
+        folder = Folder.objects.create(name='parent')
+        Folder.objects.create(name='child', parent=folder)
+        request = RequestFactory().post('/')
+        request.user = create_superuser()
+        return request, folder
+
     def test_check_folder_edit_permissions_passes(self):
-        mock_folder = type('obj', (), {
-            'has_edit_permission': lambda self, r: True,
-            'files': [],
-            'children': type('obj', (), {'all': lambda self: []})(),
-        })()
-        check_folder_edit_permissions(None, [mock_folder])
+        request, folder = self.folder_request()
+        check_folder_edit_permissions(request, [folder])
 
     def test_check_folder_read_permissions_passes(self):
-        mock_folder = type('obj', (), {
-            'has_read_permission': lambda self, r: True,
-            'files': [],
-            'children': type('obj', (), {'all': lambda self: []})(),
-        })()
-        check_folder_read_permissions(None, [mock_folder])
+        request, folder = self.folder_request()
+        check_folder_read_permissions(request, [folder])
 
 
 class UserPermsForRequestTests(TestCase):
