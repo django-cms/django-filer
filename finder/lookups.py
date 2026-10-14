@@ -1,5 +1,6 @@
 from finder.models.inode import InodeManager
 from finder.models.filetag import FileTag
+from finder.models.folder import FolderModel
 
 
 def annotate_unified_queryset(ambit, queryset):
@@ -8,8 +9,13 @@ def annotate_unified_queryset(ambit, queryset):
     This step must be applied after filtering and sorting.
     """
     tags = FileTag.objects.values_list('id', 'label', 'color')
+    folders = {
+        folder.pk: folder for folder in FolderModel.objects.with_child_counts(
+            InodeManager.get_proxy_object(entry) for entry in queryset if entry['is_folder']
+        )
+    }
     for entry in queryset:
-        proxy_obj = InodeManager.get_proxy_object(entry)
+        proxy_obj = folders[entry['id']] if entry['is_folder'] else InodeManager.get_proxy_object(entry)
         entry.update(
             download_url=proxy_obj.get_download_url(ambit),
             thumbnail_url=proxy_obj.get_thumbnail_url(ambit),

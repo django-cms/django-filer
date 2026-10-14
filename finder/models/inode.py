@@ -12,11 +12,10 @@ from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Q, Value
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
-from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from finder.models.permission import AccessControlEntry, Privilege, is_anonymous
+from finder.models.permission import AccessControlEntry, Privilege, is_excluded
 
 if DJANGO_VERSION < (6, 0):
     try:
@@ -361,7 +360,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     def has_permission(self, user, privilege):
         assert (privilege & Privilege.FULL) != 0, "Invalid privilege value."
-        if is_anonymous(user):
+        if is_excluded(user):
             return False
         if user.is_superuser:
             return True
@@ -379,48 +378,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         if user and not self.has_permission(user, Privilege.ADMIN):
             return
 
-        current_acl_qs = AccessControlEntry.objects.filter(inode=self.id)
-        entry_ids, update_entries, create_entries = [], [], []
-        if isinstance(next_acl, QuerySet):
-            for ace in next_acl:
-                try:
-                    entry = current_acl_qs.get(user=ace.user, group=ace.group)
-                except AccessControlEntry.DoesNotExist:
-                    entry = AccessControlEntry(inode=self.id, user=ace.user, group=ace.group, privilege=ace.privilege)
-                    create_entries.append(entry)
-                else:
-                    if entry.privilege != ace.privilege:
-                        entry.privilege = ace.privilege
-                        update_entries.append(entry)
-                    else:
-                        entry_ids.append(entry.id)
-        else:
-            for ace in next_acl:
-                if entry := next(filter(
-                    lambda ca: ca.as_dict['type'] == ace['type'] and ca.as_dict['principal'] == ace['principal'],
-                    current_acl_qs
-                ), None):
-                    if entry.privilege != ace['privilege']:
-                        entry.privilege = ace['privilege']
-                        update_entries.append(entry)
-                    else:
-                        entry_ids.append(entry.id)
-                else:
-                    create_kwargs = {'inode': self.id, 'privilege': ace['privilege']}
-                    if ace['type'] == 'everyone':
-                        pass  # user and group are already None
-                    elif ace['type'] == 'group':
-                        create_kwargs['group_id'] = ace['principal']
-                    elif ace['type'] == 'user':
-                        create_kwargs['user_id'] = ace['principal']
-                    else:  # pragma: no cover
-                        raise ValueError(f"Unknown access control type {ace['type']}")
-                    create_entries.append(AccessControlEntry(**create_kwargs))
-
-        AccessControlEntry.objects.bulk_update(update_entries, ['privilege'])
-        AccessControlEntry.objects.bulk_create(create_entries)
-        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
-        current_acl_qs.exclude(id__in=entry_ids).delete()
+        AccessControlEntry.objects.filter(inode=self.id).replace_with(next_acl, inode=self.id)
 
 
 class DiscardedInode(models.Model):

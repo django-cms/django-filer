@@ -114,7 +114,7 @@ export default function Image(props) {
 	return (<>
 		{children}
 		<FileDetails controlButtons={controlButtons} {...props}>
-			<ReactCrop crop={crop} aspect={1} disabled={disabled} onChange={handleChange}>
+			<ReactCrop crop={crop} aspect={1} disabled={disabled} minWidth={25} ruleOfThirds={true} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>
 		</FileDetails>
