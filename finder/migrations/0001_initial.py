@@ -49,7 +49,8 @@ def create_default_ambit(apps, schema_editor):
         slug=slug,
         verbose_name=slug.capitalize(),
     )
-    # grant read/write to everyone, as `manage.py finder add-ambit` does
+    # grant read/write to everyone, as `manage.py finder add-ambit` does; unless
+    # FINDER_STAFF_ONLY is switched off, “everyone” only covers staff users
     AccessControlEntry.objects.using(using).create(
         inode=root_folder.id,
         privilege=PRIVILEGE_READ_WRITE,
