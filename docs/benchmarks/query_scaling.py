@@ -208,9 +208,10 @@ def main():
     from app_helper.runner import setup
     from tests import settings as test_settings
 
-    import filer
+    # Use one import style for filer; CodeQL flags mixing both.
+    from filer import __file__ as filer_path
 
-    assert Path(filer.__file__).resolve().is_relative_to(source), filer.__file__
+    assert Path(filer_path).resolve().is_relative_to(source), filer_path
     setup('filer', test_settings)
     assert connection.settings_dict['NAME'] == ':memory:'
     call_command('migrate', verbosity=0, interactive=False)
