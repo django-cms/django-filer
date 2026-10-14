@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
+from django.db.models import Count
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -32,18 +33,13 @@ class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
-        duplicates = {}
-        seen = set()
-        for file_obj in self.all():
-            if not file_obj.sha1 or file_obj.sha1 in seen:
-                continue
-
-            # Each member shares the same result; load the group only once.
-            seen.add(file_obj.sha1)
-            matches = self.filter(sha1=file_obj.sha1)
-            if len(matches) > 1:
-                duplicates[file_obj.sha1] = matches
-        return duplicates
+        # Discover duplicate digests without materializing files or unique groups.
+        digests = (
+            self.exclude(sha1='').order_by().values('sha1')
+            .annotate(total=Count('pk')).filter(total__gt=1)
+            .values_list('sha1', flat=True)
+        )
+        return {sha1: self.filter(sha1=sha1) for sha1 in digests}
 
     def find_duplicates(self, file_obj):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]

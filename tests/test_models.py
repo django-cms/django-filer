@@ -30,10 +30,12 @@ class DuplicateQueryTests(TestCase):
                     for index in range(size)
                 ])
 
-                # One scan and one group query, independent of group size.
-                with self.assertNumQueries(2):
+                # Discover digests without loading the returned querysets.
+                with self.assertNumQueries(1):
                     duplicates = File.objects.find_all_duplicates()
                     self.assertEqual(list(duplicates), [digest])
+
+                with self.assertNumQueries(1):
                     self.assertCountEqual(duplicates[digest], files)
 
     def test_duplicate_groups_match(self):
@@ -44,11 +46,36 @@ class DuplicateQueryTests(TestCase):
 
         duplicates = File.objects.find_all_duplicates()
 
-        self.assertEqual(list(duplicates), ['first', 'second'])
+        self.assertCountEqual(duplicates, ['first', 'second'])
         self.assertCountEqual(duplicates['first'], files[3:5])
         self.assertCountEqual(duplicates['second'], files[5:7])
         # Keep queryset-valued results usable by existing callers.
         self.assertEqual(duplicates['first'].filter(pk=files[3].pk).get(), files[3])
+
+    def test_mostly_unique_digests(self):
+        for size in (20, 100):
+            with self.subTest(size=size):
+                File.objects.all().delete()
+                File.objects.bulk_create([
+                    File(name=str(index), sha1=str(index).zfill(40), _file_size=1)
+                    for index in range(size)
+                ])
+                with self.assertNumQueries(1):
+                    self.assertEqual(File.objects.find_all_duplicates(), {})
+
+    def test_duplicates_keep_subtypes(self):
+        digest = 'a' * 40
+        file = File.objects.create(name='file', _file_size=1)
+        image = Image.objects.create(name='image', _file_size=1)
+        File.objects.filter(pk__in=(file.pk, image.pk)).update(sha1=digest)
+
+        with self.assertNumQueries(1):
+            duplicates = File.objects.find_all_duplicates()
+
+        matches = {item.pk: item for item in duplicates[digest]}
+        self.assertEqual(set(matches), {file.pk, image.pk})
+        self.assertIsInstance(matches[file.pk], File)
+        self.assertIsInstance(matches[image.pk], Image)
 
 
 class FilerApiTests(TestCase):
