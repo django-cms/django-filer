@@ -114,25 +114,25 @@ subtree grant and a cold permission cache. Search workloads use page size 100.
 
 ## Recorded tree results
 
-Baseline `b53e7c03` versus `6bbfdb04`, Python 3.12.0 / Django 5.2.18.
+Baseline `b53e7c03` versus `43b4f756`, Python 3.12.0 / Django 5.2.18.
 All 16 output fingerprints match across the six processes. See
 `tree_results.json` for raw samples and environment versions.
 
 | Workload | Size | Before (ms) | After (ms) | Speedup | SQL queries |
 |---|---:|---:|---:|---:|---:|
-| descendant ids | 50 | 12.74 | 0.42 | 30.3× | 101 → 3 |
-| descendant ids | 200 | 50.37 | 0.88 | 57.5× | 401 → 3 |
-| limited search | 50 | 46.57 | 34.00 | 1.4× | 107 → 9 |
-| limited search | 200 | 82.52 | 31.56 | 2.6× | 406 → 8 |
-| edit check | 50 | 30.60 | 4.84 | 6.3× | 209 → 13 |
-| edit check | 200 | 119.32 | 15.36 | 7.8× | 809 → 13 |
-| destinations | 50 | 18.33 | 5.35 | 3.4× | 113 → 15 |
-| destinations | 200 | 70.74 | 17.76 | 4.0× | 413 → 15 |
-| delete confirmation | 50 | 55.59 | 24.56 | 2.3× | 273 → 27 |
-| delete confirmation | 200 | 187.16 | 61.63 | 3.0× | 1,023 → 27 |
-| move listing | 50 | 33.20 | 6.77 | 4.9× | 204 → 8 |
-| move listing | 200 | 130.39 | 23.27 | 5.6× | 804 → 8 |
-| search files | 25 | 22.03 | 19.47 | 1.1× | 35 → 10 |
-| search files | 100 | 49.98 | 38.32 | 1.3× | 110 → 10 |
-| pick search folders | 25 | 21.46 | 14.12 | 1.5× | 82 → 10 |
-| pick search folders | 100 | 60.43 | 29.34 | 2.1× | 307 → 10 |
+| descendant ids | 50 | 12.84 | 0.58 | 22.3× | 101 → 3 |
+| descendant ids | 200 | 50.80 | 1.16 | 43.6× | 401 → 3 |
+| limited search | 50 | 46.87 | 34.72 | 1.3× | 107 → 9 |
+| limited search | 200 | 82.93 | 32.23 | 2.6× | 406 → 8 |
+| edit check | 50 | 30.76 | 4.99 | 6.2× | 209 → 13 |
+| edit check | 200 | 119.73 | 15.52 | 7.7× | 809 → 13 |
+| destinations | 50 | 18.33 | 5.54 | 3.3× | 113 → 15 |
+| destinations | 200 | 71.19 | 18.28 | 3.9× | 413 → 15 |
+| delete confirmation | 50 | 56.57 | 24.77 | 2.3× | 273 → 27 |
+| delete confirmation | 200 | 189.20 | 62.57 | 3.0× | 1,023 → 27 |
+| move listing | 50 | 33.68 | 6.80 | 5.0× | 204 → 8 |
+| move listing | 200 | 132.70 | 23.69 | 5.6× | 804 → 8 |
+| search files | 25 | 22.57 | 19.60 | 1.2× | 35 → 10 |
+| search files | 100 | 50.66 | 38.89 | 1.3× | 110 → 10 |
+| pick search folders | 25 | 21.79 | 14.16 | 1.5× | 82 → 10 |
+| pick search folders | 100 | 60.91 | 29.66 | 2.1× | 307 → 10 |
