@@ -17,6 +17,23 @@ from . import mixins
 PERMISSION_BATCH_SIZE = 1000
 
 
+def _descendant_ids(roots):
+    # Read only the given subtrees, one query per level, visiting overlaps once.
+    visited = set(roots)
+    pending = list(roots)
+    max_params = connections[Folder.objects.db].features.max_query_params
+    batch_size = min(PERMISSION_BATCH_SIZE, max_params or PERMISSION_BATCH_SIZE)
+    while pending:
+        descendants = set()
+        for offset in range(0, len(pending), batch_size):
+            descendants.update(Folder.objects.filter(
+                parent_id__in=pending[offset:offset + batch_size],
+            ).order_by().values_list('id', flat=True).iterator())
+        pending = list(descendants - visited)
+        visited.update(pending)
+    return visited
+
+
 class FolderPermissionManager(models.Manager):
     """
     These methods are called by introspection from "has_generic_permission" on
@@ -73,28 +90,12 @@ class FolderPermissionManager(models.Manager):
                 id_lists[grant].update(Folder.objects.order_by().values_list('id', flat=True).iterator())
                 continue
 
-            id_lists[grant].update(self._descendant_ids(roots))
+            id_lists[grant].update(_descendant_ids(roots))
 
         # Deny has precedence over allow
         id_list = id_lists[FolderPermission.ALLOW] - id_lists[FolderPermission.DENY]
         update_folder_permission_cache(user, attr, id_list)
         return id_list
-
-    def _descendant_ids(self, roots):
-        # Read only granted subtrees, visiting overlapping descendants once.
-        visited = set(roots)
-        pending = list(roots)
-        max_params = connections[Folder.objects.db].features.max_query_params
-        batch_size = min(PERMISSION_BATCH_SIZE, max_params or PERMISSION_BATCH_SIZE)
-        while pending:
-            descendants = set()
-            for offset in range(0, len(pending), batch_size):
-                descendants.update(Folder.objects.filter(
-                    parent_id__in=pending[offset:offset + batch_size],
-                ).order_by().values_list('id', flat=True).iterator())
-            pending = list(descendants - visited)
-            visited.update(pending)
-        return visited
 
 
 class Folder(models.Model, mixins.IconsMixin):
@@ -199,11 +200,8 @@ class Folder(models.Model, mixins.IconsMixin):
         return folder_path
 
     def get_descendants_ids(self):
-        desc = []
-        for child in self.children.all():
-            desc.append(child.id)
-            desc.extend(child.get_descendants_ids())
-        return desc
+        # Query per tree level instead of per folder.
+        return list(_descendant_ids([self.pk]) - {self.pk})
 
     @property
     def pretty_logical_path(self):
