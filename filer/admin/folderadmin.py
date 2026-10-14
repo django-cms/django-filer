@@ -54,6 +54,7 @@ from .tools import (
     check_files_read_permissions,
     check_folder_edit_permissions,
     check_folder_read_permissions,
+    filter_in_batches,
     get_directory_listing_type,
     popup_status,
     userperms_for_request,
@@ -946,23 +947,36 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset)])
         return to_copy_or_move
 
-    def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
+    def _list_all_destination_folders_recursive(self, request, current_folder, children, folders, allow_self, level):
         for fo in folders:
-            if not allow_self and fo in folders_queryset:
-                # We do not allow moving to selected folders or their descendants
-                continue
-
-            if not fo.has_read_permission(request):
-                continue
-
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
-            yield from self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1)
+            yield from self._list_all_destination_folders_recursive(request, current_folder, children, children.get(fo.pk, ()), allow_self, level + 1)
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
-        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
+        # We do not allow moving to selected folders or their descendants
+        excluded = set() if allow_self else set(folders_queryset.values_list('pk', flat=True))
+
+        # Load visible folders one level at a time, so queries grow with depth.
+        level = list(self.get_queryset(request).filter(parent__isnull=True).order_by('name'))
+        children = {}
+        while level:
+            visible = {}
+            for fo in level:
+                if fo.pk in excluded or not fo.has_read_permission(request):
+                    continue
+
+                visible[fo.pk] = fo
+                children.setdefault(fo.parent_id, []).append(fo)
+
+            level = list(filter_in_batches(Folder.objects.order_by('name'), 'parent_id', visible))
+            for child in level:
+                # Share parents so folder labels do not reload ancestors.
+                child.parent = visible[child.parent_id]
+
+        root_folders = children.get(None, [])
+        return list(self._list_all_destination_folders_recursive(request, current_folder, children, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         files_queryset.update(folder=destination)
