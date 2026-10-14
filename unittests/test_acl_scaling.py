@@ -1,7 +1,11 @@
+import json
+
 import pytest
 
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 
+from finder.admin.inode import InodeAdmin
 from finder.models.folder import FolderModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 
@@ -113,3 +117,27 @@ def test_acl_reconciles_entries(acl_target, staff_users, groups, ambit, input_ki
     apply_acl([] if input_kind == 'json' else model.objects.none())
     assert not model.objects.filter(**lookup).exists()
     assert model.objects.filter(**source_lookup).count() == len(entries)
+
+
+def test_permission_queries(acl_target, sub_folder, admin_user, staff_users, groups, django_assert_num_queries):
+    model, lookup, _ = acl_target
+    entries = model.objects.bulk_create([
+        model(**lookup, user=admin_user, privilege=Privilege.FULL),
+        model(**lookup, user=staff_users[0], privilege=Privilege.READ),
+        model(**lookup, group=groups[0], privilege=Privilege.READ_WRITE),
+        model(**lookup, privilege=Privilege.READ),
+    ])
+    inode_admin = InodeAdmin(FolderModel, admin.site)
+
+    with django_assert_num_queries(1):
+        response = inode_admin.get_permissions(sub_folder, admin_user, model is DefaultAccessControlEntry)
+
+    actual = json.loads(response.content)['access_control_list']
+    expected = [
+        {
+            **entry.as_dict,
+            'is_current_user': entry.user_id == admin_user.id,
+        }
+        for entry in entries
+    ]
+    assert sorted(actual, key=str) == sorted(expected, key=str)

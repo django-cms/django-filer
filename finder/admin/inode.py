@@ -143,7 +143,7 @@ class InodeAdmin(admin.ModelAdmin):
             acl_qs = DefaultAccessControlEntry.objects.filter(folder=current_inode)
         else:
             acl_qs = AccessControlEntry.objects.filter(inode=current_inode.id)
-        for ace in acl_qs:
+        for ace in acl_qs.select_related('user', 'group'):
             entry = ace.as_dict
             entry['is_current_user'] = entry['type'] == 'user' and entry['principal'] == current_user.id
             access_control_list.append(entry)
