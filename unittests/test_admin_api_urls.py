@@ -26,9 +26,18 @@ def test_an_anonymous_request_is_not_sent_to_the_login_page(client, ambit):
     assert response.status_code != 302
 
 
-def test_a_user_who_is_not_staff_can_read_the_structure(client, ambit):
+def test_a_user_who_is_not_staff_is_refused_the_structure(client, ambit):
+    """No gate applies at the URL, but FINDER_STAFF_ONLY keeps the ACLs from granting anything."""
     user = get_user_model().objects.create_user(username='joe', password='secret')
     assert user.is_staff is False
+    client.force_login(user)
+    response = client.get(reverse('admin:finder-api:base-url') + f'structure/{ambit.slug}')
+    assert response.status_code == 403
+
+
+def test_a_user_who_is_not_staff_can_read_the_structure_if_permitted(client, ambit, settings):
+    settings.FINDER_STAFF_ONLY = False
+    user = get_user_model().objects.create_user(username='joe', password='secret')
     client.force_login(user)
     response = client.get(reverse('admin:finder-api:base-url') + f'structure/{ambit.slug}')
     assert response.status_code == 200

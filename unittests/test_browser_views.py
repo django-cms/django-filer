@@ -5,6 +5,7 @@ from io import BytesIO
 
 from PIL import Image
 
+from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
@@ -472,10 +473,33 @@ def test_delete_file(admin_client, ambit, uploaded_file, api_url):
 
 def test_delete_file_anonymously(client, ambit, uploaded_file, api_url):
     """An anonymous request must not be allowed to delete a file."""
+    AccessControlEntry.objects.filter(
+        inode__in=[ambit.root_folder.id, uploaded_file.id],
+    ).delete()
+    anonymous_user = AnonymousUser()
+
     assert '_auth_user_id' not in client.session
+    assert AccessControlEntry.objects.filter(inode=ambit.root_folder.id).exists() is False
+    assert AccessControlEntry.objects.filter(inode=uploaded_file.id).exists() is False
+    assert ambit.root_folder.has_permission(anonymous_user, Privilege.WRITE) is False
+    assert uploaded_file.has_permission(anonymous_user, Privilege.WRITE) is False
+
     response = client.delete(f'{api_url}{uploaded_file.id}/change')
-    assert FileModel.objects.filter(id=uploaded_file.id).exists() is True
+
     assert response.status_code == 403
+    assert FileModel.objects.filter(id=uploaded_file.id).exists() is True
+
+
+def test_delete_file_without_write_permission(staff_client, ambit, uploaded_file, api_url):
+    """Deleting a file requires WRITE on that file."""
+    AccessControlEntry.objects.all().delete()
+    assert ambit.root_folder.has_permission(staff_client.user, Privilege.WRITE) is False
+    assert uploaded_file.has_permission(staff_client.user, Privilege.WRITE) is False
+
+    response = staff_client.delete(f'{api_url}{uploaded_file.id}/change')
+
+    assert response.status_code == 403
+    assert FileModel.objects.filter(id=uploaded_file.id).exists() is True
 
 
 def test_crop_image(admin_client, ambit, uploaded_image, api_url):
