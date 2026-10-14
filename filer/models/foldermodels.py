@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
@@ -40,46 +42,54 @@ class FolderPermissionManager(models.Manager):
         if cached_id_list is not None:
             return cached_id_list
 
-        allow_list = set()
-        deny_list = set()
+        id_lists = {FolderPermission.ALLOW: set(), FolderPermission.DENY: set()}
+        subtree_roots = {FolderPermission.ALLOW: set(), FolderPermission.DENY: set()}
+        global_grants = set()
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
-        perms = self.filter(q)
-
-        for perm in perms:
-            p = getattr(perm, attr)
-
-            if p is None:
-                # Not allow nor deny, we continue with the next permission
+        for folder_id, scope, permission in self.filter(q).values_list('folder_id', 'type', attr):
+            if permission is None:
                 continue
 
-            if not perm.folder:
-                assert perm.type == FolderPermission.ALL
-
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(Folder.objects.all().values_list('id', flat=True))
-                else:
-                    deny_list.update(Folder.objects.all().values_list('id', flat=True))
-
+            grant = FolderPermission.ALLOW if permission == FolderPermission.ALLOW else FolderPermission.DENY
+            if folder_id is None:
+                assert scope == FolderPermission.ALL
+                global_grants.add(grant)
                 continue
 
-            folder_id = perm.folder.id
+            id_lists[grant].add(folder_id)
+            if scope in (FolderPermission.ALL, FolderPermission.CHILDREN):
+                subtree_roots[grant].add(folder_id)
 
-            if p == FolderPermission.ALLOW:
-                allow_list.add(folder_id)
-            else:
-                deny_list.add(folder_id)
+        if global_grants or any(subtree_roots.values()):
+            parents = dict(Folder.objects.order_by().values_list('id', 'parent_id'))
+            children = defaultdict(list)
+            for folder_id, parent_id in parents.items():
+                children[parent_id].append(folder_id)
 
-            if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants_ids())
-                else:
-                    deny_list.update(perm.folder.get_descendants_ids())
+            for grant, roots in subtree_roots.items():
+                if grant in global_grants:
+                    id_lists[grant].update(parents)
+                    continue
+
+                id_lists[grant].update(self._descendant_ids(roots, children))
 
         # Deny has precedence over allow
-        id_list = allow_list - deny_list
+        id_list = id_lists[FolderPermission.ALLOW] - id_lists[FolderPermission.DENY]
         update_folder_permission_cache(user, attr, id_list)
         return id_list
+
+    def _descendant_ids(self, roots, children):
+        # Overlapping grants visit each descendant at most once per decision.
+        visited = set()
+        pending = list(roots)
+        while pending:
+            folder_id = pending.pop()
+            if folder_id in visited:
+                continue
+            visited.add(folder_id)
+            pending.extend(children.get(folder_id, ()))
+        return visited
 
 
 class Folder(models.Model, mixins.IconsMixin):
