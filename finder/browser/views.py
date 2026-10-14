@@ -259,9 +259,7 @@ class BrowserView(View):
             next_offset = None
 
         ambit = current_folder.get_ambit()
-        unified_queryset = sort_by_attribute(request, unified_queryset)
-        # Bound serialization work to the requested page.
-        unified_queryset = unified_queryset[offset:offset + self.limit]
+        unified_queryset = sort_by_attribute(request, unified_queryset)[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
             'files': list(unified_queryset),
