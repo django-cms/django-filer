@@ -109,7 +109,7 @@ class DirectoryPaginationTests(TestCase):
                 self.assertEqual(items[key], expected[key])
         for key in (len(expected), -len(expected) - 1):
             with self.assertRaises(IndexError):
-                items[key]
+                _ = items[key]
 
     def test_permission_page_counts(self):
         user = get_user_model().objects.create(username='reader', is_staff=True)
