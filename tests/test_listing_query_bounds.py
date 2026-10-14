@@ -130,20 +130,21 @@ class PickFolderQueryTests(ListingMixin, TestCase):
         return parent
 
     def test_pick_labels_follow_page(self):
-        for mode in MODES:
-            counts = {}
-            for count in (SMALL_COUNT, LARGE_COUNT):
-                token = f'{mode}{count}'
-                folder = self.build(token, count)
-                pick = {'_pick': 'folder', '_popup': '1', '_list_type': TABLE_LIST_TYPE}
-                self.listing(folder, mode, f'{token}s', **pick)
-                response, counts[count] = count_queries(
-                    lambda: self.listing(folder, mode, f'{token}s', **pick),
-                )
+        for list_type in LIST_TYPES:
+            for mode in MODES:
+                counts = {}
+                for count in (SMALL_COUNT, LARGE_COUNT):
+                    token = f'{list_type}{mode}{count}'
+                    folder = self.build(token, count)
+                    pick = {'_pick': 'folder', '_popup': '1', '_list_type': list_type}
+                    self.listing(folder, mode, f'{token}s', **pick)
+                    response, counts[count] = count_queries(
+                        lambda: self.listing(folder, mode, f'{token}s', **pick),
+                    )
 
-                path = '/'.join(f'{token}d{depth}' for depth in range(3))
-                for index in range(count):
-                    self.assertContains(response, f'data-label="/{path}/{token}s{index}"')
+                    path = '/'.join(f'{token}d{depth}' for depth in range(3))
+                    for index in range(count):
+                        self.assertContains(response, f'data-label="/{path}/{token}s{index}"')
 
-            with self.subTest(mode=mode):
-                self.assertEqual(counts[SMALL_COUNT], counts[LARGE_COUNT])
+                with self.subTest(list_type=list_type, mode=mode):
+                    self.assertEqual(counts[SMALL_COUNT], counts[LARGE_COUNT])
