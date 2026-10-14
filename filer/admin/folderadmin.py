@@ -50,12 +50,14 @@ from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
     AdminContext,
     admin_url_params_encoded,
+    attach_ancestors,
     check_files_edit_permissions,
     check_files_read_permissions,
     check_folder_edit_permissions,
     check_folder_read_permissions,
     filter_in_batches,
     get_directory_listing_type,
+    popup_pick_type,
     popup_status,
     userperms_for_request,
 )
@@ -394,7 +396,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         file_qs = file_qs.annotate(
             thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
             thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
-        ).select_related("owner")
+        ).select_related("owner", "folder")  # Permission checks read each file's folder.
 
         try:
             permissions = {
@@ -466,6 +468,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
+
+        if popup_pick_type(request) == 'folder':
+            # Folder labels walk ancestors; load each ancestor level once.
+            attach_ancestors([item for item in paginated_items.object_list if isinstance(item, Folder)])
 
         context = self.admin_site.each_context(request)
         context.update({
