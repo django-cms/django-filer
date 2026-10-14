@@ -5,9 +5,12 @@ from django.utils.http import urlencode
 
 from .. import settings
 from ..models import File, Folder
+from ..models.foldermodels import PERMISSION_BATCH_SIZE
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
+# Cap IN lists on backends that declare no parameter limit, e.g. PostgreSQL.
+BATCH_SIZE = PERMISSION_BATCH_SIZE
 
 
 def check_files_edit_permissions(request, files):
@@ -114,7 +117,8 @@ def attach_ancestors(folders):
 def filter_in_batches(queryset, field, ids):
     # Stay below the database's query parameter limit, e.g. 999 on SQLite.
     ids = list(ids)
-    batch_size = connections[queryset.db].features.max_query_params or len(ids) or 1
+    max_params = connections[queryset.db].features.max_query_params
+    batch_size = min(BATCH_SIZE, max_params or BATCH_SIZE)
     for offset in range(0, len(ids), batch_size):
         yield from queryset.filter(**{f'{field}__in': ids[offset:offset + batch_size]})
 

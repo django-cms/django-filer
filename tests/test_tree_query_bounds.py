@@ -18,6 +18,7 @@ from filer.admin.tools import (
     check_files_edit_permissions,
     check_folder_edit_permissions,
     check_folder_read_permissions,
+    filter_in_batches,
     load_subtrees,
 )
 from filer.cache import clear_folder_permission_cache
@@ -489,3 +490,12 @@ class TreeHelperTests(TestCase):
         NestedObjects(using='default')._share_source(source, child)
         self.assertIs(child.parent, source)
 
+    def test_batches_without_backend_limit(self):
+        folders = Folder.objects.bulk_create([Folder(name=f'batched {index}') for index in range(5)])
+        ids = [folder.pk for folder in folders]
+
+        # Backends without a declared limit still get bounded IN lists.
+        with patch.object(type(connection.features), 'max_query_params', None), \
+                patch('filer.admin.tools.BATCH_SIZE', 2), self.assertNumQueries(3):
+            loaded = list(filter_in_batches(Folder.objects.all(), 'pk', ids))
+        self.assertEqual(sorted(folder.pk for folder in loaded), ids)
