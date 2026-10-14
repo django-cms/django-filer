@@ -1,4 +1,5 @@
 import io
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.contrib import admin
@@ -506,8 +507,10 @@ class TreeHelperTests(TestCase):
         folders = Folder.objects.bulk_create([Folder(name=f'batched {index}') for index in range(5)])
         ids = [folder.pk for folder in folders]
 
-        # Backends without a declared limit still get bounded IN lists.
-        with patch.object(type(connection.features), 'max_query_params', None), \
+        # Backends without a declared limit still get bounded IN lists. Fake
+        # only the lookup in tools; SQLite itself reads its real limit.
+        unlimited = {'default': SimpleNamespace(features=SimpleNamespace(max_query_params=None))}
+        with patch('filer.admin.tools.connections', unlimited), \
                 patch('filer.admin.tools.BATCH_SIZE', 2), self.assertNumQueries(3):
             loaded = list(filter_in_batches(Folder.objects.all(), 'pk', ids))
         self.assertEqual(sorted(folder.pk for folder in loaded), ids)
