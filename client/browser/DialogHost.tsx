@@ -79,7 +79,12 @@ export function useDialogHost(styleUrl: string, dialogRef: RefObject<HTMLDialogE
 				event.preventDefault();
 			}
 		};
-		const removeHost = () => host.remove();
+		const removeHost = () => {
+			parentWindow.removeEventListener('keydown', handleParentEscape, true);
+			parentWindow.removeEventListener('dragover', preventParentDefault);
+			parentWindow.removeEventListener('drop', preventParentDefault);
+			host.remove();
+		};
 		parentWindow.addEventListener('keydown', handleParentEscape, true);
 		parentWindow.addEventListener('dragover', preventParentDefault, false);
 		parentWindow.addEventListener('drop', preventParentDefault, false);
@@ -90,9 +95,6 @@ export function useDialogHost(styleUrl: string, dialogRef: RefObject<HTMLDialogE
 			window.removeEventListener('keydown', handleEscape);
 			window.removeEventListener('dragover', preventDefault);
 			window.removeEventListener('drop', preventDefault);
-			parentWindow.removeEventListener('keydown', handleParentEscape, true);
-			parentWindow.removeEventListener('dragover', preventParentDefault);
-			parentWindow.removeEventListener('drop', preventParentDefault);
 			window.removeEventListener('pagehide', removeHost);
 			removeHost();
 		};
