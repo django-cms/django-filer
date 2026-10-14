@@ -1,3 +1,4 @@
+import io
 from unittest.mock import patch
 
 from django.contrib import admin
@@ -5,6 +6,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.db import connection
 from django.test import RequestFactory, TestCase
 from django.test.utils import CaptureQueriesContext
@@ -17,8 +19,13 @@ from filer.admin.tools import (
     check_folder_read_permissions,
 )
 from filer.cache import clear_folder_permission_cache
-from filer.models import File, Folder, FolderPermission
-from tests.helpers import create_superuser
+from filer.models import Clipboard, File, Folder, FolderPermission
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
+from tests.helpers import create_image, create_superuser
+
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 SMALL_WIDTH = 2
@@ -34,6 +41,12 @@ def build_tree(name, width):
         grandchild = Folder.objects.create(name=f'{name} grandchild {index}', parent=child)
         expected.update((child.pk, grandchild.pk))
     return root, expected
+
+
+class MessageStub:
+    # Admin actions report through messages; tests only need them accepted.
+    def add(self, *args, **kwargs):
+        pass
 
 
 def count_queries(func):
@@ -292,4 +305,129 @@ class DestinationFolderTests(TestCase):
 
             self.assertTrue(expected <= {folder.pk for folder, _ in destinations})
 
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+
+class ActionTreeTests(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.folder_admin = admin.site._registry[Folder]
+
+    def build(self, name, width):
+        # Files sit on both tree levels; the parent gives labels an ancestor.
+        parent = Folder.objects.create(name=f'{name} parent')
+        root, _ = build_tree(name, width)
+        Folder.objects.filter(pk=root.pk).update(parent=parent)
+        for folder in Folder.objects.filter(name__startswith=f'{name} ').exclude(pk=parent.pk):
+            # Toggling visibility moves stored files, so each needs content.
+            content = ContentFile(b'data', name=f'{folder.name}.txt')
+            File.objects.create(original_filename=content.name, file=content, folder=folder, is_public=False)
+        return Folder.objects.get(pk=root.pk)
+
+    def request(self):
+        request = RequestFactory().post('/')
+        request.user = self.superuser
+        request._messages = MessageStub()
+        return request
+
+    def label(self, obj):
+        # Reload so expected labels never reuse instances from the code under test.
+        fresh = type(obj).objects.get(pk=obj.pk)
+        return self.folder_admin._format_callback(fresh, self.superuser, admin.site, set())
+
+    def expected_tree(self, folder):
+        nested = []
+        for child in Folder.objects.filter(parent=folder).order_by('name'):
+            nested.append(self.label(child))
+            subtree = self.expected_tree(child)
+            if subtree:
+                nested.append(subtree)
+        nested.extend(self.label(file_obj) for file_obj in sorted(folder.files))
+        return nested
+
+    def move_listing(self, root):
+        return self.folder_admin._list_all_to_copy_or_move(
+            self.request(), File.objects.none(), Folder.objects.filter(pk=root.pk),
+        )
+
+    def test_move_listing_matches_tree(self):
+        root = self.build('listed', SMALL_WIDTH)
+        self.assertEqual(self.move_listing(root), [self.label(root), self.expected_tree(root)])
+
+    def test_move_listing_queries_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root = self.build(f'tree {width}', width)
+            _, counts[width] = count_queries(lambda: self.move_listing(root))
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+    def add_images(self, root):
+        buffer = io.BytesIO()
+        create_image().save(buffer, 'JPEG')
+        for leaf in Folder.objects.filter(parent__parent=root):
+            content = ContentFile(buffer.getvalue(), name=f'{leaf.name}.jpg')
+            Image.objects.create(original_filename=content.name, file=content, folder=leaf, mime_type='image/jpeg')
+
+    def expected_resize(self, folder):
+        nested = []
+        for child in Folder.objects.filter(parent=folder).order_by('name'):
+            subtree = self.expected_resize(child)
+            if subtree:
+                nested.extend((self.label(child), subtree))
+        nested.extend(self.label(file_obj) for file_obj in sorted(folder.files) if isinstance(file_obj, Image))
+        return nested
+
+    def resize_listing(self, root):
+        return self.folder_admin._list_all_to_resize(
+            self.request(), File.objects.none(), Folder.objects.filter(pk=root.pk),
+        )
+
+    def test_resize_listing_matches_tree(self):
+        root = self.build('resized', SMALL_WIDTH)
+        self.add_images(root)
+        expected = self.expected_resize(root)
+        self.assertTrue(expected)
+        self.assertEqual(self.resize_listing(root), [self.label(root), expected])
+
+    def test_resize_listing_queries_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root = self.build(f'resize {width}', width)
+            self.add_images(root)
+            _, counts[width] = count_queries(lambda: self.resize_listing(root))
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+    def folder_reads(self, func):
+        with CaptureQueriesContext(connection) as queries:
+            func()
+        return sum(query['sql'].startswith('SELECT') and 'FROM "filer_folder"' in query['sql'] for query in queries)
+
+    @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
+    def test_set_public_reads_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root = self.build(f'public {width}', width)
+            selected = Folder.objects.filter(pk=root.pk)
+            counts[width] = self.folder_reads(
+                lambda: self.folder_admin.files_set_public(self.request(), File.objects.none(), selected),
+            )
+
+            subtree = [root.pk, *root.get_descendants_ids()]
+            self.assertFalse(File.objects.filter(folder_id__in=subtree, is_public=False).exists())
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+    def test_move_to_clipboard_reads_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root = self.build(f'clip {width}', width)
+            subtree = [root.pk, *root.get_descendants_ids()]
+            expected = set(File.objects.filter(folder_id__in=subtree).values_list('pk', flat=True))
+            selected = Folder.objects.filter(pk=root.pk)
+            counts[width] = self.folder_reads(
+                lambda: self.folder_admin.move_to_clipboard(self.request(), File.objects.none(), selected),
+            )
+
+            clipboard = Clipboard.objects.get(user=self.superuser)
+            self.assertTrue(expected <= set(clipboard.files.values_list('pk', flat=True)))
+            self.assertFalse(File.objects.filter(pk__in=expected, folder__isnull=False).exists())
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
