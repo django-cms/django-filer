@@ -162,7 +162,7 @@ def run_cases():
     from django.core.cache import cache
     from django.db import transaction
 
-    from filer import settings as filer_settings
+    import filer
 
     cases = (
         ('listing', (100, 1000, 10000), listing_case),
@@ -175,7 +175,7 @@ def run_cases():
         ('mostly_unique', (100, 400), duplicate_case),
     )
     results = []
-    with patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True):
+    with patch.object(filer.settings, 'FILER_ENABLE_PERMISSIONS', True):
         with patch('filer.admin.folderadmin.FILER_PAGINATE_BY', PAGE_SIZE):
             for name, sizes, setup in cases:
                 for size in sizes:
