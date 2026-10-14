@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from django.contrib import admin
+from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
@@ -182,3 +184,110 @@ class TreePermissionCheckTests(TestCase):
 
             with self.subTest(check=check.__name__):
                 self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+
+class DeleteActionTests(TestCase):
+    def setUp(self):
+        create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def delete(self, folder):
+        url = reverse('admin:filer-directory_listing-root')
+        return self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: [f'folder-{folder.pk}'],
+        })
+
+    def test_delete_queries_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root, descendants = build_tree(f'tree {width}', width)
+            _, counts[width] = count_queries(lambda: self.delete(root))
+
+            self.assertFalse(Folder.objects.filter(pk__in=descendants | {root.pk}).exists())
+
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+    def test_confirmation_shows_paths(self):
+        parent = Folder.objects.create(name='parent')
+        root, _ = build_tree('shown', SMALL_WIDTH)
+        Folder.objects.filter(pk=root.pk).update(parent=parent)
+        response = self.client.post(reverse('admin:filer-directory_listing', args=(parent.pk,)), {
+            'action': 'delete_files_or_folders',
+            helpers.ACTION_CHECKBOX_NAME: [f'folder-{root.pk}'],
+        })
+
+        for index in range(SMALL_WIDTH):
+            self.assertContains(response, f'/parent/shown/shown child {index}/shown grandchild {index}</a>')
+        self.assertTrue(Folder.objects.filter(pk=root.pk).exists())
+
+
+class DestinationFolderTests(TestCase):
+    def setUp(self):
+        permissions = patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
+        permissions.start()
+        self.addCleanup(permissions.stop)
+
+        self.user = get_user_model().objects.create(username='mover', is_staff=True)
+        self.user.user_permissions.add(Permission.objects.get(codename='change_folder'))
+        clear_folder_permission_cache(self.user)
+        self.addCleanup(clear_folder_permission_cache, self.user)
+        self.folder_admin = admin.site._registry[Folder]
+
+    def destinations(self, selected, current, allow_self):
+        request = RequestFactory().post('/')
+        request.user = get_user_model().objects.get(pk=self.user.pk)
+        clear_folder_permission_cache(request.user)
+        return self.folder_admin._list_all_destination_folders(
+            request, Folder.objects.filter(pk__in=[folder.pk for folder in selected]), current, allow_self,
+        )
+
+    def grant(self, folder, **grants):
+        FolderPermission.objects.create(user=self.user, folder=folder, type=FolderPermission.CHILDREN, **grants)
+
+    def test_destination_choices(self):
+        a = Folder.objects.create(name='A')
+        a1 = Folder.objects.create(name='A1', parent=a)
+        a1a = Folder.objects.create(name='A1a', parent=a1)
+        a2 = Folder.objects.create(name='A2', parent=a)
+        a2a = Folder.objects.create(name='A2a', parent=a2)
+        b = Folder.objects.create(name='B')
+        Folder.objects.create(name='B1', parent=b)
+        self.grant(a, can_read=FolderPermission.ALLOW)
+        self.grant(a1, can_add_children=FolderPermission.ALLOW)
+
+        indent = '&nbsp;&nbsp;'
+        cases = (
+            # Selected folders and their subtrees are excluded; B is unreadable.
+            (False, [
+                (a, ('/A', False)),
+                (a1, (f'{indent}/A/A1', False)),
+                (a1a, (f'{indent * 2}/A/A1/A1a', True)),
+            ]),
+            (True, [
+                (a, ('/A', False)),
+                (a1, (f'{indent}/A/A1', True)),
+                (a1a, (f'{indent * 2}/A/A1/A1a', True)),
+                (a2, (f'{indent}/A/A2', False)),
+                (a2a, (f'{indent * 2}/A/A2/A2a', False)),
+            ]),
+        )
+        for allow_self, expected in cases:
+            with self.subTest(allow_self=allow_self):
+                actual = self.destinations([a2], a1, allow_self)
+                self.assertEqual(
+                    [(folder.pk, (str(label), enabled)) for folder, (label, enabled) in actual],
+                    [(folder.pk, choice) for folder, choice in expected],
+                )
+
+    def test_destination_queries_follow_depth(self):
+        counts = {}
+        for width in (SMALL_WIDTH, LARGE_WIDTH):
+            root, expected = build_tree(f'tree {width}', width)
+            self.grant(root, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            destinations, counts[width] = count_queries(lambda: self.destinations([], None, False))
+
+            self.assertTrue(expected <= {folder.pk for folder, _ in destinations})
+
+        self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
