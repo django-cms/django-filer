@@ -2,8 +2,8 @@ name: Publish Python 🐍 distributions 📦 to TestPyPI
 
 on:
   push:
-    branches:
-      - jrief/finder
+    tags:
+      - '*'
 
 jobs:
   build-and-publish:
