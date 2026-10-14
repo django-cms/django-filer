@@ -79,6 +79,17 @@ class FilerCheckTestCase(TestCase):
         with self.assertRaises(File.DoesNotExist):
             File.objects.get(id=file_pk)
 
+    def test_missing_verbose_messages(self):
+        os.remove(self.filer_file.file.path)
+        out = StringIO()
+        call_command('filer_check', stdout=out, missing=True, verbosity=3)
+        self.assertEqual("File reference 'None/testimage.jpg' is missing in storage.\n", out.getvalue())
+
+        out = StringIO()
+        call_command('filer_check', stdout=out, delete_missing=True, interactive=False, verbosity=3)
+        self.assertEqual("Deleted missing file reference 'None/testimage.jpg' from the database.\n", out.getvalue())
+        self.assertFalse(File.objects.filter(pk=self.filer_file.pk).exists())
+
     def test_delete_orphans_public(self):
         # First check - should be empty initially
         out = StringIO()

@@ -13,10 +13,12 @@ from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from filer import settings as filer_settings
+from filer.admin.patched.admin_utils import NestedObjects
 from filer.admin.tools import (
     check_files_edit_permissions,
     check_folder_edit_permissions,
     check_folder_read_permissions,
+    load_subtrees,
 )
 from filer.cache import clear_folder_permission_cache
 from filer.models import Clipboard, File, Folder, FolderPermission
@@ -185,6 +187,22 @@ class TreePermissionCheckTests(TestCase):
         check_files_edit_permissions(self.request(), [owned])
         with self.assertRaises(PermissionDenied):
             check_files_edit_permissions(self.request(), [other])
+
+    def test_owned_images_bypass_grants(self):
+        folder = Folder.objects.create(name='ungranted images')
+        buffer = io.BytesIO()
+        create_image().save(buffer, 'JPEG')
+        images = [
+            Image.objects.create(
+                original_filename=f'{owner.username}.jpg', folder=folder, owner=owner, mime_type='image/jpeg',
+                file=ContentFile(buffer.getvalue(), name=f'{owner.username}.jpg'),
+            )
+            for owner in (self.user, self.owner)
+        ]
+
+        check_files_edit_permissions(self.request(), images[:1])
+        with self.assertRaises(PermissionDenied):
+            check_files_edit_permissions(self.request(), images[1:])
 
     def test_check_queries_follow_depth(self):
         for check in (check_folder_edit_permissions, check_folder_read_permissions):
@@ -431,3 +449,27 @@ class ActionTreeTests(TestCase):
             self.assertTrue(expected <= set(clipboard.files.values_list('pk', flat=True)))
             self.assertFalse(File.objects.filter(pk__in=expected, folder__isnull=False).exists())
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
+
+
+class TreeHelperTests(TestCase):
+    def test_load_subtrees_stops_on_cycles(self):
+        first = Folder.objects.create(name='first')
+        second = Folder.objects.create(name='second', parent=first)
+        # Corrupt data must not loop forever.
+        Folder.objects.filter(pk=first.pk).update(parent=second)
+
+        children, _ = load_subtrees([Folder.objects.get(pk=first.pk)])
+
+        self.assertEqual({parent: [child.pk for child in kids] for parent, kids in children.items()}, {first.pk: [second.pk]})
+
+    def test_share_source_needs_matching_key(self):
+        source = Folder.objects.create(name='source')
+        other = Folder.objects.create(name='other')
+        child = Folder.objects.create(name='child', parent=other)
+
+        NestedObjects(using='default')._share_source(source, child)
+        self.assertEqual(child.parent, other)
+
+        child.parent_id = source.pk
+        NestedObjects(using='default')._share_source(source, child)
+        self.assertIs(child.parent, source)
