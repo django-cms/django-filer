@@ -1,9 +1,7 @@
-from collections import defaultdict
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connections, models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -14,6 +12,9 @@ from django.utils.translation import gettext_lazy as _
 from .. import settings as filer_settings
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
 from . import mixins
+
+
+PERMISSION_BATCH_SIZE = 1000
 
 
 class FolderPermissionManager(models.Manager):
@@ -61,34 +62,38 @@ class FolderPermissionManager(models.Manager):
             if scope in (FolderPermission.ALL, FolderPermission.CHILDREN):
                 subtree_roots[grant].add(folder_id)
 
-        if global_grants or any(subtree_roots.values()):
-            parents = dict(Folder.objects.order_by().values_list('id', 'parent_id'))
-            children = defaultdict(list)
-            for folder_id, parent_id in parents.items():
-                children[parent_id].append(folder_id)
+        # A global denial overrides every grant without reading any folders.
+        if FolderPermission.DENY in global_grants:
+            id_list = set()
+            update_folder_permission_cache(user, attr, id_list)
+            return id_list
 
-            for grant, roots in subtree_roots.items():
-                if grant in global_grants:
-                    id_lists[grant].update(parents)
-                    continue
+        for grant, roots in subtree_roots.items():
+            if grant in global_grants:
+                id_lists[grant].update(Folder.objects.order_by().values_list('id', flat=True).iterator())
+                continue
 
-                id_lists[grant].update(self._descendant_ids(roots, children))
+            id_lists[grant].update(self._descendant_ids(roots))
 
         # Deny has precedence over allow
         id_list = id_lists[FolderPermission.ALLOW] - id_lists[FolderPermission.DENY]
         update_folder_permission_cache(user, attr, id_list)
         return id_list
 
-    def _descendant_ids(self, roots, children):
-        # Overlapping grants visit each descendant at most once per decision.
-        visited = set()
+    def _descendant_ids(self, roots):
+        # Read only granted subtrees, visiting overlapping descendants once.
+        visited = set(roots)
         pending = list(roots)
+        max_params = connections[Folder.objects.db].features.max_query_params
+        batch_size = min(PERMISSION_BATCH_SIZE, max_params or PERMISSION_BATCH_SIZE)
         while pending:
-            folder_id = pending.pop()
-            if folder_id in visited:
-                continue
-            visited.add(folder_id)
-            pending.extend(children.get(folder_id, ()))
+            descendants = set()
+            for offset in range(0, len(pending), batch_size):
+                descendants.update(Folder.objects.filter(
+                    parent_id__in=pending[offset:offset + batch_size],
+                ).order_by().values_list('id', flat=True).iterator())
+            pending = list(descendants - visited)
+            visited.update(pending)
         return visited
 
 
