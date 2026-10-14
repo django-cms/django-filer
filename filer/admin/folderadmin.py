@@ -44,6 +44,7 @@ from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
+from .pagination import FolderItems
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
@@ -404,7 +405,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:  # noqa
             permissions = {}
 
-        items = list(itertools.chain(folder_qs, file_qs))
+        items = FolderItems(folder_qs, file_qs)
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
@@ -486,6 +487,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
             'folder_files': file_qs,
+            'folder_count': items.folder_count,
+            'file_count': items.file_count,
             'thumbnail_size': FILER_TABLE_ICON_SIZE if list_type == TABLE_LIST_TYPE else FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
