@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "django-finder"
+name = "django-file-finder"
 dynamic = ["version"]
 authors = [
     {name = "Jacob Rief", email = "jacob.rief@gmail.com"},
