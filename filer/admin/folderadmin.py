@@ -844,7 +844,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                         f.delete()
                 # delete all folders
                 if DJANGO_VERSION >= (5, 1):
-                    self.log_deletions(request, files_queryset)
+                    self.log_deletions(request, folders_queryset)
                     folders_queryset.delete()
                 else:
                     for f in folders_queryset:
