@@ -13,6 +13,7 @@ from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
+from django.core.cache import cache
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.template import Context, Template
@@ -1589,6 +1590,8 @@ class PermissionAdminTest(TestCase):
 class FolderListingTest(TestCase):
 
     def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
         superuser = create_superuser()
         self.staff_user = User.objects.create_user(
             username='joe', password='x', email='joe@mata.com')

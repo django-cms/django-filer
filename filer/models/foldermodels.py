@@ -36,7 +36,8 @@ class FolderPermissionManager(models.Manager):
         if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
         cached_id_list = get_folder_permission_cache(user, attr)
-        if cached_id_list:
+        # An empty set is a cached denial, not a cache miss.
+        if cached_id_list is not None:
             return cached_id_list
 
         allow_list = set()

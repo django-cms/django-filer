@@ -2,12 +2,15 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase
 
+from filer import settings as filer_settings
 from filer.cache import (
     clear_folder_permission_cache,
     get_folder_perm_cache_key,
     get_folder_permission_cache,
     update_folder_permission_cache,
 )
+from filer.models import FolderPermission
+from tests.helpers import SettingsOverride
 
 
 User = get_user_model()
@@ -34,6 +37,17 @@ class PermissionCacheTests(TestCase):
     def test_get_folder_permission_cache_returns_none_for_non_existing_cache(self):
         permissions = get_folder_permission_cache(self.user, self.permission)
         self.assertIsNone(permissions)
+
+    def test_empty_permissions_cached(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            for permission in ('read', 'edit', 'add_children'):
+                with self.subTest(permission=permission):
+                    get_ids = getattr(FolderPermission.objects, f'get_{permission}_id_list')
+                    self.assertEqual(get_ids(self.user), set())
+
+                    # An empty cached result must not repeat the permission query.
+                    with self.assertNumQueries(0):
+                        self.assertEqual(get_ids(self.user), set())
 
     def test_clear_folder_permission_cache_clears_all_permissions_for_user(self):
         cache.set(get_folder_perm_cache_key(self.user, 'can_read'), {self.user.pk: ['can_read']})
