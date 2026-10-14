@@ -9,6 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -1533,6 +1534,21 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
             helpers.ACTION_CHECKBOX_NAME: folders,
         })
         self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
+
+    def test_delete_folders_action_logs_folders(self):
+        url = reverse('admin:filer-directory_listing', args=(self.folder.id,))
+        self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % self.sub_folder1.id],
+        })
+
+        # Selected folders must be logged, not only their files.
+        self.assertTrue(LogEntry.objects.filter(
+            action_flag=DELETION,
+            content_type__model='folder',
+            object_id=str(self.sub_folder1.id),
+        ).exists())
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
