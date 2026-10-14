@@ -3,8 +3,7 @@ import uuid
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.widgets import TextInput
-from django.utils.html import format_html
+from django.forms.widgets import Script, TextInput
 
 from finder.browser.urls import reverse_api
 from finder.models.ambit import AmbitModel
@@ -15,10 +14,7 @@ from finder.models.folder import FolderModel
 class FinderInodeSelect(TextInput):
     class Media:
         css = {'all': ['finder/css/finder-select.css']}
-        js = [format_html(
-            '<script type="module" src="{}"></script>',
-            staticfiles_storage.url('finder/js/finder-select.js')
-        )]
+        js = [Script('finder/js/finder-select.js', type='module')]
 
 
 class FinderFileSelect(FinderInodeSelect):
