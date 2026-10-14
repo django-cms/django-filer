@@ -200,6 +200,8 @@ class DeleteActionTests(TestCase):
         })
 
     def test_delete_queries_follow_depth(self):
+        # Warm the content type cache used by deletion logging.
+        self.delete(build_tree('warmup', SMALL_WIDTH)[0])
         counts = {}
         for width in (SMALL_WIDTH, LARGE_WIDTH):
             root, descendants = build_tree(f'tree {width}', width)
