@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
-        django-version: ["5.2", "6.0"]
+        django-version: ["5.2", "6.0", "6.1"]
         node-version: ["24.x"]
         with_cte: ["0", "1"]
         use_postgres: ["0", "1"]
@@ -35,12 +35,17 @@ jobs:
           - python-version: "3.11"
             django-version: "6.0"
           - python-version: "3.11"
+            django-version: "6.1"
+          - python-version: "3.11"
             django-version: "5.2"
             use_postgres: "1"
           - django-version: "5.2"
             with_cte: "0"
             use_postgres: "1"
           - django-version: "6.0"
+            with_cte: "0"
+            use_postgres: "0"
+          - django-version: "6.1"
             with_cte: "0"
             use_postgres: "0"
           - python-version: "3.11"

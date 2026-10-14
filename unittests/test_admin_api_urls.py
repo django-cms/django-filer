@@ -4,6 +4,7 @@ The browser API is served by the admin, but without the admin's permission gate.
 
 import pytest
 
+from bs4 import BeautifulSoup
 from django import VERSION as DJANGO_VERSION
 from django.contrib.auth import get_user_model
 from django.urls import reverse

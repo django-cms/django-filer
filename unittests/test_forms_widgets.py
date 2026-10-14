@@ -58,7 +58,7 @@ def test_render_form_with_empty_file_select(admin_client, public_ambit):
     assert input_element.get('value') is None
     assert input_element.get('data-selected_file') is None
     # the widget pulls in its own web component
-    assert 'finder/js/finder-select.js' in response.text
+    assert '<script src="/static/finder/js/finder-select.js" type="module"></script>' in response.text
 
 
 def test_render_form_with_selected_file(admin_client, public_ambit, public_file):
