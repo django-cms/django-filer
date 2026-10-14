@@ -1,0 +1,53 @@
+name: Publish Python 🐍 distributions 📦 to TestPyPI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-publish:
+    name: "Build and publish Python 🐍 distributions 📦 to PyPI"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        node-version: ["24.x"]
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/django-file-finder/
+
+    permissions:
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y gettext
+        npm install --include=dev
+        python -m pip install --upgrade pip
+        python -m pip install build django --user
+    - name: Build CSS files
+      run: |
+        npm run compilescss
+    - name: Build Client
+      run: |
+        npm run esbuild
+    - name: Build 🐍 Python 📦 Wheel and Source Distribution
+      run: python -m build --sdist --wheel --outdir dist/
+    - name: Publish 🐍 Python 📦 Package to PyPI
+      if: startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/releases')
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_TOKEN_FINDER }}
