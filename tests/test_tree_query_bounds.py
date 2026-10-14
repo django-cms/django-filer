@@ -72,6 +72,18 @@ class DescendantIdsTests(TestCase):
         # Width must not add queries; only depth may.
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
 
+    def test_descendants_keep_tree_order(self):
+        # Names sort opposite to creation order, so key order cannot pass.
+        root = Folder.objects.create(name='root')
+        b = Folder.objects.create(name='b', parent=root)
+        b_child = Folder.objects.create(name='b child', parent=b)
+        a = Folder.objects.create(name='a', parent=root)
+        a_z = Folder.objects.create(name='z', parent=a)
+        a_y = Folder.objects.create(name='y', parent=a)
+
+        # Name-ordered and depth first, as the recursive version returned them.
+        self.assertEqual(root.get_descendants_ids(), [a.pk, a_y.pk, a_z.pk, b.pk, b_child.pk])
+
     def test_leaf_has_no_descendants(self):
         leaf = Folder.objects.create(name='leaf')
         self.assertEqual(leaf.get_descendants_ids(), [])
