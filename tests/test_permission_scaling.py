@@ -269,7 +269,8 @@ class PermissionScalingTests(TestCase):
         ])
         expected = {folder.pk for folder in roots + children}
         # Two levels of five parents require three batches each, plus grants.
-        with patch.object(connection.features, 'max_query_params', 2), self.assertNumQueries(7):
+        # Patch the class because Django 6 exposes a read-only property.
+        with patch.object(type(connection.features), 'max_query_params', 2), self.assertNumQueries(7):
             self.assertEqual(FolderPermission.objects.get_read_id_list(self.user), expected)
 
     def test_cyclic_subtree_terminates(self):
