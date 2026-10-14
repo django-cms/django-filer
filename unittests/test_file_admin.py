@@ -2,6 +2,7 @@ import json
 import pytest
 
 from bs4 import BeautifulSoup
+from django import VERSION as DJANGO_VERSION
 from django.contrib import admin
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -128,6 +129,15 @@ def test_file_detail_view(admin_client, ambit, uploaded_file):
     assert links[0].string.strip() == "Home"
     assert links[1].string.strip() == "Finder"
     assert uploaded_file.name in breadcrumbs.get_text()
+    # the markup must match what the admin stylesheet of the running Django version expects
+    if DJANGO_VERSION >= (6, 1):
+        assert breadcrumbs.name == 'ol'
+        items = breadcrumbs.find_all('li')
+        assert items[-1].get('aria-current') == 'page'
+        assert items[-1].get_text().strip() == uploaded_file.name
+        assert all(item.get('aria-current') is None for item in items[:-1])
+    else:
+        assert breadcrumbs.name == 'div'
 
     # Form with file fields
     form = soup.find('form', id='filemodel_form')

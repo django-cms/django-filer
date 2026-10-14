@@ -1,6 +1,7 @@
 import json
 from functools import lru_cache
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -266,6 +267,7 @@ class InodeAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         context.update(
             breadcrumbs=self.get_breadcrumbs(obj),
+            list_breadcrumbs=DJANGO_VERSION >= (6, 1),
             finder_settings=self.get_editor_settings(request, obj),
         )
         return TemplateResponse(
