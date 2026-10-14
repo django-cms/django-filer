@@ -61,7 +61,8 @@ class BrowserView(View):
     @classmethod
     def _get_children(cls, ambit, can_view_subquery, open_folders, parent):
         children = []
-        for subfolder in parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True):
+        subfolders = parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True)
+        for subfolder in FolderModel.objects.with_child_counts(subfolders):
             child = subfolder.as_dict(ambit)
             if str(subfolder.id) in open_folders:
                 child.update(

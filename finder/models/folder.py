@@ -22,6 +22,24 @@ RENAMED_SUFFIX = "renamed"
 
 class FolderModelManager(InodeManager):
 
+    def with_child_counts(self, folders):
+        folders = list(folders)
+        if not folders:
+            return folders
+
+        counts = {folder.pk: [0, 0] for folder in folders}
+        # Count each model once for the whole batch, including empty folders.
+        for model in InodeModel.get_models(include_folder=True):
+            totals = model.objects.filter(parent_id__in=counts).order_by().values('parent_id').annotate(
+                total=models.Count('pk'),
+            )
+            for row in totals:
+                counts[row['parent_id']][0 if model.is_folder else 1] += row['total']
+
+        for folder in folders:
+            folder.child_counts = tuple(counts[folder.pk])
+        return folders
+
     def get_trash_folder(self, ambit, owner):
         with transaction.atomic():
             try:
@@ -80,11 +98,19 @@ class FolderModel(InodeModel):
 
     @property
     def num_children(self):
-        num_children = sum(
-            inode_model.objects.filter(parent=self).count()
-            for inode_model in InodeModel.get_models(include_folder=True)
+        return sum(
+            model.objects.filter(parent=self).count()
+            for model in InodeModel.get_models(include_folder=True)
         )
-        return num_children
+
+    @cached_property
+    def child_counts(self):
+        num_folders = self.subfolders.count()
+        num_files = sum(
+            model.objects.filter(parent=self).count()
+            for model in InodeModel.get_models()
+        )
+        return num_folders, num_files
 
     @cached_property
     def ancestors(self):
@@ -169,9 +195,7 @@ class FolderModel(InodeModel):
 
     @cached_property
     def summary(self):
-        num_inodes = self.num_children
-        num_folders = self._meta.model.objects.filter(parent_id=self.id).count()
-        num_files = num_inodes - num_folders
+        num_folders, num_files = self.child_counts
         return ", ".join((
             ngettext("{} Folder", "{} Folders", num_folders).format(num_folders),
             ngettext("{} File", "{} Files", num_files).format(num_files),
@@ -182,7 +206,7 @@ class FolderModel(InodeModel):
         return {
             **super().as_dict(ambit),
             'is_folder': True,
-            'has_subfolders': self.subfolders.exists(),
+            'has_subfolders': self.child_counts[0] > 0,
         }
 
     def has_permission(self, user, privilege):
