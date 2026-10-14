@@ -27,7 +27,8 @@ class DefaultServer(ServerBase):
         if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                                   statobj[stat.ST_MTIME]):
             return HttpResponseNotModified(**response_params)
-        response = HttpResponse(open(fullpath, 'rb').read(), **response_params)
+        with open(fullpath, 'rb') as f:
+            response = HttpResponse(f.read(), **response_params)
         response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
         self.default_headers(request=request, response=response, file_obj=filer_file.file, **kwargs)
         return response

@@ -1,0 +1,53 @@
+<div class="filer-widget">
+    <div class="clearfix"></div>
+
+    <template class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
+        <span class="filerFile">
+            <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
+            <span data-dz-name class="dz-name"></span>
+            <a class="filerClearer" title="Clear" href="#"
+               data-dz-remove data-no-icon-file="/static/filer/icons/file-unknown.svg">
+                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
+            </a>
+            <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+        </span>
+    </template>
+
+    <div class="js-filer-dropzone filer-dropzone js-object-attached"
+         data-url="/admin/filer/clipboard/operations/upload/"
+         data-max-files="1">
+        <div class="z-index-fix"></div>
+        <div class="dz-default dz-message js-filer-dropzone-message hidden">
+            <span class="icon"></span><span>or drop your file here</span>
+        </div>
+
+        <span class="filerFile js-file-selector">
+            <a href="/media/old_image.jpg" target="_blank"><img
+                src="/media/old_image__120x120.jpg"
+                srcset="/media/old_image__120x120.jpg 1x, /media/old_image__240x240.jpg 2x"
+                width="120" height="120" class="thumbnail_img"></a>
+            &nbsp;<span class="description_text">old_image.jpg</span>
+
+            <a class="filerClearer" title="Clear"
+               data-no-icon-file="/static/filer/icons/file-unknown.svg" href="#">
+                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
+            </a>
+
+            <a href="/admin/filer/image/1/change/?_edit_from_widget=1"
+               class="js-related-edit related-lookup related-lookup-change edit" id="id_image_change" title="Edit">
+                <span class="edit-file"></span>
+            </a>
+
+            <a href="/admin/filer/folder/?_pick=file"
+               class="js-related-lookup related-lookup related-lookup-change lookup" id="id_image_lookup" title="Lookup">
+                <span class="choose-file"></span><span class="replace-file"></span>
+            </a>
+
+            <br>
+
+            <div class="hidden">
+                <input type="text" name="image" value="1" id="id_image" class="vForeignKeyRawIdAdminField">
+            </div>
+        </span>
+    </div>
+</div>
