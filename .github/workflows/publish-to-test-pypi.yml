@@ -3,41 +3,54 @@ name: Publish Python 🐍 distributions 📦 to TestPyPI
 on:
   push:
     branches:
-      - master
+      - jrief/finder
+    tags:
+      - '*'
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to TestPyPI
-    runs-on: ubuntu-latest
+  build-and-publish:
+    name: "Build and publish Python 🐍 distributions 📦 to TestPyPI"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        node-version: ["24.x"]
+
     environment:
       name: test
-      url: https://test.pypi.org/p/django-filer
+      url: https://test.pypi.org/p/django-finder/
+
     permissions:
       id-token: write
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
       with:
-        python-version: '3.12'
-
-    - name: Install pypa/build
-      run: >-
-        python -m
-        pip install
-        build
-        --user
-    - name: Build a binary wheel and a source tarball
-      run: >-
-        python -m
-        build
-        --sdist
-        --wheel
-        --outdir dist/
-        .
-
-    - name: Publish distribution 📦 to Test PyPI
+        node-version: ${{ matrix.node-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y gettext
+        npm install --include=dev
+        python -m pip install --upgrade pip
+        python -m pip install build django --user
+    - name: Build CSS files
+      run: |
+        npm run compilescss
+    - name: Build Client
+      run: |
+        npm run esbuild
+    - name: Build 🐍 Python 📦 Wheel and Source Distribution
+      run: python -m build --sdist --wheel --outdir dist/
+    - name: Publish 🐍 Python 📦 Package to Test PyPI
+      if: startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/releases')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         repository_url: https://test.pypi.org/legacy/
-        skip_existing: true
+        password: ${{ secrets.PYPI_API_TOKEN_FINDER }}
