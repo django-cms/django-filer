@@ -69,6 +69,20 @@ def _check_folder_tree(request, folders, check):
         level = [child for child in children if child.pk not in seen]
 
 
+def attach_ancestors(folders):
+    # Share one instance per ancestor, loading one tree level per query.
+    known = {folder.pk: folder for folder in folders}
+    level = list(folders)
+    while level:
+        missing = {folder.parent_id for folder in level if folder.parent_id is not None} - known.keys()
+        loaded = list(filter_in_batches(Folder.objects.all(), 'pk', missing))
+        known.update((folder.pk, folder) for folder in loaded)
+        for folder in level:
+            if folder.parent_id is not None:
+                folder.parent = known[folder.parent_id]
+        level = loaded
+
+
 def filter_in_batches(queryset, field, ids):
     # Stay below the database's query parameter limit, e.g. 999 on SQLite.
     ids = list(ids)
