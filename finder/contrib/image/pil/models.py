@@ -56,7 +56,7 @@ class PILImageModel(ImageFileModel):
                 if key in self.exif_values and isinstance(value, (str, int, float, datetime)):
                     self.meta_data['exif'].setdefault(ExifTags.Base(key).name, value)
         except Exception as exc:
-            logger.warning(f"Sample generation failed for image file {self.pk}: {exc}")
+            logger.warning(f"Sample generation failed for image file {self.id}: {exc}")
         else:
             if 'update_fields' in kwargs:
                 kwargs['update_fields'].append('meta_data')

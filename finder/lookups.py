@@ -11,7 +11,7 @@ def annotate_unified_queryset(ambit, queryset):
     This step must be applied after filtering and sorting.
     """
     folders = {
-        folder.pk: folder for folder in FolderModel.objects.with_child_counts(
+        folder.id: folder for folder in FolderModel.objects.with_child_counts(
             InodeManager.get_proxy_object(entry) for entry in queryset if entry['is_folder']
         )
     }

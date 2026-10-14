@@ -45,7 +45,7 @@ class AudioFileModel(FileModel):
                 with open(outpath, 'rb') as outfile:
                     ambit.sample_storage.save(sample_path, outfile)
             except Exception as exc:
-                logger.warning(f"Sample generation failed for audio file {self.pk}: {exc}")
+                logger.warning(f"Sample generation failed for audio file {self.id}: {exc}")
                 return
             finally:
                 unlink(outpath)

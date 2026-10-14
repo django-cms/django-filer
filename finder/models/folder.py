@@ -27,17 +27,17 @@ class FolderModelManager(InodeManager):
         if not folders:
             return folders
 
-        counts = {folder.pk: [0, 0] for folder in folders}
+        counts = {folder.id: [0, 0] for folder in folders}
         # Count each model once for the whole batch, including empty folders.
         for model in InodeModel.get_models(include_folder=True):
             totals = model.objects.filter(parent_id__in=counts).order_by().values('parent_id').annotate(
-                total=models.Count('pk'),
+                total=models.Count('id'),
             )
             for row in totals:
                 counts[row['parent_id']][0 if model.is_folder else 1] += row['total']
 
         for folder in folders:
-            folder.child_counts = tuple(counts[folder.pk])
+            folder.child_counts = tuple(counts[folder.id])
         return folders
 
     def get_trash_folder(self, ambit, owner):
