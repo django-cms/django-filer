@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - jrief/finder
-    tags:
-      - '*'
 
 jobs:
   build-and-publish:
@@ -53,4 +51,4 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         repository_url: https://test.pypi.org/legacy/
-        password: ${{ secrets.PYPI_API_TOKEN_FINDER }}
+        password: ${{ secrets.PYPI_TEST_TOKEN_FINDER }}

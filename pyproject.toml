@@ -12,7 +12,7 @@ maintainers = [
     {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
 ]
 description = "A media asset management application for Django."
-readme = "README-finder.rst"
+readme = "README-finder.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 dependencies = [
