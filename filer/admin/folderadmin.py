@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.db import models, router
 from django.db.models import Case, Count, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
@@ -44,7 +44,7 @@ from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
-from .pagination import FolderItems
+from .pagination import FolderItems, FolderPaginator
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
@@ -406,7 +406,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {}
 
         items = FolderItems(folder_qs, file_qs)
-        paginator = Paginator(items, FILER_PAGINATE_BY)
+        paginator = FolderPaginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
@@ -455,9 +455,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             action_form = None
 
-        selection_note_all = ngettext_lazy('%(total_count)s selected',
-            'All %(total_count)s selected', paginator.count)
-
         # If page request (9999) is out of range, deliver last page of results.
         try:
             paginated_items = paginator.page(request.GET.get('page', 1))
@@ -465,6 +462,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
+
+        # Only after the page is loaded: its query also yields the total.
+        selection_note_all = ngettext_lazy('%(total_count)s selected',
+            'All %(total_count)s selected', paginator.count)
 
         context = self.admin_site.each_context(request)
         context.update({

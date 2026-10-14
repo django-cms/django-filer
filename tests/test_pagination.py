@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from filer import settings as filer_settings
-from filer.admin.pagination import FolderItems
+from filer.admin.pagination import FolderItems, FolderPaginator
 from filer.cache import clear_folder_permission_cache
 from filer.models import File, Folder, FolderPermission
 from tests.helpers import create_superuser
@@ -129,3 +129,50 @@ class DirectoryPaginationTests(TestCase):
         page = response.context['paginated_items']
         self.assertEqual(page.paginator.count, 5)
         self.assertEqual(list(page), self.files[2:4])
+
+    def test_page_query_count(self):
+        def page(number):
+            items = FolderItems(
+                Folder.objects.filter(parent=self.parent).order_by('name'),
+                File.objects.filter(folder=self.parent).order_by('name'),
+            )
+            return FolderPaginator(items, PAGE_SIZE).page(number)
+
+        # One query for all folders, one for the file slice and its total.
+        with self.assertNumQueries(2):
+            current = page(1)
+            self.assertEqual(list(current), self.folders + self.files[:1])
+            self.assertEqual(current.paginator.count, len(self.folders) + len(self.files))
+        with self.assertNumQueries(2):
+            current = page(2)
+            self.assertEqual(list(current), self.files[1:4])
+            self.assertEqual(current.paginator.num_pages, 4)
+
+    def test_folder_page_query_count(self):
+        folders = self.folders + [
+            Folder.objects.create(name=name, parent=self.parent, owner=self.user)
+            for name in ('beta', 'gamma', 'delta')
+        ]
+        folders.sort(key=lambda folder: folder.name)
+
+        def page(number):
+            items = FolderItems(
+                Folder.objects.filter(parent=self.parent).order_by('name'),
+                File.objects.filter(folder=self.parent).order_by('name'),
+            )
+            return FolderPaginator(items, PAGE_SIZE).page(number)
+
+        # Folder slice and its total, then the file total.
+        with self.assertNumQueries(2):
+            current = page(1)
+            self.assertEqual(list(current), folders[:3])
+            self.assertEqual(current.paginator.count, len(folders) + len(self.files))
+        # Folder count to place the page, folder slice, file slice and its total.
+        with self.assertNumQueries(3):
+            current = page(2)
+            self.assertEqual(list(current), folders[3:] + self.files[:1])
+        # Folder count, then the file slice and its total.
+        with self.assertNumQueries(2):
+            current = page(3)
+            self.assertEqual(list(current), self.files[1:4])
+            self.assertEqual(current.paginator.count, len(folders) + len(self.files))

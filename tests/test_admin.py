@@ -132,12 +132,11 @@ class FilerFolderAdminUrlsTests(TestCase):
         # Polymorphic resolves content types once per process: warm that cache so
         # that the query count does not depend on which tests ran before
         self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             # Expected queries:
             # 1. Authentication check
-            # 2. Count files without materializing the directory
-            # 3. Load the page and thumbnail annotations
-            # 4. Select polymorphic image and owner data
+            # 2. Load the page, its total and thumbnail annotations
+            # 3. Select polymorphic image and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
         self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
