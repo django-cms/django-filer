@@ -14,7 +14,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import Case, F, OuterRef, Subquery, When
+from django.db.models import Case, Count, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -330,7 +330,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
-            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
+            folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
@@ -340,6 +340,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name').select_related("owner")
+        folder_qs = self._with_folder_counts(folder_qs)
         order_by = request.GET.get('order_by', None)
         order_by_annotation = None
         if order_by is None:
@@ -504,6 +505,19 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
         })
         return TemplateResponse(request, self.directory_listing_template, context)
+
+    def _with_folder_counts(self, queryset):
+        children = Folder.objects.filter(parent_id=OuterRef('pk')).order_by().values('parent_id')
+        files = File.objects.filter(folder_id=OuterRef('pk')).order_by().values('folder_id')
+        # Separate aggregates avoid multiplying counts by joining both relations.
+        return queryset.annotate(
+            _children_count_cache=Coalesce(
+                Subquery(children.annotate(total=Count('pk')).values('total')), 0,
+            ),
+            _file_count_cache=Coalesce(
+                Subquery(files.annotate(total=Count('pk')).values('total')), 0,
+            ),
+        )
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa

@@ -144,6 +144,37 @@ class FilerFolderAdminUrlsTests(TestCase):
         for thumbnail_url in thumbnail_urls:
             self.assertContains(response, thumbnail_url)
 
+    def test_folder_counts_batched(self):
+        parent = Folder.objects.create(name='parent')
+        populated = Folder.objects.create(name='populated', parent=parent)
+        empty = Folder.objects.create(name='empty', parent=parent)
+        Folder.objects.bulk_create([
+            Folder(name=f'child-{index}', parent=populated) for index in range(2)
+        ])
+        File.objects.bulk_create([
+            File(name=f'file-{index}', folder=populated) for index in range(3)
+        ])
+        request = RequestFactory().get('/')
+        request.user = self.superuser
+        request.session = {}
+        folder_admin = admin.site._registry[Folder]
+
+        for query in ('', 'p', 'empty'):
+            with self.subTest(query=query):
+                request.GET = request.GET.copy()
+                request.GET['q'] = query
+                response = folder_admin.directory_listing(request, parent.pk)
+                folders = list(response.context_data['folder_children'])
+
+                # Counts must be available without per-folder queries, including search.
+                with self.assertNumQueries(0):
+                    counts = {folder.pk: (folder.children_count, folder.file_count) for folder in folders}
+
+                if query != 'empty':
+                    self.assertEqual(counts[populated.pk], (2, 3))
+                if query != 'p':
+                    self.assertEqual(counts[empty.pk], (0, 0))
+
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
