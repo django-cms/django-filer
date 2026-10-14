@@ -1,10 +1,11 @@
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from PIL import ExifTags, Image
 
 from django.core.files.temp import NamedTemporaryFile
-from django.utils.timezone import datetime
 from django.utils.translation import gettext_lazy as _
+
+from PIL import ExifTags, Image
 
 from finder.contrib.image.models import ImageFileModel
 from finder.models.file import digest_sha1

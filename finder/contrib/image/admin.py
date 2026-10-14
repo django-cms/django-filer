@@ -1,9 +1,8 @@
 from functools import cached_property
 
-from django.utils.text import format_lazy
-
 from django.conf import settings
 from django.contrib import admin
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from finder.admin.file import FileAdmin

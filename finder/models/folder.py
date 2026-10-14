@@ -6,14 +6,17 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _, ngettext
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeModel
-from finder.models.permission import (
-    AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege, is_excluded,
-)
+from finder.models.permission import AccessControlEntry
+from finder.models.permission import DefaultAccessControlEntry as DefaultACE
+from finder.models.permission import Privilege, is_excluded
 from finder.storages import delete_directory
+
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'

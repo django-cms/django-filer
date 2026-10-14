@@ -1,8 +1,8 @@
 import json
 
-from finder.models.inode import InodeManager
 from finder.models.filetag import LabelTag
 from finder.models.folder import FolderModel
+from finder.models.inode import InodeManager
 
 
 def annotate_unified_queryset(ambit, queryset):

@@ -5,12 +5,13 @@ from functools import lru_cache, reduce
 from operator import or_
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models
 from django.template.defaultfilters import filesizeformat
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from finder import settings
 from finder.models.filetag import FileTag

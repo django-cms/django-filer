@@ -5,10 +5,10 @@ from tempfile import mkstemp
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+import ffmpeg
+
 from finder.models.file import FileModel
 from finder.storages import copy_to_local
-
-import ffmpeg
 
 
 SAMPLE_DURATION = 5

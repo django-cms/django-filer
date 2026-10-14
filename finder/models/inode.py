@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections
-from django.db.models import CASCADE, F, Model, NOT_PROVIDED, Q, SET_NULL, Value
+from django.db.models import CASCADE, NOT_PROVIDED, SET_NULL, F, Model, Q, Value
 from django.db.models.aggregates import Aggregate
 from django.db.models.base import ModelBase
 from django.db.models.fields import BooleanField, CharField, DateTimeField, PositiveIntegerField, UUIDField
@@ -20,6 +20,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from finder.models.permission import AccessControlEntry, Privilege, is_excluded
+
 
 if DJANGO_VERSION < (6, 0):
     try:

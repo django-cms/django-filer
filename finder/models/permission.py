@@ -7,7 +7,8 @@ from django.db import models
 from django.db.models import BooleanField, Value
 from django.db.models.expressions import Exists, F, OuterRef, Q
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 
 class Privilege(models.IntegerChoices):

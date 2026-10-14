@@ -110,6 +110,7 @@ exclude = [
     "data",
     "dist",
     "docs",
+    "finder/migrations",
     "*migrations*",
     "tmp",
     "node_modules",
@@ -120,6 +121,7 @@ ignore = ["E251", "E128", "E501", "W503"]
 line_length = 119
 skip = [
     "manage.py",
+    "finder/migrations",
     "*migrations*",
     ".env",
     ".venv",
@@ -143,4 +145,4 @@ known_django = ["django"]
 
 [tool.ruff]
 src = ["finder", "filer"]
-exclude = ["*/migrations/*"]
+exclude = ["finder/migrations", "*/migrations/*"]

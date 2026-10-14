@@ -3,7 +3,7 @@ import json
 from django import VERSION as DJANGO_VERSION
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import QuerySet, Subquery
 from django.db.models.expressions import Value
@@ -20,11 +20,11 @@ from django.utils.translation import gettext
 from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
 from finder.models.fields import FinderBaseModelField
-from finder.models.file import InodeModel, FileModel
-from finder.models.folder import FolderModel, RENAMED_SUFFIX
-from finder.models.inode import DiscardedInode, InodeManager, filename_validator
+from finder.models.file import FileModel, InodeModel
 from finder.models.filetag import LabelTag
-from finder.models.permission import Privilege, AccessControlEntry
+from finder.models.folder import RENAMED_SUFFIX, FolderModel
+from finder.models.inode import DiscardedInode, InodeManager, filename_validator
+from finder.models.permission import AccessControlEntry, Privilege
 
 
 @admin.register(FolderModel)

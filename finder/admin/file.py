@@ -10,9 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from finder.admin.inode import InodeAdmin
 from finder.forms.file import FileForm
 from finder.models.file import FileModel
+from finder.models.filetag import LabelTag
 from finder.models.folder import FolderModel
 from finder.models.inode import InodeModel
-from finder.models.filetag import LabelTag
 from finder.models.permission import Privilege
 
 

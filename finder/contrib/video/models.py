@@ -10,6 +10,7 @@ import ffmpeg
 from finder.models.file import FileModel
 from finder.storages import copy_to_local
 
+
 SAMPLE_DURATION = 5
 
 logger = getLogger(__name__)
