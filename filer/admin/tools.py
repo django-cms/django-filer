@@ -69,6 +69,34 @@ def _check_folder_tree(request, folders, check):
         level = [child for child in children if child.pk not in seen]
 
 
+def load_subtrees(folders):
+    """
+    Load everything below ``folders``, one tree level per query.
+
+    Returns ``(children, files)``, mapping folder ids to child folders (by
+    name) and to their files. Loaded rows share their parent instances.
+    """
+    children, files = {}, {}
+    level = {folder.pk: folder for folder in folders}
+    seen = set(level)
+    while level:
+        for file_obj in filter_in_batches(File.objects.all(), 'folder_id', level):
+            file_obj.folder = level[file_obj.folder_id]
+            files.setdefault(file_obj.folder_id, []).append(file_obj)
+
+        next_level = {}
+        for child in filter_in_batches(Folder.objects.order_by('name'), 'parent_id', level):
+            if child.pk in seen:
+                continue
+
+            child.parent = level[child.parent_id]
+            children.setdefault(child.parent_id, []).append(child)
+            next_level[child.pk] = child
+        seen.update(next_level)
+        level = next_level
+    return children, files
+
+
 def attach_ancestors(folders):
     # Share one instance per ancestor, loading one tree level per query.
     known = {folder.pk: folder for folder in folders}

@@ -57,6 +57,7 @@ from .tools import (
     check_folder_read_permissions,
     filter_in_batches,
     get_directory_listing_type,
+    load_subtrees,
     popup_pick_type,
     popup_status,
     userperms_for_request,
@@ -700,10 +701,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def move_files(files):
             files_count[0] += tools.move_file_to_clipboard(files, clipboard)
 
+        children, files = load_subtrees(folders_queryset)
+
         def move_folders(folders):
             for f in folders:
-                move_files(f.files)
-                move_folders(f.children.all())
+                move_files(files.get(f.pk, ()))
+                move_folders(children.get(f.pk, ()))
 
         move_files(files_queryset)
         move_folders(folders_queryset)
@@ -744,10 +747,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     f.save()
                     files_count[0] += 1
 
+        children, files = load_subtrees(folders_queryset)
+
         def set_folders(folders):
             for f in folders:
-                set_files(f.files)
-                set_folders(f.children.all())
+                set_files(files.get(f.pk, ()))
+                set_folders(children.get(f.pk, ()))
 
         set_files(files_queryset)
         set_folders(folders_queryset)
@@ -940,11 +945,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             return None
 
-    def _list_folders_to_copy_or_move(self, request, folders):
+    def _list_folders_to_copy_or_move(self, request, folders, subtrees=None):
+        if subtrees is None:
+            # Load the selected trees and label ancestors once, not per folder.
+            folders = list(folders)
+            attach_ancestors(folders)
+            subtrees = load_subtrees(folders)
+        children_by_id, files_by_id = subtrees
         for fo in folders:
             yield self._format_callback(fo, request.user, self.admin_site, set())
-            children = list(self._list_folders_to_copy_or_move(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files)])
+            children = list(self._list_folders_to_copy_or_move(request, children_by_id.get(fo.pk, ()), subtrees))
+            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_by_id.get(fo.pk, ()))])
             if children:
                 yield children
 
@@ -1266,10 +1277,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return True
         return False
 
-    def _list_folders_to_resize(self, request, folders):
+    def _list_folders_to_resize(self, request, folders, subtrees=None):
+        if subtrees is None:
+            # Load the selected trees and label ancestors once, not per folder.
+            folders = list(folders)
+            attach_ancestors(folders)
+            subtrees = load_subtrees(folders)
+        children_by_id, files_by_id = subtrees
         for fo in folders:
-            children = list(self._list_folders_to_resize(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files) if isinstance(f, Image)])
+            children = list(self._list_folders_to_resize(request, children_by_id.get(fo.pk, ()), subtrees))
+            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_by_id.get(fo.pk, ())) if isinstance(f, Image)])
             if children:
                 yield self._format_callback(fo, request.user, self.admin_site, set())
                 yield children
