@@ -257,6 +257,25 @@ class PermissionScalingTests(TestCase):
         # Width does not add queries below the database parameter limit.
         self.assert_cold_ids(expected, max_queries=4)
 
+    def test_single_root_deep_chain(self):
+        for depth in (4, 16, 100):
+            with self.subTest(depth=depth):
+                FolderPermission.objects.all().delete()
+                parent = None
+                folders = []
+                for index in range(depth):
+                    parent = Folder.objects.create(name=f'single {depth}-{index}', parent=parent)
+                    folders.append(parent)
+                FolderPermission.objects.create(
+                    user=self.user, folder=folders[0], type=FolderPermission.CHILDREN,
+                    can_read=FolderPermission.ALLOW,
+                )
+                clear_folder_permission_cache(self.user)
+                # One grants query plus one child lookup per level, including leaves.
+                with self.assertNumQueries(depth + 1):
+                    actual = FolderPermission.objects.get_read_id_list(self.user)
+                self.assertEqual(actual, {folder.pk for folder in folders})
+
     def test_descendants_are_batched(self):
         roots = Folder.objects.bulk_create([Folder(name=f'root {index}') for index in range(5)])
         children = Folder.objects.bulk_create([Folder(name='child', parent=root) for root in roots])

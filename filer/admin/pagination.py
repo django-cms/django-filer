@@ -40,6 +40,7 @@ class FolderItems:
 
         start, stop, step = key.indices(len(self))
         if step != 1:
+            # General slicing fallback; paginator pages use unit steps.
             return list(self)[key]
         if start >= stop:
             return []

@@ -167,6 +167,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def file_count(self):
+        # FolderAdmin._with_folder_counts populates both count cache attributes.
         if not hasattr(self, '_file_count_cache'):
             self._file_count_cache = self.files.count()
         return self._file_count_cache
