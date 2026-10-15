@@ -30,12 +30,12 @@ class DuplicateQueryTests(TestCase):
                     for index in range(size)
                 ])
 
-                # Discover digests without loading the returned querysets.
+                # Discovery also materializes groups, without one query per digest.
                 with self.assertNumQueries(1):
                     duplicates = File.objects.find_all_duplicates()
                     self.assertEqual(list(duplicates), [digest])
 
-                with self.assertNumQueries(1):
+                with self.assertNumQueries(0):
                     self.assertCountEqual(duplicates[digest], files)
 
     def test_duplicate_groups_match(self):
@@ -49,8 +49,18 @@ class DuplicateQueryTests(TestCase):
         self.assertCountEqual(duplicates, ['first', 'second'])
         self.assertCountEqual(duplicates['first'], files[3:5])
         self.assertCountEqual(duplicates['second'], files[5:7])
-        # Keep queryset-valued results usable by existing callers.
-        self.assertEqual(duplicates['first'].filter(pk=files[3].pk).get(), files[3])
+
+    def test_groups_are_snapshots(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1=digest, _file_size=1)
+            for index, digest in enumerate(('first', 'first', 'second', 'second'))
+        ])
+        duplicates = File.objects.find_all_duplicates()
+        File.objects.filter(pk=files[0].pk).update(sha1='changed')
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(duplicates['first'], files[:2])
+            self.assertCountEqual(duplicates['second'], files[2:])
 
     def test_mostly_unique_digests(self):
         for size in (20, 100):
@@ -67,10 +77,9 @@ class DuplicateQueryTests(TestCase):
         digest = 'a' * 40
         file = File.objects.create(name='file', _file_size=1)
         image = Image.objects.create(name='image', _file_size=1)
-        File.objects.filter(pk__in=(file.pk, image.pk)).update(sha1=digest)
+        File.objects.filter(pk__in=(file.pk, image.pk)).update(sha1=digest, _file_size=1)
 
-        with self.assertNumQueries(1):
-            duplicates = File.objects.find_all_duplicates()
+        duplicates = File.objects.find_all_duplicates()
 
         matches = {item.pk: item for item in duplicates[digest]}
         self.assertEqual(set(matches), {file.pk, image.pk})

@@ -33,13 +33,16 @@ class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
-        # Discover duplicate digests without materializing files or unique groups.
+        # Select duplicate groups in SQL, then return a stable snapshot.
         digests = (
             self.exclude(sha1='').order_by().values('sha1')
             .annotate(total=Count('pk')).filter(total__gt=1)
             .values_list('sha1', flat=True)
         )
-        return {sha1: self.filter(sha1=sha1) for sha1 in digests}
+        duplicates = {}
+        for file_obj in self.filter(sha1__in=digests).order_by('sha1', 'pk'):
+            duplicates.setdefault(file_obj.sha1, []).append(file_obj)
+        return duplicates
 
     def find_duplicates(self, file_obj):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
