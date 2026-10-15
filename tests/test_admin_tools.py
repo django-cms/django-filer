@@ -1,5 +1,8 @@
 """Tests for filer.admin.tools."""
 
+import subprocess
+import sys
+
 from django.test import RequestFactory, TestCase
 
 from filer.admin.tools import (
@@ -192,3 +195,17 @@ class AdminContextTests(TestCase):
         request = self.factory.get('/')
         ctx = AdminContext(request)
         self.assertEqual(ctx['pick'], '')
+
+
+class ImportSafetyTests(TestCase):
+    def test_import_before_app_setup(self):
+        # Isolate this helper: filer.admin.__init__ already requires the registry.
+        result = subprocess.run([
+            sys.executable, '-c',
+            'from django.conf import settings; '
+            "settings.configure(DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3'}}); "
+            "import importlib.util; "
+            "spec = importlib.util.spec_from_file_location('filer.admin.tools', 'filer/admin/tools.py'); "
+            "spec.loader.exec_module(importlib.util.module_from_spec(spec))",
+        ], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)

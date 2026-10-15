@@ -3,7 +3,6 @@ from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
 
 from .. import settings
-from ..models import File, Folder
 from ..utils.queries import filter_in_batches
 
 
@@ -47,6 +46,8 @@ def check_folder_read_permissions(request, folders):
 
 
 def _check_folder_tree(request, folders, check):
+    from ..models import File, Folder
+
     # Walk one tree level at a time so queries grow with depth, not size.
     # Per-object checks still decide, so model overrides keep working.
     level = list(folders)
@@ -76,6 +77,8 @@ def load_subtrees(folders):
     Returns ``(children, files)``, mapping folder ids to child folders (by
     name) and to their files. Loaded rows share their parent instances.
     """
+    from ..models import File, Folder
+
     children, files = {}, {}
     level = {folder.pk: folder for folder in folders}
     seen = set(level)
@@ -98,6 +101,8 @@ def load_subtrees(folders):
 
 
 def attach_ancestors(folders):
+    from ..models import Folder
+
     # Share one instance per ancestor, loading one tree level per query.
     known = {folder.pk: folder for folder in folders}
     level = list(folders)
