@@ -450,6 +450,25 @@ class ActionTreeTests(TestCase):
         return sum(query['sql'].startswith('SELECT') and 'FROM "filer_folder"' in query['sql'] for query in queries)
 
     @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
+    def test_public_overlap_saves_once(self):
+        root = self.build('overlap', 1)
+        file_obj = File.objects.filter(folder__parent=root).first()
+        saved = []
+        original_save = File.save
+
+        def save(instance, *args, **kwargs):
+            saved.append(instance.pk)
+            return original_save(instance, *args, **kwargs)
+
+        with patch.object(File, 'save', save), patch.object(self.folder_admin, 'message_user') as message:
+            self.folder_admin.files_set_public(
+                self.request(), File.objects.filter(pk=file_obj.pk), Folder.objects.filter(pk=root.pk),
+            )
+
+        self.assertEqual(saved.count(file_obj.pk), 1)
+        self.assertIn(f'for {len(saved)} files.', str(message.call_args.args[1]))
+
+    @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
     def test_set_public_reads_follow_depth(self):
         counts = {}
         for width in (SMALL_WIDTH, LARGE_WIDTH):

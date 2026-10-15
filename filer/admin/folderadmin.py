@@ -754,6 +754,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 set_files(files.get(f.pk, ()))
                 set_folders(children.get(f.pk, ()))
 
+        # Search selections can contain both a file and its parent folder.
+        selected_ids = {file_obj.pk for file_obj in files_queryset}
+        files = {pk: [file_obj for file_obj in group if file_obj.pk not in selected_ids]
+                 for pk, group in files.items()}
         set_files(files_queryset)
         set_folders(folders_queryset)
 
