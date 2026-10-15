@@ -350,7 +350,7 @@ class DestinationFolderTests(TestCase):
             self.grant(root, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
             destinations, counts[width] = count_queries(lambda: self.destinations([], None, False))
 
-            self.assertTrue(expected <= {folder.pk for folder, _ in destinations})
+            self.assertLessEqual(expected, {folder.pk for folder, _ in destinations})
 
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
 
@@ -475,7 +475,7 @@ class ActionTreeTests(TestCase):
             )
 
             clipboard = Clipboard.objects.get(user=self.superuser)
-            self.assertTrue(expected <= set(clipboard.files.values_list('pk', flat=True)))
+            self.assertLessEqual(expected, set(clipboard.files.values_list('pk', flat=True)))
             self.assertFalse(File.objects.filter(pk__in=expected, folder__isnull=False).exists())
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
 
