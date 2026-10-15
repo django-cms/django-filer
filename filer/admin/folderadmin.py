@@ -326,6 +326,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
+                # TODO: Keep descendants in SQL (recursive CTE or materialized
+                # path) to avoid backend parameter limits. Splitting IN clauses
+                # does not cap total parameters; results still need pagination.
                 desc_folder_ids = folder.get_descendants_ids()
                 # Do not include current folder itself in search results.
                 folder_qs = Folder.objects.filter(pk__in=desc_folder_ids)
