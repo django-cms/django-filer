@@ -4,6 +4,7 @@ from django.utils.http import urlencode
 
 from .. import settings
 from ..utils.queries import filter_in_batches
+from ..utils.tree import walk_tree_levels
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
@@ -46,52 +47,42 @@ def check_folder_read_permissions(request, folders):
 
 
 def _check_folder_tree(request, folders, check):
-    from ..models import File, Folder
-
-    # Walk one tree level at a time so queries grow with depth, not size.
-    # Per-object checks still decide, so model overrides keep working.
-    level = list(folders)
-    seen = set()
-    while level:
-        level_by_id = {}
-        for folder in level:
+    # Check the same instances used by the shared traversal.
+    for level, files in walk_subtrees(folders):
+        for folder in level.values():
             if not getattr(folder, check)(request):
                 raise PermissionDenied
-            level_by_id[folder.pk] = folder
-        seen.update(level_by_id)
-
-        for file_obj in filter_in_batches(File.objects.all(), 'folder_id', level_by_id):
-            # Reuse the loaded folder and its permission cache.
-            file_obj.folder = level_by_id[file_obj.folder_id]
+        for file_obj in files:
             if not getattr(file_obj, check)(request):
                 raise PermissionDenied
+        del files
 
-        children = filter_in_batches(Folder.objects.all(), 'parent_id', level_by_id)
-        level = [child for child in children if child.pk not in seen]
+
+def walk_folder_levels(folders, accept=None):
+    """Walk visible folders, pruning rejected subtrees and sharing parents."""
+    from ..models import Folder
+
+    def children(level):
+        for child in filter_in_batches(Folder.objects.order_by('name'), 'parent_id', level):
+            child.parent = level[child.parent_id]
+            if accept is None or accept(child):
+                yield child.pk, child
+
+    roots = {folder.pk: folder for folder in folders if accept is None or accept(folder)}
+    yield from walk_tree_levels(roots, children)
 
 
 def walk_subtrees(folders):
     """Yield folders and files one level at a time, sharing parent instances."""
-    from ..models import File, Folder
+    from ..models import File
 
-    level = {folder.pk: folder for folder in folders}
-    seen = set(level)
-    while level:
+    for level in walk_folder_levels(folders):
         files = []
         for file_obj in filter_in_batches(File.objects.all(), 'folder_id', level):
             file_obj.folder = level[file_obj.folder_id]
             files.append(file_obj)
         yield level, files
         del files
-
-        next_level = {}
-        for child in filter_in_batches(Folder.objects.order_by('name'), 'parent_id', level):
-            if child.pk in seen:
-                continue
-            child.parent = level[child.parent_id]
-            next_level[child.pk] = child
-        seen.update(next_level)
-        level = next_level
 
 
 def attach_ancestors(folders):

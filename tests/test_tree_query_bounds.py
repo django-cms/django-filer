@@ -356,7 +356,7 @@ class DestinationFolderTests(TestCase):
 
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
 
-    def test_destination_accepts_lists(self):
+    def test_destination_lists(self):
         root = Folder.objects.create(name='root')
         selected = Folder.objects.create(name='selected', parent=root)
         Folder.objects.create(name='excluded child', parent=selected)
@@ -485,6 +485,37 @@ class ActionTreeTests(TestCase):
 
         self.assertLessEqual(peak, 3)
 
+    def test_preview_checks_once(self):
+        root = self.build('checked preview', 2)
+        for action in ('copy_files_and_folders', 'move_files_and_folders', 'resize_images'):
+            with self.subTest(action=action), CaptureQueriesContext(connection) as queries:
+                getattr(self.folder_admin, action)(
+                    self.request(), File.objects.none(), Folder.objects.filter(pk=root.pk),
+                )
+            file_reads = [query for query in queries
+                          if 'FROM "filer_file"' in query['sql'] and '"folder_id" IN' in query['sql']]
+            self.assertEqual(len(file_reads), 3, action)
+
+    def test_denied_tree_actions(self):
+        root = self.build('denied preview', 1)
+        denied = File.objects.get(folder__parent__parent=root)
+        cases = (
+            ('copy_files_and_folders', 'has_read_permission'),
+            ('move_files_and_folders', 'has_edit_permission'),
+            ('resize_images', 'has_read_permission'),
+        )
+        for action, check in cases:
+            request = self.request()
+            request.POST = request.POST.copy()
+            request.POST['post'] = 'yes'
+            with self.subTest(action=action), \
+                    patch.object(File, check, lambda obj, request: obj.pk != denied.pk), \
+                    self.assertRaises(PermissionDenied):
+                getattr(self.folder_admin, action)(request, File.objects.none(), Folder.objects.filter(pk=root.pk))
+
+        self.assertTrue(Folder.objects.filter(pk=root.pk).exists())
+        self.assertTrue(File.objects.filter(pk=denied.pk, folder=denied.folder).exists())
+
     def test_delete_batches_subtrees(self):
         root = self.build('delete batches', 3)
         files = list(File.objects.filter(folder__name__startswith='delete batches '))
@@ -509,7 +540,7 @@ class ActionTreeTests(TestCase):
         self.assertEqual(LogEntry.objects.filter(action_flag=DELETION, content_type__model='file').count(), len(files))
 
     @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
-    def test_public_overlap_saves_once(self):
+    def test_public_overlap_once(self):
         root = self.build('overlap', 1)
         file_obj = File.objects.filter(folder__parent=root).first()
         saved = []

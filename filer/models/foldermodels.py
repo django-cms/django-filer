@@ -12,22 +12,22 @@ from django.utils.translation import gettext_lazy as _
 from .. import settings as filer_settings
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
 from ..utils.queries import filter_in_batches
+from ..utils.tree import walk_tree_levels
 from . import mixins
 
 
 def _descendant_rows(roots):
     # Yield (id, parent_id) below the given subtrees, one query per level.
     # Children come by name, and overlapping subtrees are visited once.
-    visited = set(roots)
-    pending = list(roots)
-    while pending:
-        level = filter_in_batches(
-            Folder.objects.order_by('name').values_list('id', 'parent_id'), 'parent_id', pending,
+    def children(level):
+        yield from filter_in_batches(
+            Folder.objects.order_by('name').values_list('id', 'parent_id'), 'parent_id', level,
         )
-        level = [(pk, parent_id) for pk, parent_id in level if pk not in visited]
-        visited.update(pk for pk, _ in level)
-        yield from level
-        pending = [pk for pk, _ in level]
+
+    levels = walk_tree_levels(dict.fromkeys(roots), children)
+    next(levels, None)  # Roots are included by the walker, but are not descendants.
+    for level in levels:
+        yield from level.items()
 
 
 def _descendant_ids(roots):
