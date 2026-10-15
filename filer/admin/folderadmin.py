@@ -31,6 +31,7 @@ from easy_thumbnails.models import Thumbnail
 from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
+from ..models.foldermodels import _descendant_ids
 from ..settings import (
     FILER_IMAGE_MODEL,
     FILER_PAGINATE_BY,
@@ -847,20 +848,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # This would happen automatically by ways of the delete
                 # cascade, but then the individual .delete() methods won't be
                 # called and the files won't be deleted from the filesystem.
-                folder_ids = set()
-                for folder in folders_queryset:
-                    folder_ids.add(folder.id)
-                    folder_ids.update(folder.get_descendants_ids())
+                folder_ids = _descendant_ids([folder.pk for folder in folders_queryset])
+                files_to_delete = list(filter_in_batches(File.objects.all(), 'folder_id', folder_ids))
                 if DJANGO_VERSION >= (5, 1):
-                    qs = File.objects.filter(folder__in=folder_ids)
-                    self.log_deletions(request, qs)
-                    # Still need to delete files individually (not only the database entries)
-                    for f in qs:
-                        f.delete()
-                else:
-                    for f in File.objects.filter(folder__in=folder_ids):
-                        self.log_deletion(request, f, force_str(f))
-                        f.delete()
+                    self.log_deletions(request, files_to_delete)
+                for file_obj in files_to_delete:
+                    if DJANGO_VERSION < (5, 1):
+                        self.log_deletion(request, file_obj, force_str(file_obj))
+                    # Preserve storage cleanup and subclass delete hooks.
+                    file_obj.delete()
                 # delete all folders
                 if DJANGO_VERSION >= (5, 1):
                     self.log_deletions(request, folders_queryset)

@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
@@ -460,6 +461,29 @@ class ActionTreeTests(TestCase):
         with CaptureQueriesContext(connection) as queries:
             func()
         return sum(query['sql'].startswith('SELECT') and 'FROM "filer_folder"' in query['sql'] for query in queries)
+
+    def test_delete_batches_subtrees(self):
+        root = self.build('delete batches', 3)
+        files = list(File.objects.filter(folder__name__startswith='delete batches '))
+        file_ids = {file_obj.pk for file_obj in files}
+        selected = Folder.objects.filter(pk=root.pk) | Folder.objects.filter(parent=root)
+        request = self.request()
+        request.POST = request.POST.copy()
+        request.POST['post'] = 'yes'
+
+        def enforce_limit(execute, sql, params, many, context):
+            if sql.startswith('SELECT') and 'FROM "filer_file"' in sql and '"folder_id" IN' in sql:
+                self.assertLessEqual(len(params), 5)
+            return execute(sql, params, many, context)
+
+        with patch.object(type(connection.features), 'max_query_params', 5), \
+                connection.execute_wrapper(enforce_limit):
+            self.folder_admin.delete_files_or_folders(request, File.objects.none(), selected)
+
+        self.assertFalse(File.objects.filter(pk__in=file_ids).exists())
+        for file_obj in files:
+            self.assertFalse(file_obj.file.storage.exists(file_obj.file.name))
+        self.assertEqual(LogEntry.objects.filter(action_flag=DELETION, content_type__model='file').count(), len(files))
 
     @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
     def test_public_overlap_saves_once(self):
