@@ -1,4 +1,5 @@
 import io
+import weakref
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -21,7 +22,7 @@ from filer.admin.tools import (
     check_folder_edit_permissions,
     check_folder_read_permissions,
     filter_in_batches,
-    load_subtrees,
+    walk_subtrees,
 )
 from filer.cache import clear_folder_permission_cache
 from filer.models import Clipboard, File, Folder, FolderPermission
@@ -462,6 +463,28 @@ class ActionTreeTests(TestCase):
             func()
         return sum(query['sql'].startswith('SELECT') and 'FROM "filer_folder"' in query['sql'] for query in queries)
 
+    def test_preview_releases_files(self):
+        root = Folder.objects.create(name='root')
+        folder = root
+        for index in range(8):
+            File.objects.bulk_create([File(folder=folder, name=str(index), _file_size=1, sha1='a')])
+            folder = Folder.objects.create(name=str(index), parent=folder)
+        live = weakref.WeakValueDictionary()
+        peak = 0
+        from_db = File.from_db
+
+        def track(cls, *args, **kwargs):
+            nonlocal peak
+            obj = from_db(*args, **kwargs)
+            live[obj.pk] = obj
+            peak = max(peak, len(live))
+            return obj
+
+        with patch.object(File, 'from_db', classmethod(track)):
+            self.folder_admin._list_all_to_copy_or_move(self.request(), File.objects.none(), [root])
+
+        self.assertLessEqual(peak, 3)
+
     def test_delete_batches_subtrees(self):
         root = self.build('delete batches', 3)
         files = list(File.objects.filter(folder__name__startswith='delete batches '))
@@ -536,15 +559,15 @@ class ActionTreeTests(TestCase):
 
 
 class TreeHelperTests(TestCase):
-    def test_load_subtrees_stops_on_cycles(self):
+    def test_walk_stops_on_cycles(self):
         first = Folder.objects.create(name='first')
         second = Folder.objects.create(name='second', parent=first)
         # Corrupt data must not loop forever.
         Folder.objects.filter(pk=first.pk).update(parent=second)
 
-        children, _ = load_subtrees([Folder.objects.get(pk=first.pk)])
+        levels = [list(level) for level, _ in walk_subtrees([Folder.objects.get(pk=first.pk)])]
 
-        self.assertEqual({parent: [child.pk for child in kids] for parent, kids in children.items()}, {first.pk: [second.pk]})
+        self.assertEqual(levels, [[first.pk], [second.pk]])
 
     def test_share_source_needs_matching_key(self):
         source = Folder.objects.create(name='source')

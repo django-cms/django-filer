@@ -58,10 +58,10 @@ from .tools import (
     check_folder_read_permissions,
     filter_in_batches,
     get_directory_listing_type,
-    load_subtrees,
     popup_pick_type,
     popup_status,
     userperms_for_request,
+    walk_subtrees,
 )
 
 
@@ -705,15 +705,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def move_files(files):
             files_count[0] += tools.move_file_to_clipboard(files, clipboard)
 
-        children, files = load_subtrees(folders_queryset)
-
-        def move_folders(folders):
-            for f in folders:
-                move_files(files.get(f.pk, ()))
-                move_folders(children.get(f.pk, ()))
-
         move_files(files_queryset)
-        move_folders(folders_queryset)
+        for level, files in walk_subtrees(folders_queryset):
+            move_files(files)
+            del files
 
         self.message_user(request, _("Successfully moved %(count)d files to "
                                      "clipboard.") % {"count": files_count[0]})
@@ -751,19 +746,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     f.save()
                     files_count[0] += 1
 
-        children, files = load_subtrees(folders_queryset)
-
-        def set_folders(folders):
-            for f in folders:
-                set_files(files.get(f.pk, ()))
-                set_folders(children.get(f.pk, ()))
-
-        # Search selections can contain both a file and its parent folder.
-        selected_ids = {file_obj.pk for file_obj in files_queryset}
-        files = {pk: [file_obj for file_obj in group if file_obj.pk not in selected_ids]
-                 for pk, group in files.items()}
+        # Read subtree files after direct selections have been saved.
         set_files(files_queryset)
-        set_folders(folders_queryset)
+        for level, files in walk_subtrees(folders_queryset):
+            set_files(files)
+            del files
 
         if set_public:
             self.message_user(request, _("Successfully disabled permissions for %(count)d files.") % {"count": files_count[0], })
@@ -948,17 +935,32 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             return None
 
+    def _tree_labels(self, request, folders, file_type=File):
+        # Retain labels for the confirmation page, not every polymorphic file.
+        attach_ancestors(folders)
+        children, labels = {}, {}
+        roots = {folder.pk for folder in folders}
+        for level, files in walk_subtrees(folders):
+            for folder in level.values():
+                if folder.pk not in roots:
+                    children.setdefault(folder.parent_id, []).append(folder)
+            for file_obj in sorted(files):
+                if isinstance(file_obj, file_type):
+                    label = self._format_callback(file_obj, request.user, self.admin_site, set())
+                    labels.setdefault(file_obj.folder_id, []).append(label)
+            del files
+        return children, labels
+
     def _list_folders_to_copy_or_move(self, request, folders, subtrees=None):
         if subtrees is None:
             # Load the selected trees and label ancestors once, not per folder.
             folders = list(folders)
-            attach_ancestors(folders)
-            subtrees = load_subtrees(folders)
+            subtrees = self._tree_labels(request, folders)
         children_by_id, files_by_id = subtrees
         for fo in folders:
             yield self._format_callback(fo, request.user, self.admin_site, set())
             children = list(self._list_folders_to_copy_or_move(request, children_by_id.get(fo.pk, ()), subtrees))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_by_id.get(fo.pk, ()))])
+            children.extend(files_by_id.get(fo.pk, ()))
             if children:
                 yield children
 
@@ -1284,12 +1286,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if subtrees is None:
             # Load the selected trees and label ancestors once, not per folder.
             folders = list(folders)
-            attach_ancestors(folders)
-            subtrees = load_subtrees(folders)
+            subtrees = self._tree_labels(request, folders, Image)
         children_by_id, files_by_id = subtrees
         for fo in folders:
             children = list(self._list_folders_to_resize(request, children_by_id.get(fo.pk, ()), subtrees))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_by_id.get(fo.pk, ())) if isinstance(f, Image)])
+            children.extend(files_by_id.get(fo.pk, ()))
             if children:
                 yield self._format_callback(fo, request.user, self.admin_site, set())
                 yield children
