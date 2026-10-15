@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
-from django.db import connections, models
+from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -11,10 +11,8 @@ from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
+from ..utils.queries import filter_in_batches
 from . import mixins
-
-
-PERMISSION_BATCH_SIZE = 1000
 
 
 def _descendant_rows(roots):
@@ -22,14 +20,10 @@ def _descendant_rows(roots):
     # Children come by name, and overlapping subtrees are visited once.
     visited = set(roots)
     pending = list(roots)
-    max_params = connections[Folder.objects.db].features.max_query_params
-    batch_size = min(PERMISSION_BATCH_SIZE, max_params or PERMISSION_BATCH_SIZE)
     while pending:
-        level = []
-        for offset in range(0, len(pending), batch_size):
-            level.extend(Folder.objects.filter(
-                parent_id__in=pending[offset:offset + batch_size],
-            ).order_by('name').values_list('id', 'parent_id').iterator())
+        level = filter_in_batches(
+            Folder.objects.order_by('name').values_list('id', 'parent_id'), 'parent_id', pending,
+        )
         level = [(pk, parent_id) for pk, parent_id in level if pk not in visited]
         visited.update(pk for pk, _ in level)
         yield from level

@@ -527,9 +527,9 @@ class TreeHelperTests(TestCase):
         ids = [folder.pk for folder in folders]
 
         # Backends without a declared limit still get bounded IN lists. Fake
-        # only the lookup in tools; SQLite itself reads its real limit.
+        # only the lookup in queries; SQLite itself reads its real limit.
         unlimited = {'default': SimpleNamespace(features=SimpleNamespace(max_query_params=None))}
-        with patch('filer.admin.tools.connections', unlimited), \
-                patch('filer.admin.tools.BATCH_SIZE', 2), self.assertNumQueries(3):
+        with patch('filer.utils.queries.connections', unlimited), \
+                patch('filer.utils.queries.QUERY_BATCH_SIZE', 2), self.assertNumQueries(3):
             loaded = list(filter_in_batches(Folder.objects.all(), 'pk', ids))
         self.assertEqual(sorted(folder.pk for folder in loaded), ids)

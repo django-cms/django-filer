@@ -1,16 +1,13 @@
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
-from django.db import connections
 from django.utils.http import urlencode
 
 from .. import settings
 from ..models import File, Folder
-from ..models.foldermodels import PERMISSION_BATCH_SIZE
+from ..utils.queries import filter_in_batches
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
-# Cap IN lists on backends that declare no parameter limit, e.g. PostgreSQL.
-BATCH_SIZE = PERMISSION_BATCH_SIZE
 
 
 def check_files_edit_permissions(request, files):
@@ -112,15 +109,6 @@ def attach_ancestors(folders):
             if folder.parent_id is not None:
                 folder.parent = known[folder.parent_id]
         level = loaded
-
-
-def filter_in_batches(queryset, field, ids):
-    # Stay below the database's query parameter limit, e.g. 999 on SQLite.
-    ids = list(ids)
-    max_params = connections[queryset.db].features.max_query_params
-    batch_size = min(BATCH_SIZE, max_params or BATCH_SIZE)
-    for offset in range(0, len(ids), batch_size):
-        yield from queryset.filter(**{f'{field}__in': ids[offset:offset + batch_size]})
 
 
 def userperms_for_request(item, request):
