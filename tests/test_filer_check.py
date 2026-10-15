@@ -1,11 +1,16 @@
+import gc
 import os
 import shutil
 import tempfile
+import weakref
 from io import BytesIO, StringIO
+from unittest.mock import patch
 
 from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.db.models.signals import post_init
 from django.test import TestCase
 from django.utils.module_loading import import_string
 
@@ -73,6 +78,17 @@ class FilerCheckTestCase(TestCase):
         call_command('filer_check', delete_missing=True, interactive=False, verbosity=0)
         with self.assertRaises(File.DoesNotExist):
             File.objects.get(id=file_pk)
+
+    def test_missing_verbose_messages(self):
+        os.remove(self.filer_file.file.path)
+        out = StringIO()
+        call_command('filer_check', stdout=out, missing=True, verbosity=3)
+        self.assertEqual("File reference 'None/testimage.jpg' is missing in storage.\n", out.getvalue())
+
+        out = StringIO()
+        call_command('filer_check', stdout=out, delete_missing=True, interactive=False, verbosity=3)
+        self.assertEqual("Deleted missing file reference 'None/testimage.jpg' from the database.\n", out.getvalue())
+        self.assertFalse(File.objects.filter(pk=self.filer_file.pk).exists())
 
     def test_delete_orphans_public(self):
         # First check - should be empty initially
@@ -283,3 +299,48 @@ class FilerCheckTestCase(TestCase):
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
         self.assertGreater(self.filer_image._width, 0)
+
+
+COLLECT_EVERY = 50
+
+
+class VerifyReferencesMemoryTests(TestCase):
+    # Both sizes exceed one iterator chunk (Django's default is 2000 rows).
+    SMALL = 2500
+    LARGE = 5000
+
+    def peak_live_files(self, count):
+        File.objects.bulk_create([File(original_filename=f'f{index}.txt', file=f'f{index}.txt') for index in range(count)])
+        live = peak = 0
+
+        def created(sender, instance, **kwargs):
+            nonlocal live, peak
+            if not isinstance(instance, File):
+                return
+
+            live += 1
+            weakref.finalize(instance, released)
+            # FieldFile references its instance, so freed rows need the
+            # cycle collector before they stop counting as live.
+            if live % COLLECT_EVERY == 0:
+                gc.collect()
+            peak = max(peak, live)
+
+        def released():
+            nonlocal live
+            live -= 1
+
+        post_init.connect(created, weak=False)
+        try:
+            # Every file exists, so the command keeps no file for reporting.
+            with patch.object(FileSystemStorage, 'exists', return_value=True):
+                call_command('filer_check', stdout=StringIO(), missing=True)
+        finally:
+            post_init.disconnect(created)
+        File.objects.all().delete()
+        return peak
+
+    def test_scan_memory_is_bounded(self):
+        small = self.peak_live_files(self.SMALL)
+        large = self.peak_live_files(self.LARGE)
+        self.assertLessEqual(large, small)

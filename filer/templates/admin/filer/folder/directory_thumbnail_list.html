@@ -50,7 +50,7 @@
                             <a class="insertlink insertlinkButton js-dismiss-popup js-dismiss-folder"
                                 href="#"
                                 data-file-id="{{ subfolder.pk|safe }}"
-                                data-label="{{ subfolder.quoted_logical_path }}">
+                                data-label="{{ subfolder.pretty_logical_path }}">
                                 &nbsp;
                             </a>
                         {% elif action_form and item.pk and not is_popup %}

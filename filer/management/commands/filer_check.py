@@ -91,19 +91,24 @@ class Command(BaseCommand):
         Checks that every file reference in the database exists in storage.
         If a file is missing, either report it or delete the reference based on the provided options.
         """
-        for file in File.objects.all():
-            if not file.file.storage.exists(file.file.name):
-                if options['delete_missing']:
-                    file.delete()
-                    verbose_msg = f"Deleted missing file reference '{file.folder}/{file}' from the database."
-                else:
-                    verbose_msg = f"File reference '{file.folder}/{file}' is missing in storage."
-                if options.get('verbosity', 1) > 2:
-                    self.stdout.write(verbose_msg + "\n")
-                    self.stdout.flush()
-                elif options.get('verbosity'):
-                    self.stdout.write(os.path.join(str(file.folder), str(file)) + "\n")
-                    self.stdout.flush()
+        # Stream the scan to keep memory flat, and only change rows after it,
+        # so nothing is written while the cursor over the table is open.
+        missing = [
+            file for file in File.objects.all().iterator()
+            if not file.file.storage.exists(file.file.name)
+        ]
+        for file in missing:
+            if options['delete_missing']:
+                file.delete()
+                verbose_msg = f"Deleted missing file reference '{file.folder}/{file}' from the database."
+            else:
+                verbose_msg = f"File reference '{file.folder}/{file}' is missing in storage."
+            if options.get('verbosity', 1) > 2:
+                self.stdout.write(verbose_msg + "\n")
+                self.stdout.flush()
+            elif options.get('verbosity'):
+                self.stdout.write(os.path.join(str(file.folder), str(file)) + "\n")
+                self.stdout.flush()
 
     def verify_storages(self, options):
         """
