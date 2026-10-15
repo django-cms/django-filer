@@ -977,7 +977,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
         # We do not allow moving to selected folders or their descendants
-        excluded = set() if allow_self else set(folders_queryset.values_list('pk', flat=True))
+        excluded = set() if allow_self else {folder.pk for folder in folders_queryset}
 
         # Load visible folders one level at a time, so queries grow with depth.
         level = list(self.get_queryset(request).filter(parent__isnull=True).order_by('name'))

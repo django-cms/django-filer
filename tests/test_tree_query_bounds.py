@@ -354,6 +354,18 @@ class DestinationFolderTests(TestCase):
 
         self.assertEqual(counts[SMALL_WIDTH], counts[LARGE_WIDTH])
 
+    def test_destination_accepts_lists(self):
+        root = Folder.objects.create(name='root')
+        selected = Folder.objects.create(name='selected', parent=root)
+        Folder.objects.create(name='excluded child', parent=selected)
+        self.grant(root, can_read=FolderPermission.ALLOW)
+        request = RequestFactory().post('/')
+        request.user = self.user
+
+        choices = self.folder_admin._list_all_destination_folders(request, [selected], None, False)
+
+        self.assertEqual([folder.pk for folder, _ in choices], [root.pk])
+
 
 class ActionTreeTests(TestCase):
     def setUp(self):

@@ -5,6 +5,12 @@ CHANGELOG
 unreleased
 ==========
 
+* Compatibility: ``FolderAdmin._list_all_destination_folders`` continues to
+  accept lists as well as querysets. Its private recursive helper now takes
+  ``(request, current_folder, children, folders, allow_self, level)``;
+  ``children`` is a mapping of parent ids to preloaded child folders and replaces
+  the old ``folders_queryset`` argument. Subclass overrides must be updated.
+
 * fix: Thumbnails picked through the file widget popup showed as broken images when
   their URL contained a hyphen, e.g. UUID paths on S3 storage. ``file_icon_url`` JS-escaped
   the URL although it is only used in an HTML ``data-`` attribute, turning ``-`` into
