@@ -1,3 +1,4 @@
+import gc
 import io
 import weakref
 from types import SimpleNamespace
@@ -475,6 +476,8 @@ class ActionTreeTests(TestCase):
 
         def track(cls, *args, **kwargs):
             nonlocal peak
+            # Discard unreachable formatter cycles; count only retained files.
+            gc.collect()
             obj = from_db(*args, **kwargs)
             live[obj.pk] = obj
             peak = max(peak, len(live))
