@@ -858,8 +858,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     self.log_deletions(request, folders_queryset)
                     folders_queryset.delete()
                 else:
+                    # Log every path before deleting a selected ancestor.
                     for f in folders_queryset:
                         self.log_deletion(request, f, force_str(f))
+                    for f in folders_queryset:
                         f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {"count": n, })
             # Return None to display the change list page again.

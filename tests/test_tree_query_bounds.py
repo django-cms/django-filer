@@ -521,6 +521,8 @@ class ActionTreeTests(TestCase):
         files = list(File.objects.filter(folder__name__startswith='delete batches '))
         file_ids = {file_obj.pk for file_obj in files}
         selected = Folder.objects.filter(pk=root.pk) | Folder.objects.filter(parent=root)
+        selected = selected.order_by('pk')
+        expected_folders = {str(folder.pk): str(folder) for folder in selected.all()}
         request = self.request()
         request.POST = request.POST.copy()
         request.POST['post'] = 'yes'
@@ -538,6 +540,9 @@ class ActionTreeTests(TestCase):
         for file_obj in files:
             self.assertFalse(file_obj.file.storage.exists(file_obj.file.name))
         self.assertEqual(LogEntry.objects.filter(action_flag=DELETION, content_type__model='file').count(), len(files))
+        folder_logs = LogEntry.objects.filter(action_flag=DELETION, content_type__model='folder')
+        self.assertEqual(dict(folder_logs.values_list('object_id', 'object_repr')), expected_folders)
+        self.assertFalse(Folder.objects.filter(pk__in=expected_folders).exists())
 
     @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
     def test_public_overlap_once(self):
