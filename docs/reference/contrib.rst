@@ -34,7 +34,8 @@ model with its own icon.
 
 Not an app in its own right — it holds ``ImageFileModel``, the concrete model carrying
 ``width``, ``height``, the crop box (``crop_x``, ``crop_y``, ``crop_size``) and ``gravity``,
-plus the cropping geometry shared by the backends below.
+plus the cropping geometry shared by the backends below. It also detects the provenance of
+uploaded images, see :doc:`../explanation/image-provenance`.
 
 ``finder.contrib.image.pil``
     ``image/avif``, ``image/gif``, ``image/jpeg``, ``image/png``, ``image/webp``. Uses

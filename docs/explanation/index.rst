@@ -14,4 +14,5 @@ so that you can predict how it will behave in situations nobody wrote a guide fo
    ambits
    permissions
    thumbnails-and-samples
+   image-provenance
    user-interface

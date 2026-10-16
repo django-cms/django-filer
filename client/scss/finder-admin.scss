@@ -617,6 +617,11 @@ ul.messagelist {
 						overflow: hidden;
 						padding-right: 1rem;
 					}
+
+					> .inode-origin {
+						display: block;
+						color: var(--body-quiet-color);
+					}
 				}
 
 				.file-tags {

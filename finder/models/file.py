@@ -152,6 +152,14 @@ class AbstractFileModel(InodeModel):
         from finder.forms.file import FileForm
         return FileForm
 
+    @classmethod
+    def get_provenance_query(cls, provenance):
+        """
+        Return the query filtering files by the given provenance values (`ai`, `c2pa`).
+        Only images carry provenance, hence other files never match.
+        """
+        return models.Q(pk__isnull=True)
+
     @property
     def file_path(self):
         return f'{self.id}/{self.file_name}'

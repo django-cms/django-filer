@@ -35,6 +35,17 @@ ambits exclusively with ``manage.py finder`` — see :doc:`../how-to/manage-ambi
 The setting is read only while that migration is applied, not on every ``migrate``.
 
 
+``FINDER_PROVENANCE_FILTER``
+============================
+
+:Default: ``False``
+
+Whether the filter menu of the admin and of the file select dialog offers to list only images
+created or edited using generative AI, or only images uploaded with C2PA Content Credentials.
+Provenance is detected, stored and shown regardless of this setting — see
+:doc:`../explanation/image-provenance`.
+
+
 ``FINDER_PAYLOAD_VALIDATORS``
 =============================
 

@@ -14,6 +14,11 @@ FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'public'
 # `finder.management.create_default_ambit`, so that tests can override it.
 
 
+# FINDER_PROVENANCE_FILTER (default False) offers to filter the files list by image provenance:
+# images created or edited using generative AI, and images uploaded with C2PA Content
+# Credentials. It is read at call time by `finder.lookups.is_provenance_filter_enabled`, so that
+# tests can override it. Provenance is detected and stored regardless of this setting.
+
 # FINDER_STAFF_ONLY (default True) makes every access control entry grant nothing to a
 # signed in user who is not staff, whether the entry names that user, one of their groups
 # or everyone. The browser endpoints are reachable outside the admin, because the

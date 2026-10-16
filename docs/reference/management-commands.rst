@@ -29,6 +29,10 @@ Management commands
 ``reorder <slug>``
     Recompute the ``ordering`` value of every file in every folder of the ambit.
 
+``detect-provenance [--dry-run]``
+    Detect the provenance — IPTC digital source type and C2PA Content Credentials — of images
+    uploaded before django-finder recorded it. See :doc:`../explanation/image-provenance`.
+
 See :doc:`../how-to/manage-ambits`.
 
 

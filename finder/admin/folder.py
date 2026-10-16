@@ -17,7 +17,12 @@ from django.utils.html import format_html
 from django.utils.translation import gettext
 
 from finder.admin.inode import InodeAdmin
-from finder.lookups import lookup_by_read_permission, lookup_by_tag
+from finder.lookups import (
+    is_provenance_filter_enabled,
+    lookup_by_provenance,
+    lookup_by_read_permission,
+    lookup_by_tag,
+)
 from finder.models.fields import FinderBaseModelField
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, RENAMED_SUFFIX
@@ -167,6 +172,7 @@ class FolderAdmin(InodeAdmin):
             menu_extensions=self.get_menu_extension_settings(request),
             folder_url=folder_url,
             ancestors=ancestors,
+            provenance_filter=is_provenance_filter_enabled(),
             open_folder_icon_url=staticfiles_storage.url('finder/icons/folder-open.svg'),
         )
         return settings
@@ -211,6 +217,7 @@ class FolderAdmin(InodeAdmin):
         lookup = lookup_by_read_permission(request)
         if not current_folder.is_trash:  # pragma: no branch
             lookup.update(lookup_by_tag(request))
+            lookup.update(lookup_by_provenance(request))
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query, **lookup)
         else:
@@ -379,7 +386,7 @@ class FolderAdmin(InodeAdmin):
             inode_ids = [id for id in inode_ids if id in reorderable_inode_ids]  # preserve the order of inode_ids
         with transaction.atomic():
             target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
-        lookup = {**lookup_by_tag(request), **lookup_by_read_permission(request)}
+        lookup = {**lookup_by_tag(request), **lookup_by_provenance(request), **lookup_by_read_permission(request)}
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_inode.parent, **lookup)),
         })
