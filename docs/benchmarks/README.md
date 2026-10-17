@@ -4,10 +4,15 @@ The query and tree harnesses compare committed source snapshots using the
 project's test settings, an in-memory SQLite database, a local-memory cache,
 and synthetic base `File` records without storage or thumbnail I/O.
 
-The latest matrix was measured on 2026-10-15 against baseline `a011dbd5` and
-PR revision `4a2255f1`. Both harnesses use this same baseline. No earlier timings
+The latest matrix was measured on 2026-10-18 against baseline `a011dbd5` and
+PR revision `16a0d96c`. Both harnesses use this same baseline. No earlier timings
 are reused. Python 3.12 versus 3.14 is compared on Django 5.2; Django 5.2 versus
 6.0 is compared on Python 3.14.
+
+The later `5f3afb5f` commit only adds an explicit `return None` to a tree
+helper. That helper compiles to identical instruction bytecode on Python 3.12
+and 3.14 (source-location metadata differs). Timings remain attributed to
+`16a0d96c`, the source snapshot actually measured.
 
 | Configuration | Python | Django | SQLite |
 |---|---|---|---|
@@ -30,7 +35,7 @@ raw results. Repeat for both `query_scaling.py` and `tree_scaling.py`.
 ```sh
 bench_dir=$(mktemp -d)
 before=$(git rev-parse a011dbd5)
-after=$(git rev-parse 4a2255f1)
+after=$(git rev-parse 16a0d96c)
 mkdir "$bench_dir/before" "$bench_dir/after"
 git archive "$before" | tar -x -C "$bench_dir/before"
 git archive "$after" | tar -x -C "$bench_dir/after"
@@ -70,7 +75,7 @@ preparation are outside timings. Each case rolls back its database transaction.
 
 Duplicate workloads consume every returned group. Mostly-unique cases contain
 one two-file duplicate group and unique digests for all remaining files. The new
-implementation returns concrete groups from one SQL query for base `File`
+implementation returns evaluated querysets from one SQL query for base `File`
 records; polymorphic subclasses can add subtype queries. Aggregation still
 scans/groups database values, so this does not establish index performance.
 
@@ -85,8 +90,9 @@ concurrency, production database latency, real image subclasses, and storage I/O
 Single-root traversal issues one query per level, including the leaf lookup, plus
 the permission query; 100 folders require 101 queries. Overlapping grants can
 finish in two queries when all folders are roots and fit in one batch. Repeated
-empty permission results are recomputed to preserve compatibility. Timing ratios
-below 1 represent slowdowns and are retained in the tables.
+empty permission results are recomputed to preserve compatibility. Repeated empty-result checks are 16–22% slower in this rerun, with unchanged
+SQL counts (0.82–0.86×). Timing ratios below 1 represent slowdowns and are
+retained in the tables.
 
 ## Recorded query results
 
@@ -96,27 +102,27 @@ all samples, model counts, environment versions, and output fingerprints.
 
 | Workload | Size | Python 3.12.15 / Django 5.2.18 | Python 3.14.8 / Django 5.2.18 | Python 3.14.8 / Django 6.0.9 | SQL queries |
 |---|---:|---:|---:|---:|---:|
-| Rendered file listing, page 1 | 100 | 34.27 → 34.70 (0.99×) | 35.53 → 36.80 (0.97×) | 35.86 → 36.54 (0.98×) | 4 → 5 |
-| Rendered file listing, page 1 | 1,000 | 62.18 → 35.17 (1.77×) | 71.41 → 36.66 (1.95×) | 69.84 → 36.93 (1.89×) | 4 → 5 |
-| Rendered file listing, page 1 | 10,000 | 367.02 → 36.98 (9.93×) | 414.24 → 38.19 (10.85×) | 412.66 → 38.61 (10.69×) | 4 → 5 |
-| Rendered file search, page 1 | 100 | 34.22 → 34.97 (0.98×) | 35.93 → 36.54 (0.98×) | 35.83 → 36.83 (0.97×) | 4 → 5 |
-| Rendered file search, page 1 | 1,000 | 61.65 → 35.20 (1.75×) | 70.13 → 36.96 (1.90×) | 68.41 → 37.95 (1.80×) | 4 → 5 |
-| Rendered file search, page 1 | 10,000 | 351.26 → 37.61 (9.34×) | 416.97 → 40.13 (10.39×) | 393.28 → 39.69 (9.91×) | 4 → 5 |
-| Rendered folder counts | 25 | 21.06 → 14.78 (1.42×) | 21.49 → 14.99 (1.43×) | 21.53 → 15.05 (1.43×) | 54 → 5 |
-| Rendered folder counts | 100 | 52.82 → 29.15 (1.81×) | 55.76 → 29.70 (1.88×) | 56.08 → 29.98 (1.87×) | 204 → 5 |
-| Overlapping grants at every level, cold | 25 | 46.03 → 0.46 (100.50×) | 52.14 → 0.51 (103.24×) | 51.43 → 0.51 (99.89×) | 351 → 2 |
-| Overlapping grants at every level, cold | 50 | 174.72 → 0.51 (339.81×) | 197.93 → 0.56 (356.39×) | 195.35 → 0.56 (346.75×) | 1,326 → 2 |
-| Overlapping grants at every level, cold | 100 | 680.66 → 0.62 (1100.65×) | 766.20 → 0.68 (1126.77×) | 761.74 → 0.68 (1114.61×) | 5,151 → 2 |
-| Single root grant, cold | 25 | 3.73 → 3.34 (1.12×) | 4.20 → 3.68 (1.14×) | 4.17 → 3.71 (1.12×) | 27 → 26 |
-| Single root grant, cold | 50 | 6.95 → 6.37 (1.09×) | 7.90 → 7.04 (1.12×) | 7.83 → 7.15 (1.10×) | 52 → 51 |
-| Single root grant, cold | 100 | 14.38 → 12.46 (1.15×) | 15.46 → 13.75 (1.12×) | 15.29 → 13.88 (1.10×) | 102 → 101 |
-| Repeated empty permission checks | 100 | 24.75 → 25.80 (0.96×) | 27.85 → 28.25 (0.99×) | 27.75 → 28.24 (0.98×) | 100 → 100 |
-| Repeated empty permission checks | 1,000 | 247.65 → 257.22 (0.96×) | 279.12 → 280.84 (0.99×) | 278.28 → 281.56 (0.99×) | 1,000 → 1,000 |
-| Duplicate group, consumed | 100 | 68.86 → 1.02 (67.69×) | 83.23 → 1.17 (70.87×) | 82.46 → 1.19 (69.49×) | 101 → 1 |
-| Duplicate group, consumed | 200 | 266.13 → 1.67 (159.67×) | 303.87 → 1.91 (158.87×) | 299.78 → 1.92 (156.42×) | 201 → 1 |
-| Duplicate group, consumed | 400 | 1031.48 → 2.92 (352.89×) | 1142.77 → 3.43 (333.32×) | 1146.00 → 3.41 (336.38×) | 401 → 1 |
-| Mostly unique SHA1s, one two-file group | 100 | 12.48 → 0.41 (30.65×) | 14.30 → 0.44 (32.25×) | 14.41 → 0.45 (32.18×) | 101 → 1 |
-| Mostly unique SHA1s, one two-file group | 400 | 52.80 → 0.49 (108.30×) | 60.11 → 0.53 (113.84×) | 60.34 → 0.54 (112.31×) | 401 → 1 |
+| Rendered file listing, page 1 | 100 | 34.18 → 35.71 (0.96×) | 37.07 → 37.01 (1.00×) | 35.51 → 39.39 (0.90×) | 4 → 5 |
+| Rendered file listing, page 1 | 1,000 | 62.49 → 36.44 (1.71×) | 71.84 → 36.72 (1.96×) | 71.54 → 37.11 (1.93×) | 4 → 5 |
+| Rendered file listing, page 1 | 10,000 | 370.57 → 38.37 (9.66×) | 416.36 → 38.45 (10.83×) | 428.20 → 38.05 (11.25×) | 4 → 5 |
+| Rendered file search, page 1 | 100 | 34.18 → 36.02 (0.95×) | 37.85 → 36.89 (1.03×) | 36.26 → 36.56 (0.99×) | 4 → 5 |
+| Rendered file search, page 1 | 1,000 | 61.97 → 37.12 (1.67×) | 71.29 → 37.23 (1.91×) | 67.83 → 37.09 (1.83×) | 4 → 5 |
+| Rendered file search, page 1 | 10,000 | 364.42 → 37.84 (9.63×) | 425.17 → 39.43 (10.78×) | 411.99 → 39.28 (10.49×) | 4 → 5 |
+| Rendered folder counts | 25 | 21.04 → 15.01 (1.40×) | 23.19 → 15.04 (1.54×) | 23.00 → 15.13 (1.52×) | 54 → 5 |
+| Rendered folder counts | 100 | 53.76 → 30.59 (1.76×) | 57.72 → 29.85 (1.93×) | 57.51 → 30.71 (1.87×) | 204 → 5 |
+| Overlapping grants at every level, cold | 25 | 45.78 → 0.50 (91.02×) | 52.15 → 0.54 (97.33×) | 52.39 → 0.54 (97.53×) | 351 → 2 |
+| Overlapping grants at every level, cold | 50 | 173.71 → 0.54 (323.36×) | 198.57 → 0.59 (337.65×) | 196.95 → 0.59 (334.15×) | 1,326 → 2 |
+| Overlapping grants at every level, cold | 100 | 693.28 → 0.65 (1072.84×) | 773.37 → 0.71 (1086.00×) | 763.77 → 0.71 (1077.57×) | 5,151 → 2 |
+| Single root grant, cold | 25 | 3.70 → 2.68 (1.38×) | 4.21 → 2.96 (1.42×) | 4.18 → 2.95 (1.42×) | 27 → 26 |
+| Single root grant, cold | 50 | 6.91 → 4.97 (1.39×) | 7.93 → 5.53 (1.43×) | 7.85 → 5.51 (1.43×) | 52 → 51 |
+| Single root grant, cold | 100 | 14.34 → 9.68 (1.48×) | 15.53 → 10.66 (1.46×) | 15.62 → 10.66 (1.46×) | 102 → 101 |
+| Repeated empty permission checks | 100 | 24.68 → 30.10 (0.82×) | 27.97 → 32.78 (0.85×) | 28.16 → 33.14 (0.85×) | 100 → 100 |
+| Repeated empty permission checks | 1,000 | 249.40 → 300.14 (0.83×) | 279.75 → 327.03 (0.86×) | 284.05 → 328.76 (0.86×) | 1,000 → 1,000 |
+| Duplicate group, consumed | 100 | 69.86 → 1.05 (66.50×) | 82.78 → 1.21 (68.37×) | 84.10 → 1.21 (69.77×) | 101 → 1 |
+| Duplicate group, consumed | 200 | 270.03 → 1.70 (158.91×) | 302.05 → 1.94 (155.94×) | 304.74 → 1.94 (157.06×) | 201 → 1 |
+| Duplicate group, consumed | 400 | 1073.19 → 3.04 (353.00×) | 1155.19 → 3.44 (336.09×) | 1155.20 → 3.55 (325.55×) | 401 → 1 |
+| Mostly unique SHA1s, one two-file group | 100 | 12.52 → 0.46 (27.01×) | 14.38 → 0.48 (30.14×) | 14.26 → 0.48 (29.95×) | 101 → 1 |
+| Mostly unique SHA1s, one two-file group | 400 | 53.10 → 0.56 (94.12×) | 60.21 → 0.56 (107.16×) | 59.92 → 0.57 (105.20×) | 401 → 1 |
 
 ## Tree and search workloads
 
@@ -136,19 +142,19 @@ for all samples, environment versions, and output fingerprints.
 
 | Workload | Size | Python 3.12.15 / Django 5.2.18 | Python 3.14.8 / Django 5.2.18 | Python 3.14.8 / Django 6.0.9 | SQL queries |
 |---|---:|---:|---:|---:|---:|
-| Descendant IDs of root | 50 | 13.27 → 0.58 (22.88×) | 14.89 → 0.63 (23.70×) | 14.68 → 0.62 (23.64×) | 101 → 3 |
-| Descendant IDs of root | 200 | 52.14 → 1.12 (46.68×) | 59.05 → 1.21 (48.96×) | 58.60 → 1.20 (48.99×) | 401 → 3 |
-| Search limited to root folder | 50 | 48.17 → 33.68 (1.43×) | 51.74 → 35.01 (1.48×) | 53.35 → 34.60 (1.54×) | 107 → 9 |
-| Search limited to root folder | 200 | 99.36 → 31.59 (3.15×) | 112.20 → 32.33 (3.47×) | 110.94 → 33.88 (3.27×) | 407 → 8 |
-| Folder edit permission check | 50 | 44.32 → 5.08 (8.73×) | 49.87 → 5.71 (8.73×) | 49.92 → 5.64 (8.85×) | 308 → 13 |
-| Folder edit permission check | 200 | 173.47 → 15.76 (11.01×) | 197.92 → 18.13 (10.91×) | 196.84 → 17.96 (10.96×) | 1,208 → 13 |
-| Copy/move destination choices | 50 | 44.34 → 5.63 (7.88×) | 49.92 → 6.24 (8.00×) | 49.87 → 6.17 (8.08×) | 311 → 15 |
-| Copy/move destination choices | 200 | 175.33 → 18.90 (9.28×) | 197.60 → 20.83 (9.49×) | 195.89 → 20.64 (9.49×) | 1,211 → 15 |
-| Rendered delete confirmation | 50 | 56.37 → 24.52 (2.30×) | 62.13 → 26.57 (2.34×) | 62.24 → 26.43 (2.35×) | 273 → 27 |
-| Rendered delete confirmation | 200 | 191.66 → 62.32 (3.08×) | 215.13 → 68.97 (3.12×) | 214.37 → 70.79 (3.03×) | 1,023 → 27 |
-| Copy/move confirmation listing | 50 | 34.24 → 6.81 (5.03×) | 38.19 → 7.51 (5.09×) | 38.09 → 7.50 (5.08×) | 204 → 8 |
-| Copy/move confirmation listing | 200 | 134.52 → 23.41 (5.75×) | 150.14 → 25.78 (5.82×) | 150.47 → 25.42 (5.92×) | 804 → 8 |
-| Rendered search as staff user | 25 | 21.50 → 18.77 (1.15×) | 21.87 → 19.13 (1.14×) | 22.08 → 19.20 (1.15×) | 36 → 10 |
-| Rendered search as staff user | 100 | 49.02 → 37.68 (1.30×) | 51.87 → 41.05 (1.26×) | 51.61 → 39.17 (1.32×) | 111 → 10 |
-| Pick-folder popup search | 25 | 22.65 → 13.96 (1.62×) | 23.62 → 13.91 (1.70×) | 23.52 → 13.79 (1.71×) | 83 → 10 |
-| Pick-folder popup search | 100 | 65.45 → 29.73 (2.20×) | 70.79 → 30.27 (2.34×) | 69.04 → 29.84 (2.31×) | 308 → 10 |
+| Descendant IDs of root | 50 | 13.22 → 0.52 (25.20×) | 14.89 → 0.57 (26.19×) | 14.70 → 0.57 (25.67×) | 101 → 3 |
+| Descendant IDs of root | 200 | 52.28 → 1.08 (48.26×) | 59.16 → 1.15 (51.31×) | 58.58 → 1.16 (50.60×) | 401 → 3 |
+| Search limited to root folder | 50 | 48.89 → 33.67 (1.45×) | 51.99 → 35.72 (1.46×) | 51.90 → 34.92 (1.49×) | 107 → 9 |
+| Search limited to root folder | 200 | 99.35 → 31.64 (3.14×) | 112.62 → 32.50 (3.47×) | 110.51 → 33.77 (3.27×) | 407 → 8 |
+| Folder edit permission check | 50 | 44.49 → 5.35 (8.31×) | 50.19 → 6.28 (7.99×) | 49.63 → 5.84 (8.50×) | 308 → 13 |
+| Folder edit permission check | 200 | 177.37 → 16.22 (10.93×) | 198.14 → 18.12 (10.94×) | 196.75 → 18.27 (10.77×) | 1,208 → 13 |
+| Copy/move destination choices | 50 | 44.40 → 5.61 (7.92×) | 50.23 → 6.13 (8.19×) | 49.66 → 6.13 (8.10×) | 311 → 15 |
+| Copy/move destination choices | 200 | 175.79 → 18.94 (9.28×) | 198.26 → 20.59 (9.63×) | 198.25 → 20.65 (9.60×) | 1,211 → 15 |
+| Rendered delete confirmation | 50 | 59.48 → 24.73 (2.41×) | 62.36 → 26.55 (2.35×) | 62.89 → 27.09 (2.32×) | 273 → 27 |
+| Rendered delete confirmation | 200 | 191.28 → 63.05 (3.03×) | 215.20 → 70.23 (3.06×) | 215.85 → 70.22 (3.07×) | 1,023 → 27 |
+| Copy/move confirmation listing | 50 | 34.22 → 6.90 (4.96×) | 38.48 → 7.60 (5.06×) | 38.29 → 7.38 (5.19×) | 204 → 8 |
+| Copy/move confirmation listing | 200 | 135.88 → 23.67 (5.74×) | 150.49 → 25.57 (5.88×) | 151.48 → 26.32 (5.75×) | 804 → 8 |
+| Rendered search as staff user | 25 | 23.19 → 19.14 (1.21×) | 22.12 → 19.48 (1.14×) | 22.25 → 19.43 (1.15×) | 36 → 10 |
+| Rendered search as staff user | 100 | 50.69 → 38.22 (1.33×) | 53.69 → 40.16 (1.34×) | 52.39 → 39.78 (1.32×) | 111 → 10 |
+| Pick-folder popup search | 25 | 22.78 → 14.74 (1.55×) | 23.78 → 14.05 (1.69×) | 23.77 → 14.05 (1.69×) | 83 → 10 |
+| Pick-folder popup search | 100 | 68.80 → 32.81 (2.10×) | 71.27 → 30.18 (2.36×) | 71.23 → 30.09 (2.37×) | 308 → 10 |
