@@ -66,6 +66,7 @@ def walk_folder_levels(folders, accept=None):
         child.parent = level[child.parent_id]
         if accept is None or accept(child):
             return child.pk, child
+        return None
 
     roots = {folder.pk: folder for folder in folders if accept is None or accept(folder)}
     yield from _walk_folder_levels(roots, Folder.objects.all(), link)
