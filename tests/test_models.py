@@ -50,6 +50,16 @@ class DuplicateQueryTests(TestCase):
         self.assertCountEqual(duplicates['first'], files[3:5])
         self.assertCountEqual(duplicates['second'], files[5:7])
 
+    def test_groups_are_querysets(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1='first', _file_size=1) for index in range(3)
+        ])
+        group = File.objects.find_all_duplicates()['first']
+
+        self.assertEqual(group.count(), 3)
+        group.exclude(pk=files[0].pk).delete()
+        self.assertEqual(list(File.objects.values_list('pk', flat=True)), [files[0].pk])
+
     def test_groups_are_snapshots(self):
         files = File.objects.bulk_create([
             File(name=str(index), sha1=digest, _file_size=1)

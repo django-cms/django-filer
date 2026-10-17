@@ -35,6 +35,17 @@ class DirectoryPaginationTests(TestCase):
         ])
         self.url = reverse('admin:filer-directory_listing', args=(self.parent.pk,))
 
+    def test_ties_break_on_pk(self):
+        # Without a unique last key, OFFSET pages may overlap on equal names.
+        for params in ({}, {'order_by': 'owner'}, {'order_by': ''}, {'order_by': 'bogus'}, {'q': 'file'}):
+            with self.subTest(params=params):
+                response = self.client.get(self.url, params)
+                self.assertEqual(response.context['folder_children'].query.order_by[-1], 'pk')
+                self.assertEqual(response.context['folder_files'].query.order_by[-1], 'pk')
+                if params.get('order_by') != 'owner':
+                    # Without a valid sort, files fall back to the display name.
+                    self.assertEqual(len(response.context['folder_files'].query.order_by), 2)
+
     def test_only_page_materialized(self):
         loaded = []
 

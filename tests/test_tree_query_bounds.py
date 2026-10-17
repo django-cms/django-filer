@@ -29,6 +29,7 @@ from filer.cache import clear_folder_permission_cache
 from filer.models import Clipboard, File, Folder, FolderPermission
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
+from filer.utils.queries import chunked_by_pk
 from tests.helpers import create_image, create_superuser
 
 
@@ -416,6 +417,30 @@ class ActionTreeTests(TestCase):
         root = self.build('listed', SMALL_WIDTH)
         self.assertEqual(self.move_listing(root), [self.label(root), self.expected_tree(root)])
 
+    def test_move_listing_shows_nested_selection(self):
+        # Actions process a selected descendant twice, so the preview lists it twice.
+        root = self.build('nested', SMALL_WIDTH)
+        child = Folder.objects.filter(parent=root).order_by('name').first()
+        listing = self.folder_admin._list_all_to_copy_or_move(
+            self.request(), File.objects.none(), Folder.objects.filter(pk__in=(root.pk, child.pk)).order_by('name'),
+        )
+        self.assertEqual(listing, [
+            self.label(root), self.expected_tree(root),
+            self.label(child), self.expected_tree(child),
+        ])
+
+    def test_preview_ancestors_follow_depth(self):
+        # Selected folders share ancestors loaded once per level, not per folder.
+        # Build both trees first so the destination list is the same for each run.
+        roots = {width: self.build(f'selected {width}', width) for width in (SMALL_WIDTH, LARGE_WIDTH)}
+        reads = {}
+        for width, root in roots.items():
+            selection = Folder.objects.filter(parent__parent=root)
+            reads[width] = self.folder_reads(lambda: self.folder_admin.copy_files_and_folders(
+                self.request(), File.objects.none(), selection,
+            ))
+        self.assertEqual(reads[SMALL_WIDTH], reads[LARGE_WIDTH])
+
     def test_move_listing_queries_follow_depth(self):
         counts = {}
         for width in (SMALL_WIDTH, LARGE_WIDTH):
@@ -490,7 +515,7 @@ class ActionTreeTests(TestCase):
 
     def test_preview_checks_once(self):
         root = self.build('checked preview', 2)
-        for action in ('copy_files_and_folders', 'move_files_and_folders', 'resize_images'):
+        for action in ('copy_files_and_folders', 'move_files_and_folders', 'rename_files', 'resize_images'):
             with self.subTest(action=action), CaptureQueriesContext(connection) as queries:
                 getattr(self.folder_admin, action)(
                     self.request(), File.objects.none(), Folder.objects.filter(pk=root.pk),
@@ -546,6 +571,29 @@ class ActionTreeTests(TestCase):
         folder_logs = LogEntry.objects.filter(action_flag=DELETION, content_type__model='folder')
         self.assertEqual(dict(folder_logs.values_list('object_id', 'object_repr')), expected_folders)
         self.assertFalse(Folder.objects.filter(pk__in=expected_folders).exists())
+
+    def test_delete_bounds_files_per_folder(self):
+        # A single large folder must not be loaded at once either.
+        root = Folder.objects.create(name='crowded')
+        File.objects.bulk_create([File(folder=root, name=str(index), _file_size=1) for index in range(25)])
+        request = self.request()
+        request.POST = request.POST.copy()
+        request.POST['post'] = 'yes'
+        sizes = []
+
+        def record(*args, **kwargs):
+            for chunk in chunked_by_pk(*args, **kwargs):
+                sizes.append(len(chunk))
+                yield chunk
+
+        with patch('filer.utils.queries.QUERY_BATCH_SIZE', 2), \
+                patch('filer.admin.folderadmin.chunked_by_pk', record):
+            self.folder_admin.delete_files_or_folders(request, File.objects.none(), Folder.objects.filter(pk=root.pk))
+
+        self.assertEqual(sum(sizes), 25)
+        self.assertLessEqual(max(sizes), 2)
+        self.assertFalse(File.objects.filter(folder_id=root.pk).exists())
+        self.assertEqual(LogEntry.objects.filter(action_flag=DELETION, content_type__model='file').count(), 25)
 
     @patch.object(filer_settings, 'FILER_ENABLE_PERMISSIONS', True)
     def test_public_overlap_once(self):

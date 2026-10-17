@@ -4,7 +4,7 @@ from django.utils.http import urlencode
 
 from .. import settings
 from ..utils.queries import filter_in_batches
-from ..utils.tree import walk_tree_levels
+from ..utils.tree import walk_folder_levels as _walk_folder_levels
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
@@ -62,14 +62,13 @@ def walk_folder_levels(folders, accept=None):
     """Walk visible folders, pruning rejected subtrees and sharing parents."""
     from ..models import Folder
 
-    def children(level):
-        for child in filter_in_batches(Folder.objects.order_by('name'), 'parent_id', level):
-            child.parent = level[child.parent_id]
-            if accept is None or accept(child):
-                yield child.pk, child
+    def link(child, level):
+        child.parent = level[child.parent_id]
+        if accept is None or accept(child):
+            return child.pk, child
 
     roots = {folder.pk: folder for folder in folders if accept is None or accept(folder)}
-    yield from walk_tree_levels(roots, children)
+    yield from _walk_folder_levels(roots, Folder.objects.all(), link)
 
 
 def walk_subtrees(folders):

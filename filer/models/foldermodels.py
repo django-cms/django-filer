@@ -11,26 +11,23 @@ from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
-from ..utils.queries import filter_in_batches
-from ..utils.tree import walk_tree_levels
+from ..utils.tree import walk_folder_levels
 from . import mixins
 
 
 def _descendant_rows(roots):
     # Yield (id, parent_id) below the given subtrees, one query per level.
     # Children come by name, and overlapping subtrees are visited once.
-    def children(level):
-        yield from filter_in_batches(
-            Folder.objects.order_by('name').values_list('id', 'parent_id'), 'parent_id', level,
-        )
-
-    levels = walk_tree_levels(dict.fromkeys(roots), children)
+    levels = walk_folder_levels(
+        dict.fromkeys(roots), Folder.objects.values_list('id', 'parent_id'), lambda row, level: row,
+    )
     next(levels, None)  # Roots are included by the walker, but are not descendants.
     for level in levels:
         yield from level.items()
 
 
-def _descendant_ids(roots):
+def subtree_ids(roots):
+    """Return the ids of the given folders and of all their descendants."""
     return set(roots) | {pk for pk, _ in _descendant_rows(roots)}
 
 
@@ -90,7 +87,7 @@ class FolderPermissionManager(models.Manager):
                 id_lists[grant].update(Folder.objects.order_by().values_list('id', flat=True).iterator())
                 continue
 
-            id_lists[grant].update(_descendant_ids(roots))
+            id_lists[grant].update(subtree_ids(roots))
 
         # Deny has precedence over allow
         id_list = id_lists[FolderPermission.ALLOW] - id_lists[FolderPermission.DENY]

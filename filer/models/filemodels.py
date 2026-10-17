@@ -39,9 +39,16 @@ class FileManager(PolymorphicManager):
             .annotate(total=Count('pk')).filter(total__gt=1)
             .values_list('sha1', flat=True)
         )
-        duplicates = {}
+        groups = {}
         for file_obj in self.filter(sha1__in=digests).order_by('sha1', 'pk'):
-            duplicates.setdefault(file_obj.sha1, []).append(file_obj)
+            groups.setdefault(file_obj.sha1, []).append(file_obj)
+        # Keep returning evaluated querysets, as callers may filter or delete them.
+        duplicates = {}
+        for sha1, files in groups.items():
+            queryset = self.filter(sha1=sha1).order_by('pk')
+            queryset._result_cache = files
+            queryset._prefetch_done = True
+            duplicates[sha1] = queryset
         return duplicates
 
     def find_duplicates(self, file_obj):
