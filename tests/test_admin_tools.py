@@ -1,5 +1,8 @@
 """Tests for filer.admin.tools."""
 
+import subprocess
+import sys
+
 from django.test import RequestFactory, TestCase
 
 from filer.admin.tools import (
@@ -14,6 +17,8 @@ from filer.admin.tools import (
     popup_status,
     userperms_for_request,
 )
+from filer.models import Folder
+from tests.helpers import create_superuser
 
 
 class CheckPermissionTests(TestCase):
@@ -39,21 +44,21 @@ class CheckPermissionTests(TestCase):
         with self.assertRaises(PermissionDenied):
             check_files_read_permissions(None, [mock_file])
 
+    def folder_request(self):
+        # The tree walk loads children and files, so it needs saved folders.
+        folder = Folder.objects.create(name='parent')
+        Folder.objects.create(name='child', parent=folder)
+        request = RequestFactory().post('/')
+        request.user = create_superuser()
+        return request, folder
+
     def test_check_folder_edit_permissions_passes(self):
-        mock_folder = type('obj', (), {
-            'has_edit_permission': lambda self, r: True,
-            'files': [],
-            'children': type('obj', (), {'all': lambda self: []})(),
-        })()
-        check_folder_edit_permissions(None, [mock_folder])
+        request, folder = self.folder_request()
+        check_folder_edit_permissions(request, [folder])
 
     def test_check_folder_read_permissions_passes(self):
-        mock_folder = type('obj', (), {
-            'has_read_permission': lambda self, r: True,
-            'files': [],
-            'children': type('obj', (), {'all': lambda self: []})(),
-        })()
-        check_folder_read_permissions(None, [mock_folder])
+        request, folder = self.folder_request()
+        check_folder_read_permissions(request, [folder])
 
 
 class UserPermsForRequestTests(TestCase):
@@ -190,3 +195,17 @@ class AdminContextTests(TestCase):
         request = self.factory.get('/')
         ctx = AdminContext(request)
         self.assertEqual(ctx['pick'], '')
+
+
+class ImportSafetyTests(TestCase):
+    def test_import_before_app_setup(self):
+        # Isolate this helper: filer.admin.__init__ already requires the registry.
+        code = (
+            'from django.conf import settings; '
+            "settings.configure(DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3'}}); "
+            "import importlib.util; "
+            "spec = importlib.util.spec_from_file_location('filer.admin.tools', 'filer/admin/tools.py'); "
+            "spec.loader.exec_module(importlib.util.module_from_spec(spec))"
+        )
+        result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)

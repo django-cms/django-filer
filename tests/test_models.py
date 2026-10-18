@@ -19,6 +19,84 @@ from tests.helpers import create_clipboard_item, create_folder_structure, create
 Image = load_model(FILER_IMAGE_MODEL)
 
 
+class DuplicateQueryTests(TestCase):
+    def test_duplicate_group_queries(self):
+        for size in (5, 20):
+            with self.subTest(size=size):
+                File.objects.all().delete()
+                digest = str(size).zfill(40)
+                files = File.objects.bulk_create([
+                    File(name=f'file-{index}', sha1=digest, _file_size=1)
+                    for index in range(size)
+                ])
+
+                # Discovery also materializes groups, without one query per digest.
+                with self.assertNumQueries(1):
+                    duplicates = File.objects.find_all_duplicates()
+                    self.assertEqual(list(duplicates), [digest])
+
+                with self.assertNumQueries(0):
+                    self.assertCountEqual(duplicates[digest], files)
+
+    def test_duplicate_groups_match(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1=digest, _file_size=1)
+            for index, digest in enumerate(('', '', 'unique', 'first', 'first', 'second', 'second'))
+        ])
+
+        duplicates = File.objects.find_all_duplicates()
+
+        self.assertCountEqual(duplicates, ['first', 'second'])
+        self.assertCountEqual(duplicates['first'], files[3:5])
+        self.assertCountEqual(duplicates['second'], files[5:7])
+
+    def test_groups_are_querysets(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1='first', _file_size=1) for index in range(3)
+        ])
+        group = File.objects.find_all_duplicates()['first']
+
+        self.assertEqual(group.count(), 3)
+        group.exclude(pk=files[0].pk).delete()
+        self.assertEqual(list(File.objects.values_list('pk', flat=True)), [files[0].pk])
+
+    def test_groups_are_snapshots(self):
+        files = File.objects.bulk_create([
+            File(name=str(index), sha1=digest, _file_size=1)
+            for index, digest in enumerate(('first', 'first', 'second', 'second'))
+        ])
+        duplicates = File.objects.find_all_duplicates()
+        File.objects.filter(pk=files[0].pk).update(sha1='changed')
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(duplicates['first'], files[:2])
+            self.assertCountEqual(duplicates['second'], files[2:])
+
+    def test_mostly_unique_digests(self):
+        for size in (20, 100):
+            with self.subTest(size=size):
+                File.objects.all().delete()
+                File.objects.bulk_create([
+                    File(name=str(index), sha1=str(index).zfill(40), _file_size=1)
+                    for index in range(size)
+                ])
+                with self.assertNumQueries(1):
+                    self.assertEqual(File.objects.find_all_duplicates(), {})
+
+    def test_duplicates_keep_subtypes(self):
+        digest = 'a' * 40
+        file = File.objects.create(name='file', _file_size=1)
+        image = Image.objects.create(name='image', _file_size=1)
+        File.objects.filter(pk__in=(file.pk, image.pk)).update(sha1=digest, _file_size=1)
+
+        duplicates = File.objects.find_all_duplicates()
+
+        matches = {item.pk: item for item in duplicates[digest]}
+        self.assertEqual(set(matches), {file.pk, image.pk})
+        self.assertIsInstance(matches[file.pk], File)
+        self.assertIsInstance(matches[image.pk], Image)
+
+
 class FilerApiTests(TestCase):
 
     def setUp(self):

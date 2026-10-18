@@ -9,10 +9,12 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
+from django.core.cache import cache
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.template import Context, Template
@@ -131,17 +133,49 @@ class FilerFolderAdminUrlsTests(TestCase):
         # Polymorphic resolves content types once per process: warm that cache so
         # that the query count does not depend on which tests ran before
         self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             # Expected queries:
             # 1. Authentication check
-            # 2. Loading directory data and thumbnails (1 query)
-            # 3. Selecting file and owner data
+            # 2. Count files without materializing the directory
+            # 3. Load the page and thumbnail annotations
+            # 4. Select polymorphic image and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
         self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
         self.assertContains(response, "/media/my-preferred-base-url-for-thumbnails/")
         for thumbnail_url in thumbnail_urls:
             self.assertContains(response, thumbnail_url)
+
+    def test_folder_counts_batched(self):
+        parent = Folder.objects.create(name='parent')
+        populated = Folder.objects.create(name='populated', parent=parent)
+        empty = Folder.objects.create(name='empty', parent=parent)
+        Folder.objects.bulk_create([
+            Folder(name=f'child-{index}', parent=populated) for index in range(2)
+        ])
+        File.objects.bulk_create([
+            File(name=f'file-{index}', folder=populated) for index in range(3)
+        ])
+        request = RequestFactory().get('/')
+        request.user = self.superuser
+        request.session = {}
+        folder_admin = admin.site._registry[Folder]
+
+        for query in ('', 'p', 'empty'):
+            with self.subTest(query=query):
+                request.GET = request.GET.copy()
+                request.GET['q'] = query
+                response = folder_admin.directory_listing(request, parent.pk)
+                folders = list(response.context_data['folder_children'])
+
+                # Counts must be available without per-folder queries, including search.
+                with self.assertNumQueries(0):
+                    counts = {folder.pk: (folder.children_count, folder.file_count) for folder in folders}
+
+                if query != 'empty':
+                    self.assertEqual(counts[populated.pk], (2, 3))
+                if query != 'p':
+                    self.assertEqual(counts[empty.pk], (0, 0))
 
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
@@ -1501,6 +1535,21 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         })
         self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
 
+    def test_delete_folders_action_logs_folders(self):
+        url = reverse('admin:filer-directory_listing', args=(self.folder.id,))
+        self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % self.sub_folder1.id],
+        })
+
+        # Selected folders must be logged, not only their files.
+        self.assertTrue(LogEntry.objects.filter(
+            action_flag=DELETION,
+            content_type__model='folder',
+            object_id=str(self.sub_folder1.id),
+        ).exists())
+
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
     # TODO: Test recursive (files and folders tree) processing.
@@ -1589,6 +1638,8 @@ class PermissionAdminTest(TestCase):
 class FolderListingTest(TestCase):
 
     def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
         superuser = create_superuser()
         self.staff_user = User.objects.create_user(
             username='joe', password='x', email='joe@mata.com')

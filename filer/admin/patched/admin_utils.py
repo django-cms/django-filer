@@ -117,6 +117,7 @@ class NestedObjects(Collector):
         seen.add(obj)
         children = []
         for child in self.edges.get(obj, ()):
+            self._share_source(obj, child)
             children.extend(self._nested(child, seen, format_callback))
         if format_callback:
             ret = [format_callback(obj)]
@@ -125,6 +126,16 @@ class NestedObjects(Collector):
         if children:
             ret.append(children)
         return ret
+
+    def _share_source(self, source, child):
+        # Point the child's foreign key at the collected source, so labels
+        # that walk ancestors (e.g. folder paths) reuse already loaded rows.
+        for field in child._meta.concrete_fields:
+            if not field.many_to_one or not isinstance(source, field.related_model):
+                continue
+
+            if getattr(child, field.attname) == getattr(source, field.target_field.attname):
+                field.set_cached_value(child, source)
 
     def nested(self, format_callback=None):
         """
