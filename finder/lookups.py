@@ -38,8 +38,8 @@ def lookup_by_tag(request):
                     elif value is False:
                         exclude_tags.append(int(key))
                     # non-Booleans are ignored
-        except ValueError:
-            pass
+        except (AttributeError, ValueError):
+            request.COOKIES.pop('django-finder-filter')
         if include_tags:
             lookup['tags__in'] = include_tags
         if exclude_tags:
