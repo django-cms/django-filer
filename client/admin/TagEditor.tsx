@@ -17,7 +17,7 @@ const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const newTagInputRef = useRef<HTMLInputElement>(null);
-	const [tags, setTags] = useState(settings.tags ?? []);
+	const [tags, setTags] = useState(settings.label_tags ?? []);
 	const [newTag, setNewTag] = useState({label: '', color: '#f0f0f0'});
 	const [isOpen, setIsOpen] = useState(false);
 	const [offset, setOffset] = useState({x: 0, y: 0});
@@ -55,12 +55,12 @@ const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 				'X-CSRFToken': settings.csrf_token,
 			},
 			body: JSON.stringify({
-				tags: tagsList,
+				label_tags: tagsList,
 			}),
 		});
 		if (response.ok) {
 			const body = await response.json();
-			setTags(body['tags']);
+			setTags(body['label_tags']);
 			dismissDialog();
 		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
 			alert(await response.text());

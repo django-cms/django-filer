@@ -10,6 +10,7 @@ import ffmpeg
 from finder.models.file import FileModel
 from finder.storages import copy_to_local
 
+
 SAMPLE_DURATION = 5
 
 logger = getLogger(__name__)
@@ -50,7 +51,7 @@ class VideoFileModel(FileModel):
                 with open(outpath, 'rb') as outfile:
                     ambit.sample_storage.save(sample_path, outfile)
             except Exception as exc:
-                logger.warning(f"Sample generation failed for video file {self.pk}: {exc}")
+                logger.warning(f"Sample generation failed for video file {self.id}: {exc}")
                 return
             finally:
                 unlink(outpath)

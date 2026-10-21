@@ -1,6 +1,8 @@
-from finder.models.inode import InodeManager
-from finder.models.filetag import FileTag
+import json
+
+from finder.models.filetag import LabelTag
 from finder.models.folder import FolderModel
+from finder.models.inode import InodeManager
 
 
 def annotate_unified_queryset(ambit, queryset):
@@ -8,12 +10,12 @@ def annotate_unified_queryset(ambit, queryset):
     Annotates the given queryset with additional fields for the frontend.
     This step must be applied after filtering and sorting.
     """
-    tags = FileTag.objects.values_list('id', 'label', 'color')
     folders = {
-        folder.pk: folder for folder in FolderModel.objects.with_child_counts(
+        folder.id: folder for folder in FolderModel.objects.with_child_counts(
             InodeManager.get_proxy_object(entry) for entry in queryset if entry['is_folder']
         )
     }
+    label_tags = {str(lt['id']): lt for lt in LabelTag.objects.values('id', 'label', 'color')}
     for entry in queryset:
         proxy_obj = folders[entry['id']] if entry['is_folder'] else InodeManager.get_proxy_object(entry)
         entry.update(
@@ -25,23 +27,29 @@ def annotate_unified_queryset(ambit, queryset):
             folderitem_component=proxy_obj.folderitem_component,
         )
         if tag_ids := entry.pop('tag_ids', None):
-            tag_ids = list(map(int, tag_ids.split(',')))
-            entry['tags'] = [
-                {'id': id, 'label': label, 'color': color}
-                for id, label, color in tags if id in tag_ids
-            ]
+            entry['label_tags'] = [label_tags[id] for id in tag_ids if id in label_tags]
         entry.pop('name_lower', None)  # only used for searching
 
 
 def lookup_by_tag(request):
     lookup = {}
     if filter := request.COOKIES.get('django-finder-filter'):
-        allowed_tags = FileTag.objects.values_list('id', flat=True)
+        allowed_tags = LabelTag.objects.values_list('id', flat=True)
+        include_tags, exclude_tags = [], []
         try:
-            if tag_ids := [int(v) for v in filter.split(',') if int(v) in allowed_tags]:
-                lookup['tags__in'] = tag_ids
-        except ValueError:
-            pass
+            for key, value in json.loads(filter).items():
+                if int(key) in allowed_tags:
+                    if value is True:
+                        include_tags.append(int(key))
+                    elif value is False:
+                        exclude_tags.append(int(key))
+                    # non-Booleans are ignored
+        except (AttributeError, ValueError):
+            request.COOKIES.pop('django-finder-filter')
+        if include_tags:
+            lookup['tags__in'] = include_tags
+        if exclude_tags:
+            lookup['tags__not_in'] = exclude_tags
     return lookup
 
 

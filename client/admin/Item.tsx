@@ -4,8 +4,7 @@ import FinderSettings from './FinderSettings';
 import DroppableArea from './DroppableArea';
 import {useSearchParam} from './SearchField';
 import {useSorting} from '../common/SortingOptions';
-import {useFilter} from '../common/FilterByTag';
-import FileTags from '../common/FileTags';
+import {LabelTags, useFilter} from '../common/LabelTags';
 import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
@@ -28,11 +27,11 @@ export function DraggableItem(props) {
 	});
 	const [event, setEvent] = useState<PointerEvent>(null);
 	const [sorting] = useSorting();
-	const [filter] = useFilter();
+	const [filtered] = useFilter();
 	const [searchQuery] = useSearchParam('q');
 	const ReOrdering = useMemo(() => {
 		return (props) => {
-			if (sortingDisabled || searchQuery || sorting || filter.some(v => v))
+			if (sortingDisabled || searchQuery || sorting || Object.keys(filtered).length)
 				return <div className="reordering"></div>;
 			return (
 				<DroppableArea
@@ -201,9 +200,9 @@ export function ListItem(props) {
 			return (
 				<figure className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FileTags tags={props.tags}>
+						<LabelTags tags={props.label_tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FileTags>
+						</LabelTags>
 					</FigBody>
 					<figcaption>
 						<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -218,9 +217,9 @@ export function ListItem(props) {
 					<TooltipTrigger>
 						<div className={`figure${readonly ? ' readonly' : ''}`}>
 							<FigBody {...props}>
-								<FileTags tags={props.tags}>
+								<LabelTags tags={props.label_tags}>
 									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-								</FileTags>
+								</LabelTags>
 							</FigBody>
 						</div>
 					</TooltipTrigger>
@@ -231,9 +230,9 @@ export function ListItem(props) {
 			return (<>
 				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FileTags tags={props.tags}>
+						<LabelTags tags={props.label_tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FileTags>
+						</LabelTags>
 					</FigBody>
 				</div>
 				<div>
@@ -255,9 +254,9 @@ export function ListItem(props) {
 			return (<>
 				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FileTags tags={props.tags}>
+						<LabelTags tags={props.label_tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FileTags>
+						</LabelTags>
 					</FigBody>
 				</div>
 				<div>
@@ -272,9 +271,9 @@ export function ListItem(props) {
 					<TooltipTrigger>
 						<div className={`figure${readonly ? ' readonly' : ''}`}>
 							<FigBody {...props}>
-								<FileTags tags={props.tags}>
+								<LabelTags tags={props.label_tags}>
 									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-								</FileTags>
+								</LabelTags>
 							</FigBody>
 						</div>
 					</TooltipTrigger>

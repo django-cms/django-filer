@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "django-finder"
+name = "django-file-finder"
 dynamic = ["version"]
 authors = [
     {name = "Jacob Rief", email = "jacob.rief@gmail.com"},
@@ -12,7 +12,7 @@ maintainers = [
     {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
 ]
 description = "A media asset management application for Django."
-readme = "README-finder.rst"
+readme = "README-finder.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 dependencies = [
@@ -111,6 +111,7 @@ exclude = [
     "data",
     "dist",
     "docs",
+    "finder/migrations",
     "*migrations*",
     "tmp",
     "node_modules",
@@ -121,6 +122,7 @@ ignore = ["E251", "E128", "E501", "W503"]
 line_length = 119
 skip = [
     "manage.py",
+    "finder/migrations",
     "*migrations*",
     ".env",
     ".venv",
@@ -144,4 +146,4 @@ known_django = ["django"]
 
 [tool.ruff]
 src = ["finder", "filer"]
-exclude = ["*/migrations/*"]
+exclude = ["finder/migrations", "*/migrations/*"]

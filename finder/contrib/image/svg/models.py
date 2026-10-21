@@ -33,7 +33,7 @@ class SVGImageModel(ImageFileModel):
             # A document stating its size in relative units only cannot be
             # measured without rendering it. It keeps its unset dimensions and
             # is shown with a generic icon.
-            logger.warning(f"Reading the dimensions of SVG file {self.pk} failed: {exc}")
+            logger.warning(f"Reading the dimensions of SVG file {self.id} failed: {exc}")
         else:
             self.width, self.height = round(width), round(height)
             if 'update_fields' in kwargs:

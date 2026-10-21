@@ -3,7 +3,7 @@ import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 
 
 export default function DropDownMenu(props) {
-	const {disabled} = props;
+	const {disabled, ariaSelected} = props;
 	const ref = useRef(null);
 	const WrapperElement = props.wrapperElement ?? 'li';
 
@@ -48,6 +48,7 @@ export default function DropDownMenu(props) {
 			aria-haspopup="listbox"
 			aria-expanded="false"
 			aria-disabled={disabled ? 'true' : 'false'}
+			aria-selected={ariaSelected}
 			className={props.className}
 		>{
 		props.tooltip ? (

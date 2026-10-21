@@ -1,5 +1,6 @@
 @use "colors";
 @use "volume-control";
+@use "checkbox";
 
 @mixin menubar {
 	[role~="menubar"] {
@@ -41,12 +42,12 @@
 
 			&.search-field {
 				display: inline-flex;
-				width: calc(100% - 400px);
+				flex-grow: 2;
+				min-width: 100px;
 				max-width: 400px;
 
 				> input {
 					width: calc(100% - 48px);
-					min-width: 100px;
 					height: 100%;
 					display: block;
 					margin: 0;
@@ -67,7 +68,7 @@
 						border-left: none;
 						border-top-right-radius: 5px;
 						border-bottom-right-radius: 5px;
-						padding: 0 5px 0 10px;
+						padding: 0 5px 0 5px;
 
 						span {
 							color: colors.$body-fg-color;
@@ -172,5 +173,7 @@
 				margin-left: 0.5rem;
 			}
 		}
+
+		@include checkbox.tristate-checkbox;
 	}
 }
