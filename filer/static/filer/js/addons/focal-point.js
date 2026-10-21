@@ -77,6 +77,7 @@ window.Cl = window.Cl || {};
             this._onMouseDown = this._onMouseDown.bind(this);
             this._onMouseMove = this._onMouseMove.bind(this);
             this._onMouseUp = this._onMouseUp.bind(this);
+            this._onKeyDown = this._onKeyDown.bind(this);
 
             if (!this.location) {
                 // Without a form field to write to, dragging the circle would
@@ -132,6 +133,39 @@ window.Cl = window.Cl || {};
             this.circle.classList.add(this.options.draggableClass);
             this.circle.addEventListener('mousedown', this._onMouseDown);
             this.circle.addEventListener('touchstart', this._onMouseDown, { passive: false });
+            // keyboard support: the circle can be focused and moved with the arrow keys
+            if (!this.circle.hasAttribute('tabindex')) {
+                this.circle.setAttribute('tabindex', '0');
+            }
+            this.circle.addEventListener('keydown', this._onKeyDown);
+        }
+
+        _onKeyDown(event) {
+            const keySteps = {
+                ArrowLeft: [-1, 0],
+                ArrowRight: [1, 0],
+                ArrowUp: [0, -1],
+                ArrowDown: [0, 1]
+            };
+            const step = keySteps[event.key];
+
+            if (!step) {
+                return;
+            }
+            event.preventDefault();
+
+            const distance = event.shiftKey ? 10 : 1;
+            const containerRect = this.container.getBoundingClientRect();
+            // the circle's left/top hold its center, see _onImageLoaded and _onMouseMove
+            let centerX = (parseFloat(this.circle.style.left) || 0) + step[0] * distance;
+            let centerY = (parseFloat(this.circle.style.top) || 0) + step[1] * distance;
+
+            centerX = Math.max(0, Math.min(containerRect.width - 1, centerX));
+            centerY = Math.max(0, Math.min(containerRect.height - 1, centerY));
+
+            this.circle.style.left = `${centerX}px`;
+            this.circle.style.top = `${centerY}px`;
+            this._updateLocationValue(centerX, centerY);
         }
 
         _onMouseDown(event) {
@@ -242,6 +276,7 @@ window.Cl = window.Cl || {};
             if (this.circle?.classList.contains(this.options.draggableClass)) {
                 this.circle.removeEventListener('mousedown', this._onMouseDown);
                 this.circle.removeEventListener('touchstart', this._onMouseDown);
+                this.circle.removeEventListener('keydown', this._onKeyDown);
             }
 
             document.removeEventListener('mousemove', this._onMouseMove);

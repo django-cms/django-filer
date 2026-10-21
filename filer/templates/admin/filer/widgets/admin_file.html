@@ -6,11 +6,11 @@
 
     <template class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
         <span class="filerFile">
-            <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
+            <div class="dz-thumbnail"><img class="quiet" alt="" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <a class="filerClearer" title="{% translate 'Clear' %}" href="#"
+            <a class="filerClearer" title="{% translate 'Clear' %}" aria-label="{% translate 'Clear' %}" href="#" role="button"
                  data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
-                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
+                <span class="fa fa-close filer-icon filer-icon-remove-selection" aria-hidden="true"></span>
             </a>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
@@ -22,13 +22,13 @@
          {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
-            <span class="icon filer-icon filer-icon-arrow-down fa fa-arrow-down"></span><span>{% translate "or drop your file here" %}</span>
+            <span class="icon filer-icon filer-icon-arrow-down fa fa-arrow-down" aria-hidden="true"></span><span>{% translate "or drop your file here" %}</span>
         </div>
 
         <span class="filerFile js-file-selector">
             {% if object %}
                 {% if object.file.exists %}
-                    <a href="{{ object.url }}" target="_blank">{% file_icon object detail="thumbnail" %}</a>
+                    <a href="{{ object.url }}" target="_blank" rel="noopener noreferrer" aria-label="{% blocktrans with object.label as item_label %}Open '{{ item_label }}' in a new window{% endblocktrans %}">{% file_icon object detail="thumbnail" %}</a>
                     &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
                     {% file_icon object %}
@@ -39,20 +39,20 @@
                 &nbsp;<span class="description_text"></span>
             {% endif %}
 
-            <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% translate 'Clear' %}"
-                 data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}" href="#">
-                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
+            <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% translate 'Clear' %}" aria-label="{% translate 'Clear' %}"
+                 data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}" href="#" role="button">
+                <span class="fa fa-close filer-icon filer-icon-remove-selection" aria-hidden="true"></span>
             </a>
 
             <a href="{{ change_url }}?_edit_from_widget=1" class="js-related-edit related-lookup {% if object %}related-lookup-change{% endif %} edit" id="{{ id }}_change"
                  title="{% translate 'Edit' %}">
-                  <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></span>
+                  <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-settings" aria-hidden="true"></span><span class="sr-only">{% translate 'Edit' %}</span></span>
             </a>
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% translate 'Lookup' %}">
-                <span class="choose-file"><span class="fa fa-search cms-icon cms-icon-search"></span>{% translate 'Choose File' %}</span>
-                <span class="replace-file"><span class="fa fa-search cms-icon cms-icon-search"></span></span>
+                <span class="choose-file"><span class="fa fa-search cms-icon cms-icon-search" aria-hidden="true"></span>{% translate 'Choose File' %}</span>
+                <span class="replace-file"><span class="fa fa-search cms-icon cms-icon-search" aria-hidden="true"></span><span class="sr-only">{% translate 'Choose File' %}</span></span>
             </a>
 
             <br>

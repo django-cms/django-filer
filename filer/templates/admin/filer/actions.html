@@ -8,9 +8,9 @@
         {% if paginator.count != paginated_items.object_list|length %}
             <span class="all">{{ selection_note_all }}</span>
             <span class="question">
-                <a href="javascript:;" title="{% translate 'Click here to select the objects across all pages' %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }} files and/or folders{% endblocktrans %}</a>
+                <a role="button" href="#" title="{% translate 'Click here to select the objects across all pages' %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }} files and/or folders{% endblocktrans %}</a>
             </span>
-            <span class="clear"><a href="javascript:;">{% translate "Clear selection" %}</a></span>
+            <span class="clear"><a role="button" href="#">{% translate "Clear selection" %}</a></span>
         {% endif %}
     {% endif %}
 </div>

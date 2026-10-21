@@ -110,6 +110,10 @@
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
+        &:focus-visible {
+            outline: 2px solid $color-primary;
+            outline-offset: -2px;
+        }
         transition: max-width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {

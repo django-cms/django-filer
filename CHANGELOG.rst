@@ -21,6 +21,31 @@ unreleased
   the URL although it is only used in an HTML ``data-`` attribute, turning ``-`` into
   ``\u002D`` (#1645).
 
+* fix: Accessibility of the admin UI.
+
+  * Dropdown menus work with the keyboard again: arrow keys, Space and Escape
+    raised an error (invalid ``:visible`` selector). Clicking the toggle of an
+    open menu now closes it instead of reopening it.
+  * Icon-only buttons and links (delete, copy, move, row actions, dropdown
+    toggles, list type switcher, widget clear/edit/lookup, popup pick links),
+    the search field and all selection checkboxes have accessible names.
+    Decorative icons are hidden from screen readers, all images have ``alt``
+    text, and duplicate icon links are skipped by keyboard navigation.
+  * The focal point can be moved with the arrow keys (Shift for larger steps).
+  * Upload progress, upload results and "URL copied" are announced to screen
+    readers.
+  * Error messages no longer disappear after 5 seconds. They are shown as alerts,
+    can be dismissed, and several errors are listed together. After a failed
+    upload, the folder listing reloads only once the errors have been dismissed.
+    Messages are no longer parsed as HTML.
+  * Disabled Upload/Copy/Move buttons are reachable by keyboard, explain why they
+    are disabled, and show their tooltip on focus as well as on hover.
+  * Visible focus outlines for the search field, the focal point and button-style
+    links, which are no longer underlined on focus or, with Django 6.1+, at rest.
+  * The listing page has a heading, the image expand view is a complete HTML
+    document with keyboard zoom, and animations respect
+    ``prefers-reduced-motion``.
+
 3.6.0 (2026-09-12)
 ==================
 

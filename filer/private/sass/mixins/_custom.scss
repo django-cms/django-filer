@@ -63,7 +63,8 @@
     &:active {
         background-image: none important($important);
     }
-    &[disabled] {
+    &[disabled],
+    &[aria-disabled="true"] {
         &,
         &:hover,
         &:focus,
@@ -126,7 +127,8 @@
         background-image: none important($important);
     }
     &.cms-btn-disabled,
-    &[disabled] {
+    &[disabled],
+    &[aria-disabled="true"] {
         &,
         &:hover,
         &:focus,

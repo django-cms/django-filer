@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { announce } from './announce.js';
+import { whenErrorsDismissed } from './error-dismissed.js';
 import { getCsrfToken } from './csrf.js';
 
 
@@ -131,6 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         submitNum++;
                         maxSubmitNum++;
                         updateUploadNumber();
+                        if (uploadText && uploadNumber) {
+                            announce(`${uploadText.textContent.trim()} ${uploadNumber.textContent}`);
+                        }
                         done();
                     }
 
@@ -248,12 +253,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (uploadNumber) {
                             uploadNumber.classList.add(hiddenClass);
                         }
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                        // keep the errors on screen until the user has read and dismissed them
+                        whenErrorsDismissed(() => window.location.reload());
                     } else {
                         if (uploadSuccess) {
                             uploadSuccess.classList.remove(hiddenClass);
+                            announce(uploadSuccess.textContent);
                         }
                         window.location.reload();
                     }
@@ -280,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     cancelUpload.classList.add(hiddenClass);
                     if (uploadCanceled) {
                         uploadCanceled.classList.remove(hiddenClass);
+                        announce(uploadCanceled.textContent);
                     }
                     dropzoneInstance.removeAllFiles(true);
                 });

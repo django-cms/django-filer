@@ -2,7 +2,7 @@
 // #FOCAL POINT TEST#
 
 'use strict';
-/* globals fixture, describe, it, expect, beforeEach, afterEach, Cl, spyOn */
+/* globals fixture, describe, it, expect, beforeEach, afterEach, Cl, spyOn, KeyboardEvent */
 
 describe('Cl.FocalPoint', function () {
     var focalPoint;
@@ -61,6 +61,21 @@ describe('Cl.FocalPoint', function () {
         setTimeout(function () {
             expect(circle.classList.contains('hidden')).toBe(false);
             expect(location.value).toBe('100,200');
+            done();
+        }, 200);
+    });
+
+    it('can be focused and moved with the arrow keys', function (done) {
+        image.setAttribute('src', '/img/blank.png');
+
+        setTimeout(function () {
+            expect(circle.getAttribute('tabindex')).toBe('0');
+
+            circle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+            circle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', shiftKey: true, bubbles: true }));
+
+            // the image is shown at half size (ratio 2): 1px right is 2, 10px down is 20 in the original
+            expect(location.value).toBe('102,220');
             done();
         }, 200);
     });

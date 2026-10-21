@@ -1,5 +1,8 @@
-<html>
+{% load i18n %}{% get_current_language as LANGUAGE_CODE %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en-us' }}">
     <head>
+        <meta charset="utf-8">
+        <title>{{ label }}</title>
         <style>
             img {
                 cursor: zoom-out;
@@ -17,10 +20,21 @@
         </style>
     </head>
     <body style="margin: 0;">
-        <img id="img" src="{{ original_url }}" onclick="this.classList.toggle('zoom')"/>
+        <img id="img" src="{{ original_url }}" alt="{{ label }}" tabindex="0" role="button" aria-pressed="false"
+             title="{% translate 'Toggle zoom' %}"/>
         <script>
+            const img = document.getElementById('img');
+            const toggleZoom = function () {
+                img.setAttribute('aria-pressed', img.classList.toggle('zoom') ? 'true' : 'false');
+            };
+            img.addEventListener('click', toggleZoom);
+            img.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleZoom();
+                }
+            });
             setInterval(function () {
-                const img = document.getElementById('img')
                 document.body.classList.toggle('scrolling', img.naturalWidth >= document.body.clientWidth)
             }, 200);
         </script>

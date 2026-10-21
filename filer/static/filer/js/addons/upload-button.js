@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { announce } from './announce.js';
+import { whenErrorsDismissed } from './error-dismissed.js';
 import { getCsrfToken } from './csrf.js';
 
 /* globals Cl */
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadInfoContainer = document.querySelector('.js-filer-dropzone-upload-info-container');
     const uploadInfo = document.querySelector('.js-filer-dropzone-upload-info');
     const uploadNumber = document.querySelector('.js-filer-dropzone-upload-number');
+    const uploadText = document.querySelector('.js-filer-upload-text');
     const uploadFileNameSelector = '.js-filer-dropzone-file-name';
     const uploadProgressSelector = '.js-filer-dropzone-progress';
     const uploadSuccess = document.querySelector('.js-filer-dropzone-upload-success');
@@ -106,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateUploadNumber();
+        if (uploadNumber) {
+            announce(`${uploadText ? uploadText.textContent.trim() : ''} ${uploadNumber.textContent}`);
+        }
     });
 
     dropzone.on('uploadprogress', (file, progress) => {
@@ -168,12 +174,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (uploadCancel) {
                 uploadCancel.classList.add(hiddenClass);
             }
-            if (uploadSuccess) {
+            if (uploadSuccess && !hasErrors) {
                 uploadSuccess.classList.remove(hiddenClass);
+                announce(uploadSuccess.textContent);
             }
 
             if (hasErrors) {
-                setTimeout(reloadOrdered, 1000);
+                // keep the errors on screen until the user has read and dismissed them
+                whenErrorsDismissed(reloadOrdered);
             } else {
                 reloadOrdered();
             }
@@ -208,11 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (uploadCancel) {
                 uploadCancel.classList.add(hiddenClass);
             }
-            if (uploadSuccess) {
-                uploadSuccess.classList.remove(hiddenClass);
-            }
 
-            setTimeout(reloadOrdered, 1000);
+            whenErrorsDismissed(reloadOrdered);
         }
     });
 
@@ -228,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (uploadCanceled) {
                 uploadCanceled.classList.remove(hiddenClass);
+                announce(uploadCanceled.textContent);
             }
 
             setTimeout(() => {
