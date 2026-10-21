@@ -970,7 +970,7 @@ ul.messagelist {
 					cursor: not-allowed;
 				}
 				&.with-caret::after {
-					border-top-color: colors.$body-bg-color;
+					border-top-color: var(--button-fg);
 				}
 
 				i {
