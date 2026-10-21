@@ -7,13 +7,13 @@
                 <div class="text-left button-group">
                 {% if original.file.exists %}
                     <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}" rel="noopener noreferrer">
-                        <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
+                        <span class="icon fa fa-download filer-icon filer-icon-download" aria-hidden="true"></span>&nbsp;
                         <span>{% translate "Download" %}</span>
                     </a>
                     {% if expand_image_url %}
                         <a href="{{ expand_image_url }}" target="_blank" rel="noopener noreferrer" class="button">
                             <span>{% translate "Expand" %}</span>&nbsp;
-                            <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
+                            <span class="icon filer-icon filer-icon-expand fa fa-expand" aria-hidden="true"></span>
                         </a>
                     {% endif %}
                 {% else %}

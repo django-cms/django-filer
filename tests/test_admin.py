@@ -20,6 +20,7 @@ from django.http import HttpRequest, HttpResponseForbidden
 from django.template import Context, Template
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.html import escape
 
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
@@ -510,8 +511,10 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(url, self.file_object.get_admin_expand_view_url())
         self.assertContains(
             response,
-            f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
+            f"""<img id="img" src="{original_url}" alt="{escape(self.file_object.label)}" """
         )
+        self.assertContains(response, f"<title>{escape(self.file_object.label)}</title>")
+        self.assertContains(response, '<html lang="')
 
     def test_file_expand_view(self):
         """SVGs stored as File (not Image) have an expand view, too, see #1590"""
@@ -528,7 +531,7 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(url, file.get_admin_expand_view_url())
         self.assertContains(
             response,
-            f"""<img id="img" src="{file.url}" onclick="this.classList.toggle('zoom')"/>"""
+            f"""<img id="img" src="{file.url}" alt="{escape(file.label)}" """
         )
 
     def test_expand_view_requires_read_permission(self):

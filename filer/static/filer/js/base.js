@@ -6,6 +6,8 @@
 import Mediator from 'mediator-js/lib/mediator';
 import FocalPoint from './addons/focal-point';
 import Toggler from './addons/toggler';
+import { announce } from './addons/announce';
+import { errorDismissedEvent } from './addons/error-dismissed';
 
 window.Cl = window.Cl || {};
 Cl.mediator = new Mediator();  // mediator init
@@ -14,31 +16,59 @@ Cl.Toggler = Toggler;
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    let showErrorTimeout;
-
+    // Errors stay visible until the user dismisses them or the page reloads: removing
+    // them after a fixed delay does not leave everyone enough time to read them
+    // (WCAG 2.2.1). Several errors (e.g. from one upload batch) are listed together.
     window.filerShowError = (message) => {
-        const messages = document.querySelector('.messagelist');
         const header = document.querySelector('#header');
-        const filerErrorClass = 'js-filer-error';
-        const tpl = `<ul class="messagelist"><li class="error ${filerErrorClass}">{msg}</li></ul>`;
-        const msg = tpl.replace('{msg}', message);
+        const translate = window.gettext || ((text) => text);
+        const returnFocusTo = document.activeElement;
+        let list = document.querySelector('.messagelist');
 
-        if (messages) {
-            messages.outerHTML = msg;
-        } else if (header) {
-            header.insertAdjacentHTML('afterend', msg);
-        }
-
-        if (showErrorTimeout) {
-            clearTimeout(showErrorTimeout);
-        }
-
-        showErrorTimeout = setTimeout(() => {
-            const errorEl = document.querySelector(`.${filerErrorClass}`);
-            if (errorEl) {
-                errorEl.remove();
+        if (!list) {
+            list = document.createElement('ul');
+            list.className = 'messagelist';
+            if (header) {
+                header.after(list);
+            } else {
+                return;
             }
-        }, 5000);
+        }
+
+        const item = document.createElement('li');
+        const text = document.createElement('span');
+        const dismiss = document.createElement('button');
+
+        item.className = 'error js-filer-error';
+        item.setAttribute('role', 'alert');
+        // textContent: file names and server responses must not be parsed as HTML
+        text.textContent = message;
+        dismiss.type = 'button';
+        dismiss.className = 'filer-message-dismiss js-filer-message-dismiss';
+        dismiss.setAttribute('aria-label', translate('Dismiss'));
+        dismiss.title = translate('Dismiss');
+        dismiss.innerHTML = '<span aria-hidden="true">&times;</span>';
+        dismiss.addEventListener('click', () => {
+            item.remove();
+            if (!list.querySelector('li')) {
+                list.remove();
+            }
+
+            const nextError = document.querySelector('.js-filer-message-dismiss');
+            if (nextError) {
+                // keep keyboard users on the remaining errors
+                nextError.focus();
+            } else {
+                if (returnFocusTo && returnFocusTo !== document.body && returnFocusTo.isConnected) {
+                    returnFocusTo.focus();
+                }
+                document.dispatchEvent(new CustomEvent(errorDismissedEvent));
+            }
+        });
+
+        item.appendChild(text);
+        item.appendChild(dismiss);
+        list.appendChild(item);
     };
 
     const filterFiles = document.querySelector('.js-filter-files');
@@ -394,7 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             navigator.clipboard.writeText(url.href);
-            infobox.innerHTML = `<div class="info filer-tooltip">${msg}</div>`;
+            infobox.innerHTML = `<div class="info filer-tooltip" aria-hidden="true">${msg}</div>`;
+            announce(msg);
             this.classList.add('filer-tooltip-wrapper');
             this.appendChild(infobox.content.firstChild);
 

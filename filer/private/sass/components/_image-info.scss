@@ -185,12 +185,13 @@
         border-radius: 30px;
         cursor: move;
         background: rgba(255, 255, 255, 0.5);
+        &:focus-visible {
+            outline: 2px solid $color-primary;
+            outline-offset: 2px;
+        }
     }
     audio, video {
         margin-bottom: 15px;
-        &:focus {
-            outline: none;
-        }
     }
 }
 

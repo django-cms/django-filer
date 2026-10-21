@@ -231,7 +231,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             request,
             "admin/filer/image/expand.html",
             context={
-                "original_url": file.url
+                "original_url": file.url,
+                "label": file.label,
             },
         )
 
