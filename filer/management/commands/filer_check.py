@@ -154,8 +154,8 @@ class Command(BaseCommand):
         from django.db.models import Q
 
         import easy_thumbnails
-        from easy_thumbnails.VIL import Image as VILImage
 
+        from filer.utils import svg
         from filer.utils.compatibility import PILImage
 
         ImageModel = load_model(filer_settings.FILER_IMAGE_MODEL)
@@ -170,9 +170,10 @@ class Command(BaseCommand):
             except FileNotFoundError:
                 continue
             if image.file.name.lower().endswith('.svg'):
-                # For SVG files, use VILImage (invalid SVGs do not throw errors)
-                with VILImage.load(imgfile) as vil_image:
-                    image._width, image._height = vil_image.size
+                try:
+                    image._width, image._height = svg.get_dimensions(imgfile)
+                except ValueError:
+                    continue
             else:
                 try:
                     with PILImage.open(imgfile) as pil_image:

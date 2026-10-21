@@ -14,13 +14,16 @@ describe('Cl.Toggler', function () {
         fixture.setBase('frontend/fixtures');
         this.markup = fixture.load('toggler.html');
 
-        link = $('#link');
-        header = $('#header');
-        content = $('#content');
+        link = document.getElementById('link');
+        header = document.getElementById('header');
+        content = document.getElementById('content');
     });
 
     afterEach(function () {
-        toggler.destroy();
+        if (toggler) {
+            toggler.destroy();
+            toggler = null;
+        }
 
         link = null;
         header = null;
@@ -30,72 +33,109 @@ describe('Cl.Toggler', function () {
     });
 
     it('adds js-expanded class to the header if the content is visible', function () {
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(header).not.toHaveClass('js-collapsed');
-        expect(header).toHaveClass('js-expanded');
+        expect(header.classList.contains('js-collapsed')).toBe(false);
+        expect(header.classList.contains('js-expanded')).toBe(true);
     });
 
     it('adds js-collapsed class to the header if the content is hidden', function () {
-        content.addClass('hidden');
+        content.classList.add('hidden');
 
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(header).not.toHaveClass('js-expanded');
-        expect(header).toHaveClass('js-collapsed');
+        expect(header.classList.contains('js-expanded')).toBe(false);
+        expect(header.classList.contains('js-collapsed')).toBe(true);
     });
 
     it('adds js-expanded class to the link if the content is visible and there is no header', function () {
         header.remove();
 
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(link).not.toHaveClass('js-collapsed');
-        expect(link).toHaveClass('js-expanded');
+        expect(link.classList.contains('js-collapsed')).toBe(false);
+        expect(link.classList.contains('js-expanded')).toBe(true);
     });
 
     it('adds js-collapsed class to the link if the content is hidden and there is no header', function () {
         header.remove();
+        content.classList.add('hidden');
 
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(link).not.toHaveClass('js-collapsed');
-        expect(link).toHaveClass('js-expanded');
+        expect(link.classList.contains('js-expanded')).toBe(false);
+        expect(link.classList.contains('js-collapsed')).toBe(true);
     });
 
     it('toggles the content and header classes if the content was visible', function () {
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(header).not.toHaveClass('js-collapsed');
-        expect(header).toHaveClass('js-expanded');
+        expect(header.classList.contains('js-collapsed')).toBe(false);
+        expect(header.classList.contains('js-expanded')).toBe(true);
 
         link.click();
 
-        expect(header).not.toHaveClass('js-expanded');
-        expect(header).toHaveClass('js-collapsed');
+        expect(header.classList.contains('js-expanded')).toBe(false);
+        expect(header.classList.contains('js-collapsed')).toBe(true);
 
         link.click();
 
-        expect(header).not.toHaveClass('js-collapsed');
-        expect(header).toHaveClass('js-expanded');
+        expect(header.classList.contains('js-collapsed')).toBe(false);
+        expect(header.classList.contains('js-expanded')).toBe(true);
     });
 
     it('toggles the content and header classes if the content was hidden', function () {
-        content.addClass('hidden');
+        content.classList.add('hidden');
 
-        toggler = new Cl.Toggler();
+        toggler = new Cl.TogglerConstructor(link, {
+            dataHeaderSelector: 'togglerHeaderSelector',
+            dataContentSelector: 'togglerContentSelector',
+            collapsedClass: 'js-collapsed',
+            expandedClass: 'js-expanded',
+            hiddenClass: 'hidden'
+        });
 
-        expect(header).not.toHaveClass('js-expanded');
-        expect(header).toHaveClass('js-collapsed');
+        expect(header.classList.contains('js-expanded')).toBe(false);
+        expect(header.classList.contains('js-collapsed')).toBe(true);
 
         link.click();
 
-        expect(header).not.toHaveClass('js-collapsed');
-        expect(header).toHaveClass('js-expanded');
+        expect(header.classList.contains('js-collapsed')).toBe(false);
+        expect(header.classList.contains('js-expanded')).toBe(true);
 
         link.click();
 
-        expect(header).not.toHaveClass('js-expanded');
-        expect(header).toHaveClass('js-collapsed');
+        expect(header.classList.contains('js-expanded')).toBe(false);
+        expect(header.classList.contains('js-collapsed')).toBe(true);
     });
 });

@@ -1,8 +1,8 @@
 import json
 from functools import lru_cache
 
-from django.contrib import admin
-from django.contrib import messages
+from django import VERSION as DJANGO_VERSION
+from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -11,8 +11,8 @@ from django.db import transaction
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound,
-    HttpResponseRedirect, JsonResponse,
+    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect,
+    JsonResponse,
 )
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
@@ -143,7 +143,7 @@ class InodeAdmin(admin.ModelAdmin):
             acl_qs = DefaultAccessControlEntry.objects.filter(folder=current_inode)
         else:
             acl_qs = AccessControlEntry.objects.filter(inode=current_inode.id)
-        for ace in acl_qs:
+        for ace in acl_qs.select_related('user', 'group'):
             entry = ace.as_dict
             entry['is_current_user'] = entry['type'] == 'user' and entry['principal'] == current_user.id
             access_control_list.append(entry)
@@ -266,6 +266,7 @@ class InodeAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         context.update(
             breadcrumbs=self.get_breadcrumbs(obj),
+            list_breadcrumbs=DJANGO_VERSION >= (6, 1),
             finder_settings=self.get_editor_settings(request, obj),
         )
         return TemplateResponse(

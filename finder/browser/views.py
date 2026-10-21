@@ -1,21 +1,22 @@
 import logging
 
-from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.db.models import BooleanField, QuerySet, Subquery, Value
 from django.forms.renderers import DjangoTemplates
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_attribute
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
-from finder.models.folder import FolderModel
 from finder.models.filetag import LabelTag
+from finder.models.folder import FolderModel
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -51,13 +52,18 @@ class BrowserView(View):
             return HttpResponseForbidden(str(e))
         except ValidationError as e:
             return JsonResponse({'error': e.messages}, status=422)
-        except Exception as e:
+        except BadRequest as e:
             return HttpResponseBadRequest(str(e))
+        except Exception:
+            # the error text may name database tables, SQL or storage paths
+            logger.exception("Action “%s” of the finder browser failed.", self.action)
+            return HttpResponseBadRequest(gettext("The request could not be processed."))
 
     @classmethod
     def _get_children(cls, ambit, can_view_subquery, open_folders, parent):
         children = []
-        for subfolder in parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True):
+        subfolders = parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True)
+        for subfolder in FolderModel.objects.with_child_counts(subfolders):
             child = subfolder.as_dict(ambit)
             if str(subfolder.id) in open_folders:
                 child.update(
@@ -78,7 +84,10 @@ class BrowserView(View):
 
     def _get_inode(self, request, inode_id, privilege, **lookup):
         """
-        Look an inode up, refusing unless the caller holds `privilege` on its folder.
+        Look an inode up, refusing unless the caller holds `privilege` on it.
+
+        Access control entries are per inode, so a file is checked against its own list
+        rather than its folder's, the same way the admin does.
 
         Refused the same way as an unknown ambit, so that neither the existence of an
         inode nor the reason for the refusal can be read off the response.
@@ -88,7 +97,7 @@ class BrowserView(View):
         except ObjectDoesNotExist:
             logger.warning("No inode “%s”.", inode_id)
             raise
-        if not inode.folder.has_permission(request.user, privilege):
+        if not inode.has_permission(request.user, privilege):
             logger.warning("“%s” may not access inode “%s”.", request.user, inode_id)
             raise PermissionDenied(self.access_denied_message)
         return inode
@@ -251,10 +260,10 @@ class BrowserView(View):
             next_offset = None
 
         ambit = current_folder.get_ambit()
-        unified_queryset = sort_by_attribute(request, unified_queryset)
+        unified_queryset = sort_by_attribute(request, unified_queryset)[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': list(unified_queryset[offset:offset + self.limit]),
+            'files': list(unified_queryset),
             'has_upload_permission': current_folder.has_permission(request.user, Privilege.WRITE),
             'offset': next_offset,
             'recursive': recursive,
@@ -268,12 +277,19 @@ class BrowserView(View):
         """
         search_query = request.GET.get('q')
         if not search_query:
-            return HttpResponseBadRequest("No search query provided.")
+            raise BadRequest("No search query provided.")
         offset = int(request.GET.get('offset', 0))
-        starting_folder = FolderModel.objects.get(id=folder_id)
+        starting_folder = self._get_inode(request, folder_id, Privilege.READ)
+        if not starting_folder.is_folder:
+            raise PermissionDenied(self.access_denied_message)
         search_zone = request.COOKIES.get('django-finder-search-zone')
         if search_zone == 'everywhere':
+            # the zone comes from a client controlled cookie and moves the search to the
+            # root folder, hence the caller must be allowed to read that one too
             starting_folder = list(starting_folder.ancestors)[-1]
+            if not starting_folder.has_permission(request.user, Privilege.READ):
+                logger.warning("“%s” may not search from root folder “%s”.", request.user, starting_folder.id)
+                raise PermissionDenied(self.access_denied_message)
         if isinstance(starting_folder.descendants, QuerySet):  # pragma: with django-cte
             parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:  # pragma: without django-cte
@@ -283,15 +299,19 @@ class BrowserView(View):
         lookup = {
             'parent_id__in': parent_ids,
             'name_lower__icontains': search_query,
+            # the descendants may carry ACLs other than the starting folder's
+            'user': request.user,
+            'can_view': True,
         }
         unified_queryset = FileModel.objects.filter_unified(is_folder=False, **lookup)
         if offset + self.limit < unified_queryset.count():
             next_offset = offset + self.limit
         else:
             next_offset = None
+        unified_queryset = unified_queryset[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
-            'files': unified_queryset[offset:next_offset],
+            'files': list(unified_queryset),
             'offset': next_offset,
         }
 

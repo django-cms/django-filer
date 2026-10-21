@@ -1,10 +1,11 @@
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from PIL import ExifTags, Image
 
 from django.core.files.temp import NamedTemporaryFile
-from django.utils.timezone import datetime
 from django.utils.translation import gettext_lazy as _
+
+from PIL import ExifTags, Image
 
 from finder.contrib.image.models import ImageFileModel
 from finder.models.file import digest_sha1
@@ -56,7 +57,7 @@ class PILImageModel(ImageFileModel):
                 if key in self.exif_values and isinstance(value, (str, int, float, datetime)):
                     self.meta_data['exif'].setdefault(ExifTags.Base(key).name, value)
         except Exception as exc:
-            logger.warning(f"Sample generation failed for image file {self.pk}: {exc}")
+            logger.warning(f"Sample generation failed for image file {self.id}: {exc}")
         else:
             if 'update_fields' in kwargs:
                 kwargs['update_fields'].append('meta_data')

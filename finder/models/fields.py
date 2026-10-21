@@ -1,12 +1,13 @@
 import uuid
 
-from django.db.models.deletion import CASCADE, DO_NOTHING, SET_NULL, SET_DEFAULT
+from django.db.models.deletion import CASCADE, DO_NOTHING, SET_DEFAULT, SET_NULL
 from django.db.models.expressions import F, Value
 from django.db.models.fields import CharField, UUIDField
 from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 
-from finder.forms.fields import FinderFileField as FormFileField, FinderFolderField as FormFolderField
+from finder.forms.fields import FinderFileField as FormFileField
+from finder.forms.fields import FinderFolderField as FormFolderField
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 

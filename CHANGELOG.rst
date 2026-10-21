@@ -8,10 +8,203 @@ CHANGELOG
 Complete rewrite of the project. See README-Finder.md for details.
 
 
-3.3.3 / 2025-11-07
+3.6.0 (2026-09-12)
 ==================
 
-  * Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
+* feat: Support avif images. ``*.avif`` and ``*.avifs`` uploads now become
+  ``Image`` objects (with dimensions, thumbnails and use in image fields) if Pillow
+  can decode them: natively since Pillow 11.3, or through the optional
+  ``pillow-avif-plugin`` package (``pip install django-filer[avif]``) for older
+  Pillow versions.
+
+.. note::
+
+   avif files that were uploaded *before* upgrading remain regular ``File`` objects:
+   filer picks the model class when a file is uploaded. Re-upload them to turn them
+   into ``Image`` objects.
+
+* feat: SVG support no longer requires an SVG renderer. filer reads an SVG's size
+  from the document and thumbnails it by rewriting ``width``, ``height`` and
+  ``viewBox`` on the root element, which keeps the vector data intact instead of
+  re-drawing it. ``easy-thumbnails[svg]`` - and with it svglib, reportlab and lxml,
+  around 14 MB - moved from a hard dependency to the new ``django-filer[svg]``
+  extra (#1547).
+* fix: SVG thumbnails without a ``viewBox`` were scaled by growing the canvas
+  rather than the drawing.
+* fix: An SVG stating only one of ``width`` and ``height`` alongside a ``viewBox``
+  now keeps the dimension it states and derives the other from the viewBox's
+  aspect ratio, the way a browser sizes it. The renderer reported the viewBox's
+  own height instead, which does not match how the image is drawn.
+* fix: When an image's dimensions could not be read, the file object was left at
+  its end, so upload validators that inspect the content saw an empty file.
+* fix: SVG documents nesting elements more than
+  ``filer.utils.svg.MAX_NESTING_DEPTH`` (100) levels deep are refused. Writing
+  such a document out recurses once per level and would exhaust the stack while
+  a thumbnail is generated. Real documents nest a handful of levels.
+* feat: Add support for Django 6.1. The admin breadcrumbs now render as
+  ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
+  element-qualified CSS selectors expect, and keep the legacy
+  ``<div class="breadcrumbs">`` markup on older versions.
+* ci: Test against Django 6.0 and 6.1.
+* fix: The image preview of the file admin's change view no longer renders as a focal
+  point widget. The file form has no subject location field, so the circle could be
+  dragged but the subject location was silently dropped (#1579). ``file_icon`` takes a
+  new ``focal_point`` argument for this; templates overriding
+  ``admin/filer/tools/detail_info.html`` need to pass it on to keep the focal point.
+* fix: The focal point resolves the subject location field every time it writes to it
+  instead of keeping the element from set-up time. Admin themes that re-render the
+  fieldset left filer writing into a detached node, losing the subject location without
+  any error. It now also stays inactive - the circle stays hidden - when there is no
+  field to write to.
+* fix: The expand view for SVG images is now registered on ``FileAdmin`` instead of only
+  on ``ImageAdmin``. SVGs are not necessarily stored as ``Image`` instances, and listing
+  a folder containing such a file raised
+  ``NoReverseMatch: Reverse for 'filer_file_expand' not found`` (#1590). The change view
+  of a file now also links to its own admin's expand view instead of always linking to
+  the image admin's. The expand view now checks read permissions, just like the icon and
+  change views.
+* fix: Dropping a file on the admin file widget no longer stacks the upload preview
+  on top of the widget's own markup, which left two files visible and covered the
+  widget's buttons (#1573). The widget now shows the uploaded file itself - thumbnail,
+  label, and working lookup, edit and clear buttons - as it does after a reload, and a
+  failed upload leaves the previous selection untouched. The upload response gained a
+  ``change_url`` key for this.
+* fix: The file widget's clear button works again in widgets that are added to the page
+  after it loaded, e.g. in Django admin inline formsets.
+* fix: Raw (XMLHttpRequest) uploads with a missing or malformed ``Content-Length`` header,
+  or that no upload handler accepts, are answered with 400 instead of raising
+  ``KeyError``, ``TypeError`` or ``UnboundLocalError``.
+* fix: The directory listing no longer creates and loads the user's clipboard on every
+  request. The clipboard object was not used, so this saves three queries per listing.
+* fix: Close the file handles used by the protected file server and by the
+  ``filer_import`` management command.
+* fix: Remove the dead ``var _actions_icnt`` inline scripts from the listing templates.
+  Django's admin ``actions.js`` reads ``data-actions-icnt``, which the templates already
+  provide, so the widely disallowed inline script served no purpose.
+* fix: A file dragged over the file widget now only recolors the widget's background in
+  the admin's primary color. The widget used to hide its content and grow its border,
+  which moved what was under the cursor and made the widget flicker between its drop
+  state and the file it holds.
+* fix: Send the CSRF token with uploads started from the "Upload Files" button in the
+  folder view. Since 3.5.1 the upload endpoint enforces CSRF, but this uploader had not
+  been updated and every upload from it failed with "CSRF token missing" (#1617).
+
+.. note::
+
+   Existing installations keep SVG support unchanged: upgrading does not always uninstall
+   svglib or reportlab. Fresh installs and re-locked dependency files no longer get
+   them. The only documents that still need them are those whose size cannot be read
+   from the markup, for example ``width="100%"`` without a ``viewBox``; install
+   ``django-filer[svg]`` if your project has such files. Thumbnails generated from
+   now on are the original document rescaled rather than a reportlab rendering of
+   it - existing cached thumbnails keep their file names and are still served.
+   Installing the extra only ever adds documents filer can size; it never accepts
+   a document filer rejects, so it cannot weaken the SVG upload checks.
+
+.. note::
+
+   Projects that override one of filer's breadcrumb templates
+   (``admin/filer/breadcrumbs.html``, ``admin/filer/folder/change_form.html``, or the
+   new ``admin/filer/folder/listing_breadcrumbs.html``, which replaces the duplicated
+   breadcrumb blocks of ``directory_listing.html`` and ``legacy_listing.html``) need to
+   emit the Django 6.1 markup themselves to stay styled. Use the
+   ``{% django_version_gte 6 1 %}`` tag from ``filer_admin_tags`` to support both.
+
+3.5.1 (2026-08-26)
+==================
+
+* fix: ``FileAdmin.icon_view()`` did not check read permissions. Any staff user could
+  enumerate file ids to obtain the name and private storage path of images in folders
+  they have no read permission on (reported by Denny).
+* fix: The file and folder admin change views only consulted the global Django model
+  permissions, which are not folder aware. Any staff user holding ``filer.change_file``
+  could open the change view of a file in a folder they have no read permission on.
+* fix: Upload validators could be bypassed by declaring an unknown Content-Type,
+  allowing stored XSS (reported by Miguel Rafael Martín de Nicolás Acedo). The MIME
+  type of an upload is now always derived from the file name, never from the
+  client-supplied ``Content-Type``.
+* fix: The AJAX upload endpoint no longer is ``@csrf_exempt`` and now requires a
+  staff user. The bundled uploaders send the ``X-CSRFToken`` header.
+* fix: A malformed MIME type without a slash no longer raises an error, and upload
+  errors return a JSON error response instead of an HTTP 500.
+* fix: A failed upload now answers with a 4xx/5xx status code instead of HTTP 200,
+  so that uploaders and proxies can tell a rejected upload from an accepted one.
+  The bundled uploaders report the server's error message accordingly.
+* fix: The AJAX upload endpoint no longer echoes internal exception text back to the
+  client; unexpected failures are logged instead.
+* chore: Add tests for filer tags, views and fix whitespace/truncate by @fsbraun in https://github.com/django-cms/django-filer/pull/1607
+* chore: Let ruff sort imports, matching the isort configuration by @fsbraun
+* ci: Replace flake8 and isort with ruff, which already runs as a pre-commit hook.
+  ``tox -e flake8`` and ``tox -e isort`` become ``tox -e ruff``.
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1608
+
+.. warning::
+
+   Uploads whose file extension is unknown to Python's ``mimetypes`` module are now
+   treated as ``application/octet-stream`` and are rejected by the default validators.
+   Register additional extensions with ``mimetypes.add_type()`` if you need them.
+
+   Custom uploaders posting to ``filer-ajax_upload`` must now send a CSRF token and
+   authenticate as a staff user. They also need to handle non-2xx responses: a
+   rejected upload is answered with HTTP 400 (or 403 for a permission problem)
+   carrying the ``{"error": ...}`` body that was previously returned with HTTP 200.
+
+3.5.0 (2026-07-06)
+==================
+
+* feat: By-default fast svg sanitation (deprecating svg validation) by @fsbraun in https://github.com/django-cms/django-filer/pull/1594
+* feat: Add strip_exif "validator" to remove potentially sensitive data from uploads by @fsbraun in https://github.com/django-cms/django-filer/pull/1595
+* fix: extended list of denied mime types (XHTML/XML stored XSS, reported by SeongHyeon Lee) by @fsbraun in https://github.com/django-cms/django-filer/pull/1604
+* fix: Delete folder action failed to check all permissions (reported by Ta Duc Thien) by @fsbraun in https://github.com/django-cms/django-filer/pull/1605
+* fix: Filer property popup did not close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
+* fix: filer_admin_tags now falls back on any thumbnail render exception by @SAY-5 in https://github.com/django-cms/django-filer/pull/1598
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1600
+* fix: Treat misconfigs more gracefully by @fsbraun in https://github.com/django-cms/django-filer/pull/1602
+
+**New Contributors**
+* @dependabot[bot] made their first contribution in https://github.com/django-cms/django-filer/pull/1582
+* @felixxm made their first contribution in https://github.com/django-cms/django-filer/pull/1592
+* @SAY-5 made their first contribution in https://github.com/django-cms/django-filer/pull/1598
+* @onurguzel made their first contribution in https://github.com/django-cms/django-filer/pull/1603
+
+
+3.4.4 (2026-02-06)
+==================
+
+* fix: Popup window failed with django CMS' GrouperAdmin forms by @fsbraun in https://github.com/django-cms/django-filer/pull/1575
+
+3.4.3 (2026-01-17)
+==================
+
+* fix: django-app-helper link in the docs by @bckohan in https://github.com/django-cms/django-filer/pull/1570
+* fix: infinite recursion bug on django-polymorphic >=4.9 by @bckohan in https://github.com/django-cms/django-filer/pull/1571
+
+@bckohan made their first contribution in https://github.com/django-cms/django-filer/pull/1570
+
+3.4.2 (2026-01-13)
+==================
+
+* fix: invalid JS in `dropzone.init.js` by @PeterW-LWL in https://github.com/django-cms/django-filer/pull/1565
+* fix: Subject location only worked on Safari, incorrect subject location upscaling by @fsbraun in https://github.com/django-cms/django-filer/pull/1566
+
+
+3.4.1 (2025-11-24)
+==================
+
+* fix: Add missing JS bundles and LICENSE file
+
+3.4.0 (2025-11-21)
+==================
+
+* feat: Add Django 6.0 support
+* feat: Add CSP support by collecting all JS code in bundles
+* fix: preserve "limit search to folder" state in pagination links #1553 by @benzkji in https://github.com/django-cms/django-filer/pull/1555
+
+
+3.3.3 (2025-11-07)
+==================
+
+* Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
 
 3.3.2 (2025-09-01)
 ==================
@@ -129,7 +322,7 @@ Complete rewrite of the project. See README-Finder.md for details.
 * feat: Canonical URL action button now copies canonical URL to the user's
   clipboard
 * fix: Run validators on updated files in file change view
-* fix: Update mime type if uploading file in file change view
+* fix: Update MIME type if uploading file in file change view
 * fix: Do not allow to remove the file field from an uplaoded file in
   the admin interface
 * fix: refactor upload checks into running validators in the admin
@@ -317,7 +510,7 @@ Complete rewrite of the project. See README-Finder.md for details.
 ==================
 
 * Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
-* Fix #1211: On upload MIME-type is not set correctly.
+* Fix #1211: On upload MIME type is not set correctly.
 
 
 2.0.1 (2020-09-04)

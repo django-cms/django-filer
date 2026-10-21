@@ -3,7 +3,7 @@ from django.forms.widgets import HiddenInput
 
 from entangled.forms import EntangledModelFormMixin
 
-from finder.contrib.audio.models import AudioFileModel, SAMPLE_DURATION
+from finder.contrib.audio.models import SAMPLE_DURATION, AudioFileModel
 from finder.forms.file import FileForm
 
 

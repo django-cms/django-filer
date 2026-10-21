@@ -2,6 +2,7 @@ from django import template
 
 from finder.models.file import FileModel
 
+
 register = template.Library()
 
 

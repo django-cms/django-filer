@@ -3,17 +3,18 @@ import shutil
 import tempfile
 from io import BytesIO, StringIO
 
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.module_loading import import_string
-from django.core.files.base import ContentFile
 
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
 from tests.helpers import create_image
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 

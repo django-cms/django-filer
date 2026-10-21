@@ -1,11 +1,13 @@
+import logging
 from math import ceil
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.template import Library
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.html import escapejs, format_html_join
+from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -18,8 +20,14 @@ from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 from filer.settings import (
-    DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
+    DEFERRED_THUMBNAIL_SIZES,
+    FILER_MAX_SVG_THUMBNAIL_SIZE,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 register = Library()
@@ -70,6 +78,18 @@ def filer_admin_context_url_params(context, first_separator='?'):
         context['request'], first_separator=first_separator)
 
 
+@register.simple_tag
+def django_version_gte(major, minor=0):
+    """Return ``True`` if the running Django version is at least ``(major, minor)``.
+
+    Used in the admin templates to switch between the legacy
+    ``<div class="breadcrumbs">`` markup (Django < 6.1) and the
+    ``<ol class="breadcrumbs">`` markup introduced in Django 6.1, whose CSS is
+    element-qualified (``ol.breadcrumbs``) and no longer styles a ``<div>``.
+    """
+    return DJANGO_VERSION[:2] >= (major, minor)
+
+
 @register.simple_tag(takes_context=True)
 def filer_admin_context_hidden_formfields(context):
     request = context.get('request')
@@ -97,13 +117,15 @@ def filer_has_permission(context, item, action):
     return permission_method(request)
 
 
-def file_icon_context(file, detail, width, height):
+def file_icon_context(file, detail, width, height, focal_point=True):
     mime_maintype, mime_subtype = file.mime_maintype, file.mime_subtype
     context = {
         'mime_maintype': mime_maintype,
         'mime_type': file.mime_type,
     }
-    height, width, context = get_aspect_ratio_and_download_url(context, detail, file, height, width)
+    height, width, context = get_aspect_ratio_and_download_url(
+        context, detail, file, height, width, focal_point=focal_point
+    )
     # returned context if icon is not available
     not_available_context = {
         'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
@@ -164,6 +186,12 @@ def file_icon_context(file, detail, width, height):
                     # For remote storage systems we catch the error to avoid second trip
                     # to the storage system
                     return not_available_context
+                except Exception:
+                    # PIL/easy-thumbnails can raise broader errors (e.g. broken MPO,
+                    # truncated images). Fall back to the placeholder so a single bad
+                    # file can't 500 the entire admin (#1597).
+                    logger.warning("Could not render filer thumbnail for %s", file, exc_info=True)
+                    return not_available_context
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')
         height = width  # icon is a square
@@ -180,7 +208,7 @@ def file_icon_context(file, detail, width, height):
     return context
 
 
-def get_aspect_ratio_and_download_url(context, detail, file, height, width):
+def get_aspect_ratio_and_download_url(context, detail, file, height, width, focal_point=True):
     # Get download_url and aspect ratio right for detail view
     if detail:
         context['download_url'] = file.url
@@ -190,16 +218,22 @@ def get_aspect_ratio_and_download_url(context, detail, file, height, width):
             # because they don't really have width or height
             if file.width:
                 width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = '%.6f' % (file.width / 210)
+                if focal_point:
+                    # Only the ratio turns the preview into a focal point widget
+                    context['sidebar_image_ratio'] = '%.6f' % (file.width / 210)
     return height, width, context
 
 
 @register.inclusion_tag('admin/filer/templatetags/file_icon.html')
-def file_icon(file, detail=False, size=None):
+def file_icon(file, detail=False, size=None, focal_point=True):
     """
     This templatetag returns a rendered `<img src="..." srcset="..." width="..." height="..." class="..." />
     to be used for rendering thumbnails of files in the directory listing or in the corresponding detail
     views for that image.
+
+    ``focal_point`` renders the detail preview as the focal point widget. Set it to
+    ``False`` where the form does not offer a subject location field: the widget
+    would appear to work but have nowhere to store the subject location (#1579).
     """
     if size:
         width, height = (int(s) for s in size.split('x'))
@@ -209,7 +243,7 @@ def file_icon(file, detail=False, size=None):
         width, height = 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE
     else:
         width, height = FILER_TABLE_ICON_SIZE, FILER_TABLE_ICON_SIZE
-    return file_icon_context(file, detail is True, width, height)
+    return file_icon_context(file, detail is True, width, height, focal_point=focal_point)
 
 
 @register.simple_tag
@@ -217,7 +251,7 @@ def file_icon_url(file):
     # Cache since it is called repeatedly by templates
     if not hasattr(file, "_file_icon_url_cache"):
         context = file_icon_context(file, False, 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE)
-        file._file_icon_url_cache = escapejs(context.get('highres_url', context['icon_url']))
+        file._file_icon_url_cache = context.get('highres_url', context['icon_url'])
     return file._file_icon_url_cache
 
 

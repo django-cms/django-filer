@@ -8,7 +8,8 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFileModel
-from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_NAME
+from finder.models.folder import ROOT_FOLDER_NAME
+from finder.models.folder import FolderModel as FinderFolderModel
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 from finder.storages import UUID4_PATTERN
@@ -150,7 +151,8 @@ class Command(BaseCommand):
         values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
         AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
-        # create ACL and default ACL with RW-permission for everyone
+        # create ACL and default ACL with RW-permission for everyone (restricted to staff
+        # users, unless FINDER_STAFF_ONLY is switched off)
         AccessControlEntry.objects.create(inode=root_folder.id, privilege=Privilege.READ_WRITE)
         DefaultAccessControlEntry.objects.create(folder=root_folder, privilege=Privilege.READ_WRITE)
         self.stdout.write(f"Successfully created ambit with slug ‘{slug}’.")

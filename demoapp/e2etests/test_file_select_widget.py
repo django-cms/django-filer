@@ -8,6 +8,8 @@ selectors.
 
 import pytest
 
+from django.urls import reverse
+
 from demoapp.models import DemoAppModel
 
 pytestmark = pytest.mark.django_db(transaction=True)
@@ -86,7 +88,7 @@ def test_remove_the_selected_file(demoapp_page, image_file):
     page.wait_for_selector(f'{FILE_SELECT} .remove-file-button')
 
     page.locator(f'{FILE_SELECT} .remove-file-button').click()
-    page.wait_for_selector(f'{FILE_SELECT} .finder-file-select figure p')
+    page.wait_for_selector(f'{FILE_SELECT} .finder-file-select figure strong')
 
     assert page.locator('input#id_file').input_value() == ''
     assert page.locator(f'{FILE_SELECT} .finder-file-select figure').inner_text() == "Select File"
@@ -163,3 +165,56 @@ def test_folder_widget_renders_placeholder(demoapp_page):
     page.wait_for_selector(f'{FOLDER_SELECT} .finder-file-select')
     assert page.locator(f'{FOLDER_SELECT} .finder-file-select figure').inner_text() == "Select Folder"
     assert page.locator('input#id_folder').input_value() == ''
+
+
+@pytest.fixture
+def cms_modal_page(page, connector, ambit):
+    """The demo form in an iframe inside a django CMS like modal."""
+    page.goto(connector.url(reverse('cms-modal')))
+    frame = page.frame_locator('.cms-modal iframe')
+    frame.locator(f'{FILE_SELECT} .finder-file-select').wait_for()
+    return page, frame
+
+
+def open_parent_dialog(page, frame):
+    frame.locator(f'{FILE_SELECT} .finder-file-select figure').click()
+    page.wait_for_selector('.finder-dialog-host dialog[open] ul.files-browser')
+    return page.locator('.finder-dialog-host dialog[open]')
+
+
+def test_dialog_opens_in_parent_of_cms_modal(image_file, cms_modal_page):
+    page, frame = cms_modal_page
+    dialog = open_parent_dialog(page, frame)
+
+    # the dialog uses the whole window rather than the iframe of the modal
+    assert frame.locator(f'{FILE_SELECT} dialog').count() == 0
+    assert dialog.bounding_box()['width'] > 600
+
+    dialog.locator('ul.files-browser > li').first.click()
+    frame.locator(f'{FILE_SELECT} .finder-file-select figcaption').wait_for()
+    assert frame.locator('input#id_file').input_value() == str(image_file.id)
+    assert page.locator('.finder-dialog-host dialog[open]').count() == 0
+
+
+def test_escape_closes_the_dialog_but_not_the_cms_modal(cms_modal_page):
+    page, frame = cms_modal_page
+    open_parent_dialog(page, frame)
+
+    page.keyboard.press('Escape')
+    page.wait_for_selector('.finder-dialog-host dialog[open]', state='detached')
+    assert page.evaluate('window.cmsModalClosed') is False
+
+
+def test_dialog_host_is_removed_with_the_cms_modal(cms_modal_page):
+    page, frame = cms_modal_page
+    assert page.locator('.finder-dialog-host').count() == 2  # file and folder select
+    page.evaluate("document.querySelector('.cms-modal iframe').src = 'about:blank'")
+    page.wait_for_selector('.finder-dialog-host', state='detached')
+
+
+def test_dialog_stays_in_an_iframe_outside_of_a_cms_modal(image_file, page, connector, ambit):
+    page.goto(connector.url(reverse('cms-modal') + '?modal=0'))
+    frame = page.frame_locator('.other-container iframe')
+    frame.locator(f'{FILE_SELECT} .finder-file-select figure').click()
+    frame.locator(f'{FILE_SELECT} dialog[open] ul.files-browser').wait_for()
+    assert page.locator('.finder-dialog-host').count() == 0

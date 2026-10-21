@@ -1,7 +1,8 @@
 import json
 
-from finder.models.inode import InodeManager
 from finder.models.filetag import LabelTag
+from finder.models.folder import FolderModel
+from finder.models.inode import InodeManager
 
 
 def annotate_unified_queryset(ambit, queryset):
@@ -9,9 +10,14 @@ def annotate_unified_queryset(ambit, queryset):
     Annotates the given queryset with additional fields for the frontend.
     This step must be applied after filtering and sorting.
     """
+    folders = {
+        folder.id: folder for folder in FolderModel.objects.with_child_counts(
+            InodeManager.get_proxy_object(entry) for entry in queryset if entry['is_folder']
+        )
+    }
     label_tags = {str(lt['id']): lt for lt in LabelTag.objects.values('id', 'label', 'color')}
     for entry in queryset:
-        proxy_obj = InodeManager.get_proxy_object(entry)
+        proxy_obj = folders[entry['id']] if entry['is_folder'] else InodeManager.get_proxy_object(entry)
         entry.update(
             download_url=proxy_obj.get_download_url(ambit),
             thumbnail_url=proxy_obj.get_thumbnail_url(ambit),
