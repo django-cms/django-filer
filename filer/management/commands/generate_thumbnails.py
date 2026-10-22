@@ -1,6 +1,10 @@
 from django.core.management.base import BaseCommand
 
-from filer.models.imagemodels import Image
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
+
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 class Command(BaseCommand):
