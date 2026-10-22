@@ -8,6 +8,8 @@ from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.test import TestCase
 
+from easy_thumbnails.models import Thumbnail
+
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.settings import FILER_IMAGE_MODEL
@@ -126,8 +128,14 @@ class GenerateThumbnailsTestCase(TestCase):
         return buffer.getvalue()
 
     def test_generate_thumbnails(self):
+        thumbnails = Thumbnail.objects.filter(source__name=self.image.file.name)
+        self.assertFalse(thumbnails.exists())
+
         out = StringIO()
         call_command('generate_thumbnails', stdout=out)
 
         self.assertIn('Processing image 1 / 1', out.getvalue())
-        self.assertTrue(self.image.thumbnails)
+        self.assertTrue(thumbnails.exists())
+        for thumbnail in thumbnails:
+            with self.subTest(thumbnail=thumbnail.name):
+                self.assertTrue(self.image.file.thumbnail_storage.exists(thumbnail.name))
