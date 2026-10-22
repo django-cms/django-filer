@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', function (e) {
             const url = new URL(this.dataset.url, document.location.href);
             const msg = this.dataset.msg || 'URL copied to clipboard';
-            const infobox = document.createElement('template');
+            const infobox = document.createElement('div');
             e.preventDefault();
 
             const existingTooltips = document.querySelectorAll('.info.filer-tooltip');
@@ -372,10 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             navigator.clipboard.writeText(url.href);
-            infobox.innerHTML = `<div class="info filer-tooltip" aria-hidden="true">${msg}</div>`;
+            infobox.className = 'info filer-tooltip';
+            infobox.setAttribute('aria-hidden', 'true');
+            infobox.textContent = msg;
             announce(msg);
             this.classList.add('filer-tooltip-wrapper');
-            this.appendChild(infobox.content.firstChild);
+            this.appendChild(infobox);
 
             const self = this;
             setTimeout(() => {
