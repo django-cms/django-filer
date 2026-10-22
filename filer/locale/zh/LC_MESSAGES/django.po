@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:03+0200\n"
+"POT-Creation-Date: 2026-06-27 08:13+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
 "Language-Team: Chinese (http://app.transifex.com/divio/django-filer/language/"
@@ -20,159 +20,155 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/clipboardadmin.py:21
+#: admin/clipboardadmin.py:18
 msgid "You do not have permission to upload files."
 msgstr ""
 
-#: admin/clipboardadmin.py:22
+#: admin/clipboardadmin.py:19
 msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
-#: admin/clipboardadmin.py:24
+#: admin/clipboardadmin.py:21
 msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
-#: admin/clipboardadmin.py:26
-msgid "Upload failed. Please refresh and try again."
-msgstr "上传失败。请刷新页面后重试。"
-
-#: admin/fileadmin.py:80
+#: admin/fileadmin.py:79
 msgid "Advanced"
 msgstr ""
 
-#: admin/fileadmin.py:206
+#: admin/fileadmin.py:200
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:449 admin/folderadmin.py:640
+#: admin/folderadmin.py:424 admin/folderadmin.py:596
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: admin/folderadmin.py:472
+#: admin/folderadmin.py:447
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 
-#: admin/folderadmin.py:502
+#: admin/folderadmin.py:473
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr ""
 
-#: admin/folderadmin.py:520
+#: admin/folderadmin.py:489
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: admin/folderadmin.py:670
+#: admin/folderadmin.py:626
 msgid "No action selected."
 msgstr ""
 
-#: admin/folderadmin.py:719
+#: admin/folderadmin.py:678
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr ""
 
-#: admin/folderadmin.py:724
+#: admin/folderadmin.py:683
 msgid "Move selected files to clipboard"
 msgstr ""
 
-#: admin/folderadmin.py:762
+#: admin/folderadmin.py:723
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:764
+#: admin/folderadmin.py:725
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:772
+#: admin/folderadmin.py:733
 msgid "Enable permissions for selected files"
 msgstr ""
 
-#: admin/folderadmin.py:778
+#: admin/folderadmin.py:739
 msgid "Disable permissions for selected files"
 msgstr ""
 
-#: admin/folderadmin.py:867
+#: admin/folderadmin.py:820
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr ""
 
-#: admin/folderadmin.py:872
+#: admin/folderadmin.py:825
 msgid "Cannot delete files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:874
+#: admin/folderadmin.py:827
 msgid "Are you sure?"
 msgstr ""
 
-#: admin/folderadmin.py:880
+#: admin/folderadmin.py:833
 msgid "Delete files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:901
+#: admin/folderadmin.py:854
 msgid "Delete selected files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1050
+#: admin/folderadmin.py:961
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:1054
+#: admin/folderadmin.py:965
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr ""
 
-#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
+#: admin/folderadmin.py:973 admin/folderadmin.py:975
 msgid "Move files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1079
+#: admin/folderadmin.py:990
 msgid "Move selected files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1138
+#: admin/folderadmin.py:1047
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
-#: admin/folderadmin.py:1164
+#: admin/folderadmin.py:1056 admin/folderadmin.py:1058
+#: admin/folderadmin.py:1073
 msgid "Rename files"
 msgstr ""
 
-#: admin/folderadmin.py:1261
+#: admin/folderadmin.py:1168
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr ""
 
-#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
+#: admin/folderadmin.py:1186 admin/folderadmin.py:1188
 msgid "Copy files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1298
+#: admin/folderadmin.py:1205
 msgid "Copy selected files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1412
+#: admin/folderadmin.py:1310
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr ""
 
-#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
+#: admin/folderadmin.py:1317 admin/folderadmin.py:1319
 msgid "Resize images"
 msgstr ""
 
-#: admin/folderadmin.py:1436
+#: admin/folderadmin.py:1334
 msgid "Resize selected images"
 msgstr ""
 
@@ -221,45 +217,43 @@ msgstr ""
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr ""
 
-#: admin/imageadmin.py:18 admin/imageadmin.py:96
+#: admin/imageadmin.py:21 admin/imageadmin.py:116
 msgid "Subject location"
 msgstr ""
 
-#: admin/imageadmin.py:19
+#: admin/imageadmin.py:22
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr ""
 
-#: admin/imageadmin.py:56
+#: admin/imageadmin.py:59
 msgid "Invalid subject location format. "
 msgstr ""
 
-#: admin/imageadmin.py:64
+#: admin/imageadmin.py:67
 msgid "Subject location is outside of the image. "
 msgstr ""
 
-#: admin/imageadmin.py:73
+#: admin/imageadmin.py:76
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr ""
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:411
+#: admin/permissionadmin.py:13 models/foldermodels.py:387
 msgid "Who"
 msgstr ""
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:432
+#: admin/permissionadmin.py:14 models/foldermodels.py:408
 msgid "What"
 msgstr ""
 
-#: admin/views.py:54
+#: admin/views.py:55
 msgid "Folder with this name already exists."
 msgstr ""
 
-#: apps.py:11 templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/breadcrumbs.html:24
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/change_form.html:19
-#: templates/admin/filer/folder/listing_breadcrumbs.html:7
-#: templates/admin/filer/folder/listing_breadcrumbs.html:30
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:33
+#: templates/admin/filer/folder/legacy_listing.html:36
 msgid "Filer"
 msgstr ""
 
@@ -287,7 +281,7 @@ msgstr ""
 msgid "images"
 msgstr ""
 
-#: models/abstract.py:183
+#: models/abstract.py:164
 #, python-format
 msgid ""
 "Image format not recognized or image size exceeds limit of %(max_pixels)d "
@@ -295,7 +289,7 @@ msgid ""
 "file format or resize image to %(width)d x %(height)d resolution or lower."
 msgstr ""
 
-#: models/abstract.py:191
+#: models/abstract.py:172
 #, python-format
 msgid ""
 "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
@@ -303,11 +297,11 @@ msgid ""
 "%(height)d resolution or lower."
 msgstr ""
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:320
+#: models/clipboardmodels.py:11 models/foldermodels.py:296
 msgid "user"
 msgstr ""
 
-#: models/clipboardmodels.py:17 models/filemodels.py:168
+#: models/clipboardmodels.py:17 models/filemodels.py:157
 msgid "files"
 msgstr ""
 
@@ -319,8 +313,8 @@ msgstr ""
 msgid "clipboards"
 msgstr ""
 
-#: models/clipboardmodels.py:44 models/filemodels.py:85
-#: models/filemodels.py:167
+#: models/clipboardmodels.py:44 models/filemodels.py:74
+#: models/filemodels.py:156
 msgid "file"
 msgstr ""
 
@@ -332,187 +326,184 @@ msgstr ""
 msgid "clipboard items"
 msgstr ""
 
-#: models/filemodels.py:77 templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/change_form.html:20
-#: templates/admin/filer/folder/directory_listing.html:67
-#: templates/admin/filer/folder/legacy_listing.html:67
+#: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/legacy_listing.html:105
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
 msgstr ""
 
-#: models/filemodels.py:92
+#: models/filemodels.py:81
 msgid "file size"
 msgstr ""
 
-#: models/filemodels.py:98
+#: models/filemodels.py:87
 msgid "sha1"
 msgstr ""
 
-#: models/filemodels.py:105
+#: models/filemodels.py:94
 msgid "has all mandatory data"
 msgstr ""
 
-#: models/filemodels.py:111
+#: models/filemodels.py:100
 msgid "original filename"
 msgstr ""
 
-#: models/filemodels.py:121 models/foldermodels.py:123
+#: models/filemodels.py:110 models/foldermodels.py:109
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr ""
 
-#: models/filemodels.py:127
+#: models/filemodels.py:116
 msgid "description"
 msgstr ""
 
-#: models/filemodels.py:136 models/foldermodels.py:129
+#: models/filemodels.py:125 models/foldermodels.py:115
 msgid "owner"
 msgstr ""
 
-#: models/filemodels.py:140 models/foldermodels.py:137
+#: models/filemodels.py:129 models/foldermodels.py:123
 msgid "uploaded at"
 msgstr ""
 
-#: models/filemodels.py:145 models/foldermodels.py:147
+#: models/filemodels.py:134 models/foldermodels.py:133
 msgid "modified at"
 msgstr ""
 
-#: models/filemodels.py:151
+#: models/filemodels.py:140
 msgid "Permissions disabled"
 msgstr ""
 
-#: models/filemodels.py:152
+#: models/filemodels.py:141
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
 msgstr ""
 
-#: models/foldermodels.py:115
+#: models/foldermodels.py:101
 msgid "parent"
 msgstr ""
 
-#: models/foldermodels.py:142
+#: models/foldermodels.py:128
 msgid "created at"
 msgstr ""
 
-#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:25
-#: templates/admin/filer/folder/listing_breadcrumbs.html:8
-#: templates/admin/filer/folder/listing_breadcrumbs.html:32
+#: models/foldermodels.py:143 templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
+#: templates/admin/filer/folder/legacy_listing.html:38
 msgid "Folder"
 msgstr ""
 
-#: models/foldermodels.py:158
+#: models/foldermodels.py:144
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr ""
 
-#: models/foldermodels.py:291
+#: models/foldermodels.py:267
 msgid "all items"
 msgstr ""
 
-#: models/foldermodels.py:292
+#: models/foldermodels.py:268
 msgid "this item only"
 msgstr ""
 
-#: models/foldermodels.py:293
+#: models/foldermodels.py:269
 msgid "this item and all children"
 msgstr ""
 
-#: models/foldermodels.py:297
+#: models/foldermodels.py:273
 msgid "inherit"
 msgstr ""
 
-#: models/foldermodels.py:298
+#: models/foldermodels.py:274
 msgid "allow"
 msgstr ""
 
-#: models/foldermodels.py:299
+#: models/foldermodels.py:275
 msgid "deny"
 msgstr ""
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:287
 msgid "type"
 msgstr ""
 
-#: models/foldermodels.py:328
+#: models/foldermodels.py:304
 msgid "group"
 msgstr ""
 
-#: models/foldermodels.py:335
+#: models/foldermodels.py:311
 msgid "everybody"
 msgstr ""
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:316
 msgid "can read"
 msgstr ""
 
-#: models/foldermodels.py:348
+#: models/foldermodels.py:324
 msgid "can edit"
 msgstr ""
 
-#: models/foldermodels.py:356
+#: models/foldermodels.py:332
 msgid "can add children"
 msgstr ""
 
-#: models/foldermodels.py:364
+#: models/foldermodels.py:340
 msgid "folder permission"
 msgstr ""
 
-#: models/foldermodels.py:365
+#: models/foldermodels.py:341
 msgid "folder permissions"
 msgstr ""
 
-#: models/foldermodels.py:379
+#: models/foldermodels.py:355
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr ""
 
-#: models/foldermodels.py:381
+#: models/foldermodels.py:357
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr ""
 
-#: models/foldermodels.py:383
+#: models/foldermodels.py:359
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr ""
 
-#: models/foldermodels.py:385
+#: models/foldermodels.py:361
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
-#: models/foldermodels.py:391
+#: models/foldermodels.py:367
 msgid "All Folders"
 msgstr ""
 
-#: models/foldermodels.py:393
+#: models/foldermodels.py:369
 msgid "Logical Path"
 msgstr ""
 
-#: models/foldermodels.py:402
+#: models/foldermodels.py:378
 #, python-brace-format
 msgid "User: {user}"
 msgstr ""
 
-#: models/foldermodels.py:404
+#: models/foldermodels.py:380
 #, python-brace-format
 msgid "Group: {group}"
 msgstr ""
 
-#: models/foldermodels.py:406
+#: models/foldermodels.py:382
 msgid "Everybody"
 msgstr ""
 
-#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
-#: templates/admin/filer/widgets/admin_file.html:49
+#: models/foldermodels.py:395 templates/admin/filer/widgets/admin_file.html:46
 msgid "Edit"
 msgstr ""
 
-#: models/foldermodels.py:420
+#: models/foldermodels.py:396
 msgid "Read"
 msgstr ""
 
-#: models/foldermodels.py:421
+#: models/foldermodels.py:397
 msgid "Add children"
 msgstr ""
 
@@ -546,10 +537,10 @@ msgstr ""
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
-#: templates/admin/filer/folder/directory_table_list.html:188
+#: templates/admin/filer/folder/directory_table_list.html:184
 #: templates/admin/filer/folder/directory_thumbnail_list.html:5
-#: templates/admin/filer/folder/directory_thumbnail_list.html:160
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/folder/directory_thumbnail_list.html:157
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
 msgstr ""
 
@@ -557,10 +548,9 @@ msgstr ""
 msgid "files with missing metadata"
 msgstr ""
 
-#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/change_form.html:20
-#: templates/admin/filer/folder/directory_listing.html:67
-#: templates/admin/filer/folder/legacy_listing.html:67
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/legacy_listing.html:105
 msgid "root"
 msgstr ""
 
@@ -580,63 +570,55 @@ msgstr ""
 msgid "Go"
 msgstr ""
 
-#: templates/admin/filer/actions.html:11
-#: templates/admin/filer/folder/directory_table_list.html:252
-#: templates/admin/filer/folder/directory_thumbnail_list.html:223
+#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/folder/directory_table_list.html:249
+#: templates/admin/filer/folder/directory_thumbnail_list.html:221
 msgid "Click here to select the objects across all pages"
 msgstr ""
 
-#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
 msgstr ""
 
-#: templates/admin/filer/actions.html:13
-#: templates/admin/filer/folder/directory_table_list.html:254
-#: templates/admin/filer/folder/directory_thumbnail_list.html:225
+#: templates/admin/filer/actions.html:16
+#: templates/admin/filer/folder/directory_table_list.html:251
+#: templates/admin/filer/folder/directory_thumbnail_list.html:223
 msgid "Clear selection"
 msgstr ""
 
-#: templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/breadcrumbs.html:23
-#: templates/admin/filer/folder/listing_breadcrumbs.html:6
-#: templates/admin/filer/folder/listing_breadcrumbs.html:25
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/directory_listing.html:28
+#: templates/admin/filer/folder/legacy_listing.html:31
 msgid "Go back to admin homepage"
 msgstr ""
 
-#: templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/breadcrumbs.html:23
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/change_form.html:18
-#: templates/admin/filer/folder/listing_breadcrumbs.html:6
-#: templates/admin/filer/folder/listing_breadcrumbs.html:26
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:29
+#: templates/admin/filer/folder/legacy_listing.html:32
 msgid "Home"
 msgstr ""
 
-#: templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/breadcrumbs.html:24
-#: templates/admin/filer/folder/listing_breadcrumbs.html:7
-#: templates/admin/filer/folder/listing_breadcrumbs.html:29
+#: templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/directory_listing.html:32
+#: templates/admin/filer/folder/legacy_listing.html:35
 msgid "Go back to Filer app"
 msgstr ""
 
-#: templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:25
-#: templates/admin/filer/folder/listing_breadcrumbs.html:8
-#: templates/admin/filer/folder/listing_breadcrumbs.html:32
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
+#: templates/admin/filer/folder/legacy_listing.html:38
 msgid "Go back to root folder"
 msgstr ""
 
-#: templates/admin/filer/breadcrumbs.html:10
-#: templates/admin/filer/breadcrumbs.html:14
-#: templates/admin/filer/breadcrumbs.html:27
-#: templates/admin/filer/breadcrumbs.html:37
-#: templates/admin/filer/folder/change_form.html:12
-#: templates/admin/filer/folder/change_form.html:22
-#: templates/admin/filer/folder/listing_breadcrumbs.html:10
-#: templates/admin/filer/folder/listing_breadcrumbs.html:14
-#: templates/admin/filer/folder/listing_breadcrumbs.html:36
-#: templates/admin/filer/folder/listing_breadcrumbs.html:44
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:18
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:39
+#: templates/admin/filer/folder/directory_listing.html:47
+#: templates/admin/filer/folder/legacy_listing.html:42
+#: templates/admin/filer/folder/legacy_listing.html:50
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr ""
@@ -675,31 +657,41 @@ msgid "Yes, I&#39;m sure"
 msgstr ""
 
 #: templates/admin/filer/file/change_form.html:16
-#: templates/admin/filer/folder/change_form.html:34
+#: templates/admin/filer/folder/change_form.html:21
 #: templates/admin/filer/image/change_form.html:15
 msgid "History"
 msgstr ""
 
 #: templates/admin/filer/file/change_form.html:18
-#: templates/admin/filer/folder/change_form.html:36
+#: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:17
 msgid "View on site"
 msgstr ""
 
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/change_form.html:18
-#: templates/admin/filer/folder/change_form.html:19
-#: templates/admin/filer/folder/change_form.html:20
-#: templates/admin/filer/folder/directory_listing.html:67
-#: templates/admin/filer/folder/legacy_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/legacy_listing.html:105
 msgid "Go back to"
 msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/folder/change_form.html:6
 msgid "admin homepage"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:37
+#: templates/admin/filer/folder/directory_listing.html:98
+#: templates/admin/filer/folder/directory_listing.html:106
+#: templates/admin/filer/folder/directory_table_list.html:29
+#: templates/admin/filer/folder/directory_table_list.html:61
+#: templates/admin/filer/folder/directory_table_list.html:195
+#: templates/admin/filer/folder/directory_thumbnail_list.html:27
+#: templates/admin/filer/folder/directory_thumbnail_list.html:63
+#: templates/admin/filer/folder/directory_thumbnail_list.html:167
+#: templates/admin/filer/folder/legacy_listing.html:98
+#: templates/admin/filer/folder/legacy_listing.html:106
+msgid "Folder Icon"
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
@@ -739,13 +731,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:145
-#: templates/admin/filer/folder/legacy_listing.html:145
+#: templates/admin/filer/folder/directory_listing.html:181
+#: templates/admin/filer/folder/legacy_listing.html:181
 msgid "Copy"
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
-#: templates/admin/filer/folder/choose_copy_destination.html:70
 msgid "It is not allowed to copy files into same folder"
 msgstr ""
 
@@ -794,13 +785,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:61
 #: templates/admin/filer/folder/choose_move_destination.html:64
-#: templates/admin/filer/folder/directory_listing.html:148
-#: templates/admin/filer/folder/legacy_listing.html:148
+#: templates/admin/filer/folder/directory_listing.html:184
+#: templates/admin/filer/folder/legacy_listing.html:184
 msgid "Move"
 msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:63
-#: templates/admin/filer/folder/choose_move_destination.html:66
 msgid "It is not allowed to move files into same folder"
 msgstr ""
 
@@ -823,111 +813,83 @@ msgstr ""
 msgid "Rename"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:52
-#: templates/admin/filer/folder/legacy_listing.html:52
-msgid "Show parent folders"
-msgstr "显示上级目录"
-
-#: templates/admin/filer/folder/directory_listing.html:59
-#: templates/admin/filer/folder/legacy_listing.html:59
+#: templates/admin/filer/folder/directory_listing.html:97
+#: templates/admin/filer/folder/legacy_listing.html:97
 msgid "Go back to the parent folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:92
-#: templates/admin/filer/folder/legacy_listing.html:92
-msgid "Folder actions"
-msgstr "目录操作"
-
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/legacy_listing.html:97
+#: templates/admin/filer/folder/directory_listing.html:134
+#: templates/admin/filer/folder/legacy_listing.html:134
 msgid "Change current folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/legacy_listing.html:97
+#: templates/admin/filer/folder/directory_listing.html:134
+#: templates/admin/filer/folder/legacy_listing.html:134
 msgid "Change"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:107
-#: templates/admin/filer/folder/legacy_listing.html:107
+#: templates/admin/filer/folder/directory_listing.html:144
+#: templates/admin/filer/folder/legacy_listing.html:144
 msgid "Click here to run search for entered phrase"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:107
-#: templates/admin/filer/folder/directory_listing.html:110
-#: templates/admin/filer/folder/legacy_listing.html:107
-#: templates/admin/filer/folder/legacy_listing.html:110
+#: templates/admin/filer/folder/directory_listing.html:147
+#: templates/admin/filer/folder/legacy_listing.html:147
 msgid "Search"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:113
-#: templates/admin/filer/folder/legacy_listing.html:113
-msgid "Search options"
-msgstr "搜索选项"
-
-#: templates/admin/filer/folder/directory_listing.html:118
-#: templates/admin/filer/folder/legacy_listing.html:118
+#: templates/admin/filer/folder/directory_listing.html:154
+#: templates/admin/filer/folder/legacy_listing.html:154
 msgid "Close"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:120
-#: templates/admin/filer/folder/legacy_listing.html:120
+#: templates/admin/filer/folder/directory_listing.html:156
+#: templates/admin/filer/folder/legacy_listing.html:156
 msgid "Limit"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:125
-#: templates/admin/filer/folder/legacy_listing.html:125
+#: templates/admin/filer/folder/directory_listing.html:161
+#: templates/admin/filer/folder/legacy_listing.html:161
 msgid "Check it to limit the search to current folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:126
-#: templates/admin/filer/folder/legacy_listing.html:126
+#: templates/admin/filer/folder/directory_listing.html:162
+#: templates/admin/filer/folder/legacy_listing.html:162
 msgid "Limit the search to current folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:142
-#: templates/admin/filer/folder/legacy_listing.html:142
+#: templates/admin/filer/folder/directory_listing.html:178
+#: templates/admin/filer/folder/legacy_listing.html:178
 msgid "Delete"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:153
-#: templates/admin/filer/folder/legacy_listing.html:153
-msgid "More actions"
-msgstr "更多操作"
-
-#: templates/admin/filer/folder/directory_listing.html:171
-#: templates/admin/filer/folder/legacy_listing.html:171
+#: templates/admin/filer/folder/directory_listing.html:206
+#: templates/admin/filer/folder/legacy_listing.html:206
 msgid "Adds a new Folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:174
-#: templates/admin/filer/folder/legacy_listing.html:174
+#: templates/admin/filer/folder/directory_listing.html:209
+#: templates/admin/filer/folder/legacy_listing.html:209
 msgid "New Folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:179
-#: templates/admin/filer/folder/directory_listing.html:186
-#: templates/admin/filer/folder/directory_listing.html:189
-#: templates/admin/filer/folder/directory_listing.html:196
-#: templates/admin/filer/folder/directory_listing.html:204
-#: templates/admin/filer/folder/legacy_listing.html:179
-#: templates/admin/filer/folder/legacy_listing.html:186
-#: templates/admin/filer/folder/legacy_listing.html:189
-#: templates/admin/filer/folder/legacy_listing.html:196
-#: templates/admin/filer/folder/legacy_listing.html:204
+#: templates/admin/filer/folder/directory_listing.html:214
+#: templates/admin/filer/folder/directory_listing.html:221
+#: templates/admin/filer/folder/directory_listing.html:224
+#: templates/admin/filer/folder/directory_listing.html:231
+#: templates/admin/filer/folder/directory_listing.html:238
+#: templates/admin/filer/folder/legacy_listing.html:214
+#: templates/admin/filer/folder/legacy_listing.html:221
+#: templates/admin/filer/folder/legacy_listing.html:224
+#: templates/admin/filer/folder/legacy_listing.html:231
+#: templates/admin/filer/folder/legacy_listing.html:238
 msgid "Upload Files"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:201
-#: templates/admin/filer/folder/directory_listing.html:206
-#: templates/admin/filer/folder/legacy_listing.html:201
-#: templates/admin/filer/folder/legacy_listing.html:206
+#: templates/admin/filer/folder/directory_listing.html:236
+#: templates/admin/filer/folder/legacy_listing.html:236
 msgid "You have to select a folder first"
 msgstr ""
-
-#: templates/admin/filer/folder/directory_table_list.html:12
-msgid "Select all objects on this page for an action"
-msgstr "选择此页面上的所有对象以执行操作"
 
 #: templates/admin/filer/folder/directory_table_list.html:16
 msgid "Name"
@@ -949,194 +911,149 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:28
 #: templates/admin/filer/folder/directory_table_list.html:35
-#: templates/admin/filer/folder/directory_table_list.html:62
-#: templates/admin/filer/folder/directory_table_list.html:69
-#: templates/admin/filer/folder/directory_table_list.html:87
+#: templates/admin/filer/folder/directory_table_list.html:60
+#: templates/admin/filer/folder/directory_table_list.html:67
 #: templates/admin/filer/folder/directory_thumbnail_list.html:26
 #: templates/admin/filer/folder/directory_thumbnail_list.html:32
-#: templates/admin/filer/folder/directory_thumbnail_list.html:64
-#: templates/admin/filer/folder/directory_thumbnail_list.html:70
+#: templates/admin/filer/folder/directory_thumbnail_list.html:62
+#: templates/admin/filer/folder/directory_thumbnail_list.html:68
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:52
-#: templates/admin/filer/folder/directory_thumbnail_list.html:54
-msgid "Select this folder"
-msgstr "选择这个目录"
-
-#: templates/admin/filer/folder/directory_table_list.html:53
-#: templates/admin/filer/folder/directory_table_list.html:57
-#: templates/admin/filer/folder/directory_thumbnail_list.html:55
-#: templates/admin/filer/folder/directory_thumbnail_list.html:59
-#, python-format
-msgid "Select folder '%(item_label)s'"
-msgstr "选择目录“%(item_label)s”"
-
-#: templates/admin/filer/folder/directory_table_list.html:80
+#: templates/admin/filer/folder/directory_table_list.html:78
 #: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] ""
 
-#: templates/admin/filer/folder/directory_table_list.html:81
+#: templates/admin/filer/folder/directory_table_list.html:79
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] ""
 
-#: templates/admin/filer/folder/directory_table_list.html:87
+#: templates/admin/filer/folder/directory_table_list.html:85
 msgid "Change folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:88
+#: templates/admin/filer/folder/directory_table_list.html:86
 msgid "Remove folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:88
-#, python-format
-msgid "Remove folder '%(item_label)s'"
-msgstr "删除目录“%(item_label)s”"
-
-#: templates/admin/filer/folder/directory_table_list.html:104
-#: templates/admin/filer/folder/directory_table_list.html:117
-#: templates/admin/filer/folder/directory_table_list.html:136
-#: templates/admin/filer/folder/directory_thumbnail_list.html:102
-#: templates/admin/filer/folder/directory_thumbnail_list.html:115
-#: templates/admin/filer/folder/directory_thumbnail_list.html:133
+#: templates/admin/filer/folder/directory_table_list.html:102
+#: templates/admin/filer/folder/directory_table_list.html:114
+#: templates/admin/filer/folder/directory_table_list.html:133
+#: templates/admin/filer/folder/directory_thumbnail_list.html:100
+#: templates/admin/filer/folder/directory_thumbnail_list.html:112
+#: templates/admin/filer/folder/directory_thumbnail_list.html:130
 msgid "Select this file"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:105
-#: templates/admin/filer/folder/directory_table_list.html:107
-#: templates/admin/filer/folder/directory_thumbnail_list.html:103
-#: templates/admin/filer/folder/directory_thumbnail_list.html:105
-#, python-format
-msgid "Select file '%(item_label)s'"
-msgstr "选择文件“%(item_label)s”"
-
-#: templates/admin/filer/folder/directory_table_list.html:120
-#: templates/admin/filer/folder/directory_table_list.html:139
-#: templates/admin/filer/folder/directory_table_list.html:172
-#: templates/admin/filer/folder/directory_thumbnail_list.html:118
-#: templates/admin/filer/folder/directory_thumbnail_list.html:136
+#: templates/admin/filer/folder/directory_table_list.html:117
+#: templates/admin/filer/folder/directory_table_list.html:136
+#: templates/admin/filer/folder/directory_table_list.html:168
+#: templates/admin/filer/folder/directory_thumbnail_list.html:115
+#: templates/admin/filer/folder/directory_thumbnail_list.html:133
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:148
-#: templates/admin/filer/folder/directory_thumbnail_list.html:144
+#: templates/admin/filer/folder/directory_table_list.html:145
+#: templates/admin/filer/folder/directory_thumbnail_list.html:141
 msgid "Permissions"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:148
-#: templates/admin/filer/folder/directory_thumbnail_list.html:144
+#: templates/admin/filer/folder/directory_table_list.html:145
+#: templates/admin/filer/folder/directory_thumbnail_list.html:141
 msgid "disabled"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:148
-#: templates/admin/filer/folder/directory_thumbnail_list.html:144
+#: templates/admin/filer/folder/directory_table_list.html:145
+#: templates/admin/filer/folder/directory_thumbnail_list.html:141
 msgid "enabled"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:161
+#: templates/admin/filer/folder/directory_table_list.html:158
 msgid "URL copied to clipboard"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:164
+#: templates/admin/filer/folder/directory_table_list.html:161
 #, python-format
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:165
 #, python-format
-msgid "Copy canonical url of '%(item_label)s'"
-msgstr "复制“%(item_label)s”的权威URL"
-
-#: templates/admin/filer/folder/directory_table_list.html:169
-#, python-format
 msgid "Download '%(item_label)s'"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:173
+#: templates/admin/filer/folder/directory_table_list.html:169
 msgid "Remove file"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:173
-#, python-format
-msgid "Remove file '%(item_label)s'"
-msgstr "删除文件“%(item_label)s”"
-
-#: templates/admin/filer/folder/directory_table_list.html:181
-#: templates/admin/filer/folder/directory_thumbnail_list.html:152
+#: templates/admin/filer/folder/directory_table_list.html:177
+#: templates/admin/filer/folder/directory_thumbnail_list.html:149
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:196
-#: templates/admin/filer/folder/directory_thumbnail_list.html:167
+#: templates/admin/filer/folder/directory_table_list.html:192
+#: templates/admin/filer/folder/directory_thumbnail_list.html:164
 msgid "Drop your file to upload into:"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:206
-#: templates/admin/filer/folder/directory_thumbnail_list.html:177
+#: templates/admin/filer/folder/directory_table_list.html:202
+#: templates/admin/filer/folder/directory_thumbnail_list.html:174
 msgid "Upload"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:218
-#: templates/admin/filer/folder/directory_thumbnail_list.html:189
+#: templates/admin/filer/folder/directory_table_list.html:214
+#: templates/admin/filer/folder/directory_thumbnail_list.html:186
 msgid "cancel"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:222
-#: templates/admin/filer/folder/directory_thumbnail_list.html:193
+#: templates/admin/filer/folder/directory_table_list.html:218
+#: templates/admin/filer/folder/directory_thumbnail_list.html:190
 msgid "Upload success!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:226
-#: templates/admin/filer/folder/directory_thumbnail_list.html:197
+#: templates/admin/filer/folder/directory_table_list.html:222
+#: templates/admin/filer/folder/directory_thumbnail_list.html:194
 msgid "Upload canceled!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:233
-#: templates/admin/filer/folder/directory_thumbnail_list.html:204
+#: templates/admin/filer/folder/directory_table_list.html:229
+#: templates/admin/filer/folder/directory_thumbnail_list.html:201
 msgid "previous"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:238
-#: templates/admin/filer/folder/directory_thumbnail_list.html:209
+#: templates/admin/filer/folder/directory_table_list.html:234
+#: templates/admin/filer/folder/directory_thumbnail_list.html:206
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:243
-#: templates/admin/filer/folder/directory_thumbnail_list.html:214
+#: templates/admin/filer/folder/directory_table_list.html:239
+#: templates/admin/filer/folder/directory_thumbnail_list.html:211
 msgid "next"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table_list.html:252
-#: templates/admin/filer/folder/directory_thumbnail_list.html:223
+#: templates/admin/filer/folder/directory_table_list.html:249
+#: templates/admin/filer/folder/directory_thumbnail_list.html:221
 #, python-format
 msgid "Select all %(total_count)s"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
-#: templates/admin/filer/folder/directory_thumbnail_list.html:84
+#: templates/admin/filer/folder/directory_thumbnail_list.html:82
 msgid "Select all"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_thumbnail_list.html:16
-msgid "Select all folders"
-msgstr "选择所有目录"
-
-#: templates/admin/filer/folder/directory_thumbnail_list.html:81
+#: templates/admin/filer/folder/directory_thumbnail_list.html:79
 msgid "Files"
 msgstr ""
-
-#: templates/admin/filer/folder/directory_thumbnail_list.html:85
-msgid "Select all files"
-msgstr "选择所有文件"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
@@ -1156,10 +1073,6 @@ msgstr[0] ""
 msgid "Save"
 msgstr ""
 
-#: templates/admin/filer/image/expand.html:24
-msgid "Toggle zoom"
-msgstr "切换缩放"
-
 #: templates/admin/filer/templatetags/file_icon.html:9
 msgid "Your browser does not support audio."
 msgstr ""
@@ -1168,28 +1081,23 @@ msgstr ""
 msgid "Your browser does not support video."
 msgstr ""
 
-#: templates/admin/filer/templatetags/file_icon.html:36
-msgid ""
-"Focal point. Use the arrow keys to move it, hold Shift for larger steps."
-msgstr "焦点。使用方向键移动，按住 Shift 键可增大移动步长。"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:8
+#: templates/admin/filer/tools/clipboard/clipboard.html:9
 msgid "Clipboard"
 msgstr ""
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:20
+#: templates/admin/filer/tools/clipboard/clipboard.html:21
 msgid "Paste all items here"
 msgstr ""
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Move all clipboard files to"
 msgstr ""
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Empty Clipboard"
 msgstr ""
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:49
+#: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
 msgstr ""
 
@@ -1206,8 +1114,8 @@ msgid "Expand"
 msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:20
-#: templates/admin/filer/widgets/admin_file.html:35
-#: templatetags/filer_admin_tags.py:132
+#: templates/admin/filer/widgets/admin_file.html:33
+#: templatetags/filer_admin_tags.py:114
 msgid "File is missing"
 msgstr ""
 
@@ -1240,31 +1148,25 @@ msgid "cancel search"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_file.html:11
-#: templates/admin/filer/widgets/admin_file.html:42
+#: templates/admin/filer/widgets/admin_file.html:40
 #: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:25
+#: templates/admin/filer/widgets/admin_file.html:23
 msgid "or drop your file here"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:31
-#, python-format
-msgid "Open '%(item_label)s' in a new window"
-msgstr "在新窗口中打开“%(item_label)s”"
-
-#: templates/admin/filer/widgets/admin_file.html:38
+#: templates/admin/filer/widgets/admin_file.html:36
 msgid "no file selected"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:53
+#: templates/admin/filer/widgets/admin_file.html:51
 #: templates/admin/filer/widgets/admin_folder.html:6
 msgid "Lookup"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:54
-#: templates/admin/filer/widgets/admin_file.html:55
+#: templates/admin/filer/widgets/admin_file.html:52
 msgid "Choose File"
 msgstr ""
 
@@ -1294,7 +1196,7 @@ msgid ""
 "vulnerability"
 msgstr ""
 
-#: validation.py:101 validation.py:137 validation.py:170
+#: validation.py:101
 #, python-brace-format
 msgid "File \"{file_name}\": Rejected due to incompatible format"
 msgstr ""
@@ -1334,6 +1236,9 @@ msgstr ""
 
 #~ msgid "Add Folder"
 #~ msgstr "Add Folder"
+
+#~ msgid "Subject Location"
+#~ msgstr "Subject location"
 
 #~ msgid ""
 #~ "\n"
