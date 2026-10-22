@@ -72,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     Dropzone.autoDiscover = false;
     const dropzone = new Dropzone(uploadButton, {
         url: uploadUrl,
-        headers: { 'X-CSRFToken': getCsrfToken() },
+        // filer shows upload errors itself: the server need not store them as Django messages
+        headers: { 'X-CSRFToken': getCsrfToken(), 'X-Filer-Inline-Errors': '1' },
         paramName: 'file',
         maxFilesize: maxFilesize,  // already in MB
         parallelUploads: maxUploaderConnections,
@@ -188,7 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    dropzone.on('error', (file, errorMessage) => {
+    dropzone.on('error', (file, error) => {
+        // Dropzone passes the parsed JSON body when the server rejects an upload;
+        // filer reports the reason in "error".
+        const errorMessage = (error && (error.error || error.message)) || error;
         const fileId = `file-${encodeURIComponent(file.name)}${file.size}${file.lastModified}`;
         const fileEl = document.getElementById(fileId);
         if (fileEl) {

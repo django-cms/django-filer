@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.template import Context, Template
@@ -864,6 +865,27 @@ class FilerClipboardAdminUrlsTests(TestCase):
             # Restore in a finally: FILER_MAX_IMAGE_PIXELS is a module global, so a
             # failing assertion would otherwise leak it into every later test.
             abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+
+    def test_filer_upload_error_message_only_for_uploaders_without_inline_errors(self):
+        """filer's own uploaders show errors themselves; a session message would repeat
+        the error after the listing reloads"""
+        folder = Folder.objects.create(name='foo')
+        url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+        empty_file = SimpleUploadedFile('empty.html', b'', content_type='text/html')
+
+        response = self.client.post(url, {'file': empty_file}, HTTP_X_FILER_INLINE_ERRORS='1')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('empty', json.loads(response.content.decode('utf-8'))['error'])
+        self.assertEqual(list(get_messages(response.wsgi_request)), [])
+
+        empty_file = SimpleUploadedFile('empty.html', b'', content_type='text/html')
+        response = self.client.post(url, {'file': empty_file})
+
+        self.assertEqual(response.status_code, 400)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level, ERROR)
 
     def test_filer_max_pixel_deactivation(self):
         from django.core.checks import Warning

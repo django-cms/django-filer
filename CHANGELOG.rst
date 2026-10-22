@@ -37,7 +37,13 @@ unreleased
   * Error messages no longer disappear after 5 seconds. They are shown as alerts,
     can be dismissed, and several errors are listed together. After a failed
     upload, the folder listing reloads only once the errors have been dismissed.
-    Messages are no longer parsed as HTML.
+    Messages are no longer parsed as HTML. filer's uploaders send an
+    ``X-Filer-Inline-Errors`` header; for these, the upload view no longer also
+    stores the error as a Django message, which showed it again after the reload.
+  * The file and image widgets show failed uploads the same way, right below the
+    widget, instead of in a browser ``alert()``. Inside django CMS, they use its
+    message bar, which now stays open until closed and no longer renders the
+    file name as HTML.
   * Disabled Upload/Copy/Move buttons are reachable by keyboard, explain why they
     are disabled, and show their tooltip on focus as well as on hover.
   * Visible focus outlines for the search field, the focal point and button-style
@@ -45,6 +51,12 @@ unreleased
   * The listing page has a heading, the image expand view is a complete HTML
     document with keyboard zoom, and animations respect
     ``prefers-reduced-motion``.
+
+* fix: The upload button showed failed uploads as ``[object Object]`` instead of
+  the reason.
+
+* fix: In the file and folder picker popup, the search field covered the folder
+  name and sat far from the buttons: the popup header used a fixed 30/70 split.
 
 3.6.0 (2026-09-12)
 ==================
