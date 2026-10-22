@@ -24,6 +24,7 @@ NO_PERMISSIONS_FOR_FOLDER = _(
     "Can't use this folder, Permission Denied. Please select another folder."
 )
 UPLOAD_ERROR = _("Upload failed. Please refresh and try again.")
+INLINE_ERRORS_HEADER = "X-Filer-Inline-Errors"
 
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
@@ -31,12 +32,17 @@ Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
 def _upload_error(request, message, status):
     """
-    Report a failed upload both as a Django message (shown on the next full page
-    load) and as a JSON body with a matching HTTP status code, so that the
-    uploader - and any proxy in between - can tell a rejected upload from an
+    Report a failed upload as a JSON body with a matching HTTP status code, so that
+    the uploader - and any proxy in between - can tell a rejected upload from an
     accepted one.
+
+    Unless the uploader shows the error itself (filer's own uploaders send the
+    ``X-Filer-Inline-Errors`` header), the error is also stored as a Django message
+    for the next full page load. Storing it for filer's uploaders would show the
+    error a second time after the user dismissed it and the listing reloaded.
     """
-    messages.error(request, message)
+    if not request.headers.get(INLINE_ERRORS_HEADER):
+        messages.error(request, message)
     return JsonResponse({'error': str(message)}, status=status)
 
 

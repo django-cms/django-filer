@@ -181,6 +181,10 @@ body {
     .breadcrumbs-container {
         display: table-cell;
         vertical-align: middle;
+        // Take all space the tools do not need: the automatic table layout otherwise
+        // shrinks this cell to the search field, which then covers the folder name
+        // and leaves a gap before the tools (e.g. in the picker popup)
+        width: 100%;
         @media screen and (max-width: $screen-tablet) {
             position: static;
             margin-right: 20px;
