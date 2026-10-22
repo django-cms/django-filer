@@ -6,38 +6,43 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-27 08:13+0200\n"
+"POT-Creation-Date: 2026-10-21 12:03+0200\n"
 "PO-Revision-Date: 2026-06-27 08:13+0000\n"
 "Last-Translator: \n"
-"Language-Team: Vietnamese (http://app.transifex.com/divio/django-filer/language/vi/)\n"
+"Language-Team: Vietnamese (http://app.transifex.com/divio/django-filer/"
+"language/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/clipboardadmin.py:18
+#: admin/clipboardadmin.py:21
 msgid "You do not have permission to upload files."
 msgstr "Bạn không có quyền tải tệp lên."
 
-#: admin/clipboardadmin.py:19
+#: admin/clipboardadmin.py:22
 msgid "Can't find folder to upload. Please refresh and try again"
 msgstr "Không tìm thấy thư mục để tải lên. Vui lòng làm mới và thử lại"
 
-#: admin/clipboardadmin.py:21
+#: admin/clipboardadmin.py:24
 msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 "Không thể sử dụng thư mục này, quyền bị từ chối. Vui lòng chọn thư mục khác."
 
-#: admin/fileadmin.py:79
+#: admin/clipboardadmin.py:26
+msgid "Upload failed. Please refresh and try again."
+msgstr "Tải lên thất bại. Vui lòng làm mới trang và thử lại."
+
+#: admin/fileadmin.py:80
 msgid "Advanced"
 msgstr "Nâng Cao"
 
-#: admin/fileadmin.py:200
+#: admin/fileadmin.py:206
 msgid "canonical URL"
 msgstr "URL hợp chuẩn"
 
-#: admin/folderadmin.py:424 admin/folderadmin.py:596
+#: admin/folderadmin.py:449 admin/folderadmin.py:640
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -45,80 +50,80 @@ msgstr ""
 "Những item được chọn để thực hiện hành động trên đó. Không có item nào bị "
 "thay đổi."
 
-#: admin/folderadmin.py:447
+#: admin/folderadmin.py:472
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Tất cả %(total_count)s được chọn"
 
-#: admin/folderadmin.py:473
+#: admin/folderadmin.py:502
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr "Thư mục liệt kê cho %(folder_name)s"
 
-#: admin/folderadmin.py:489
+#: admin/folderadmin.py:520
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 trên %(cnt)sđược chọn"
 
-#: admin/folderadmin.py:626
+#: admin/folderadmin.py:670
 msgid "No action selected."
 msgstr "Không có hành động được chọn"
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:719
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Di chuyển %(count)d tệp vào bộ nhớ tạm thành công"
 
-#: admin/folderadmin.py:683
+#: admin/folderadmin.py:724
 msgid "Move selected files to clipboard"
 msgstr "Di chuyển tệp đã chọn vào bộ nhớ tạm"
 
-#: admin/folderadmin.py:723
+#: admin/folderadmin.py:762
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Vô hiệu hóa quyền của %(count)dtệp thành công"
 
-#: admin/folderadmin.py:725
+#: admin/folderadmin.py:764
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Kích hoạt quyền của %(count)dtệp thành công"
 
-#: admin/folderadmin.py:733
+#: admin/folderadmin.py:772
 msgid "Enable permissions for selected files"
 msgstr "Kích hoạt quyền cho các tệp đã chọn"
 
-#: admin/folderadmin.py:739
+#: admin/folderadmin.py:778
 msgid "Disable permissions for selected files"
 msgstr "Vô hiệu hóa quyền của các tệp đã chọn"
 
-#: admin/folderadmin.py:820
+#: admin/folderadmin.py:867
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Đã xóa %(count)d tệp và/hoặc thư mục thành công. "
 
-#: admin/folderadmin.py:825
+#: admin/folderadmin.py:872
 msgid "Cannot delete files and/or folders"
 msgstr "Không thể xóa các tệp và/hoặc các thư mục"
 
-#: admin/folderadmin.py:827
+#: admin/folderadmin.py:874
 msgid "Are you sure?"
 msgstr "Bạn chắc chắn chứ?"
 
-#: admin/folderadmin.py:833
+#: admin/folderadmin.py:880
 msgid "Delete files and/or folders"
 msgstr "Xóa các tệp và/hoặc các thư mục"
 
-#: admin/folderadmin.py:854
+#: admin/folderadmin.py:901
 msgid "Delete selected files and/or folders"
 msgstr "Xóa các tệp và/hoặc các thư mục dã chọn"
 
-#: admin/folderadmin.py:961
+#: admin/folderadmin.py:1050
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Các thư mục với tên %s đã tồn tại ở vị trí đã chọn"
 
-#: admin/folderadmin.py:965
+#: admin/folderadmin.py:1054
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
@@ -126,25 +131,25 @@ msgid ""
 msgstr ""
 "Đã di chuyển %(count)d tệp và/hoặc thư mục tới thư mục '%(destination)s'."
 
-#: admin/folderadmin.py:973 admin/folderadmin.py:975
+#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
 msgid "Move files and/or folders"
 msgstr "Di chuyển tệp và/hoặc thư mục"
 
-#: admin/folderadmin.py:990
+#: admin/folderadmin.py:1079
 msgid "Move selected files and/or folders"
 msgstr "Đã di chuyển tệp và/hoặc thư mục đã chọn"
 
-#: admin/folderadmin.py:1047
+#: admin/folderadmin.py:1138
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Đã thành công đổi tên %(count)d tệp."
 
-#: admin/folderadmin.py:1056 admin/folderadmin.py:1058
-#: admin/folderadmin.py:1073
+#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
+#: admin/folderadmin.py:1164
 msgid "Rename files"
 msgstr "Đổi tên tệp"
 
-#: admin/folderadmin.py:1168
+#: admin/folderadmin.py:1261
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
@@ -153,24 +158,24 @@ msgstr ""
 "Đã thành công sao chép %(count)d tệp và/hoặc thư mục tới thư mục "
 "'%(destination)s'."
 
-#: admin/folderadmin.py:1186 admin/folderadmin.py:1188
+#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
 msgid "Copy files and/or folders"
 msgstr "Sao chép tệp và/hoặc thư mục"
 
-#: admin/folderadmin.py:1205
+#: admin/folderadmin.py:1298
 msgid "Copy selected files and/or folders"
 msgstr "Sao chép tệp và/hoặc thư mục đã chọn"
 
-#: admin/folderadmin.py:1310
+#: admin/folderadmin.py:1412
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Đã thành công thay đổi kích thước %(count)d ảnh."
 
-#: admin/folderadmin.py:1317 admin/folderadmin.py:1319
+#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
 msgid "Resize images"
 msgstr "Thay đổi kích thước ảnh"
 
-#: admin/folderadmin.py:1334
+#: admin/folderadmin.py:1436
 msgid "Resize selected images"
 msgstr "Thay dổi kích thước ảnh đã chọn"
 
@@ -221,43 +226,45 @@ msgstr "cao cấp"
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "Tùy chọn thumbnail hoặc tham số thay đổi kích thước phải được chọn."
 
-#: admin/imageadmin.py:21 admin/imageadmin.py:116
+#: admin/imageadmin.py:18 admin/imageadmin.py:96
 msgid "Subject location"
 msgstr "Vị trí chủ đề"
 
-#: admin/imageadmin.py:22
+#: admin/imageadmin.py:19
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "Vị trí của chủ đề chính của của quang cảnh. Định dạng: \"x,y\"."
 
-#: admin/imageadmin.py:59
+#: admin/imageadmin.py:56
 msgid "Invalid subject location format. "
 msgstr "Định dạng vị trí chủ đề không hợp lệ."
 
-#: admin/imageadmin.py:67
+#: admin/imageadmin.py:64
 msgid "Subject location is outside of the image. "
 msgstr "Vị trí chủ đề ở bên ngoài hình ảnh."
 
-#: admin/imageadmin.py:76
+#: admin/imageadmin.py:73
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr "Đầu vào của bạn: \"{subject_location}\"."
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:387
+#: admin/permissionadmin.py:13 models/foldermodels.py:411
 msgid "Who"
 msgstr "Ai"
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:408
+#: admin/permissionadmin.py:14 models/foldermodels.py:432
 msgid "What"
 msgstr "Cái gì"
 
-#: admin/views.py:55
+#: admin/views.py:54
 msgid "Folder with this name already exists."
 msgstr "Thư mục với tên này đã tồn tại."
 
-#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/admin/filer/folder/directory_listing.html:33
-#: templates/admin/filer/folder/legacy_listing.html:36
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/breadcrumbs.html:24
+#: templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/change_form.html:19
+#: templates/admin/filer/folder/listing_breadcrumbs.html:7
+#: templates/admin/filer/folder/listing_breadcrumbs.html:30
 msgid "Filer"
 msgstr "Filer"
 
@@ -285,7 +292,7 @@ msgstr "hình ảnh"
 msgid "images"
 msgstr "những hình ảnh"
 
-#: models/abstract.py:164
+#: models/abstract.py:183
 #, python-format
 msgid ""
 "Image format not recognized or image size exceeds limit of %(max_pixels)d "
@@ -294,10 +301,10 @@ msgid ""
 msgstr ""
 "Định dạng ảnh không được nhận diện hoặc kích thước ảnh vượt quá giới hạn "
 "%(max_pixels)d triệu pixel gấp hai lần trở lên. Trước khi tải lên lại, hãy "
-"kiểm tra định dạng tệp hoặc thay đổi kích thước ảnh về độ phân giải %(width)d "
-"x %(height)d hoặc thấp hơn."
+"kiểm tra định dạng tệp hoặc thay đổi kích thước ảnh về độ phân giải "
+"%(width)d x %(height)d hoặc thấp hơn."
 
-#: models/abstract.py:172
+#: models/abstract.py:191
 #, python-format
 msgid ""
 "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
@@ -308,11 +315,11 @@ msgstr ""
 "triệu pixel. Trước khi tải lên lại, hãy thay đổi kích thước ảnh về độ phân "
 "giải %(width)d x %(height)d hoặc thấp hơn."
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:296
+#: models/clipboardmodels.py:11 models/foldermodels.py:320
 msgid "user"
 msgstr "người dùng"
 
-#: models/clipboardmodels.py:17 models/filemodels.py:157
+#: models/clipboardmodels.py:17 models/filemodels.py:168
 msgid "files"
 msgstr "những tệp"
 
@@ -324,8 +331,8 @@ msgstr "bộ nhớ tạm"
 msgid "clipboards"
 msgstr "những bộ nhớ tạm"
 
-#: models/clipboardmodels.py:44 models/filemodels.py:74
-#: models/filemodels.py:156
+#: models/clipboardmodels.py:44 models/filemodels.py:85
+#: models/filemodels.py:167
 msgid "file"
 msgstr "tệp"
 
@@ -337,57 +344,58 @@ msgstr "item bộ nhớ tạm"
 msgid "clipboard items"
 msgstr "items bộ nhớ tạm"
 
-#: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: models/filemodels.py:77 templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
 msgstr "thư mục"
 
-#: models/filemodels.py:81
+#: models/filemodels.py:92
 msgid "file size"
 msgstr "kích thước tệp"
 
-#: models/filemodels.py:87
+#: models/filemodels.py:98
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:94
+#: models/filemodels.py:105
 msgid "has all mandatory data"
 msgstr "có tất cả dữ liệu ủy thác"
 
-#: models/filemodels.py:100
+#: models/filemodels.py:111
 msgid "original filename"
 msgstr "tên tệp gốc"
 
-#: models/filemodels.py:110 models/foldermodels.py:109
+#: models/filemodels.py:121 models/foldermodels.py:123
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr "tên"
 
-#: models/filemodels.py:116
+#: models/filemodels.py:127
 msgid "description"
 msgstr "mô tả"
 
-#: models/filemodels.py:125 models/foldermodels.py:115
+#: models/filemodels.py:136 models/foldermodels.py:129
 msgid "owner"
 msgstr "người sở hữu"
 
-#: models/filemodels.py:129 models/foldermodels.py:123
+#: models/filemodels.py:140 models/foldermodels.py:137
 msgid "uploaded at"
 msgstr "đã tải lên tại"
 
-#: models/filemodels.py:134 models/foldermodels.py:133
+#: models/filemodels.py:145 models/foldermodels.py:147
 msgid "modified at"
 msgstr "đã chỉnh sửa tại"
 
-#: models/filemodels.py:140
+#: models/filemodels.py:151
 msgid "Permissions disabled"
 msgstr "Quyền bị vô hiệu hóa"
 
-#: models/filemodels.py:141
+#: models/filemodels.py:152
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
@@ -395,129 +403,131 @@ msgstr ""
 "Vô hiệu hóa bất kỳ quyền kiểm tra cho tệp này. Tệp sẽ truy cập được bởi bất "
 "kỳ ai."
 
-#: models/foldermodels.py:101
+#: models/foldermodels.py:115
 msgid "parent"
 msgstr "cha"
 
-#: models/foldermodels.py:128
+#: models/foldermodels.py:142
 msgid "created at"
 msgstr "đã tạo tại"
 
-#: models/foldermodels.py:143 templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/folder/legacy_listing.html:38
+#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:25
+#: templates/admin/filer/folder/listing_breadcrumbs.html:8
+#: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Folder"
 msgstr "Thư mục"
 
-#: models/foldermodels.py:144
+#: models/foldermodels.py:158
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Những thư mục"
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:291
 msgid "all items"
 msgstr "tất cả đồ"
 
-#: models/foldermodels.py:268
+#: models/foldermodels.py:292
 msgid "this item only"
 msgstr "chỉ đồ này"
 
-#: models/foldermodels.py:269
+#: models/foldermodels.py:293
 msgid "this item and all children"
 msgstr "đồ này và tất cả các con"
 
-#: models/foldermodels.py:273
+#: models/foldermodels.py:297
 msgid "inherit"
 msgstr "kế thừa"
 
-#: models/foldermodels.py:274
+#: models/foldermodels.py:298
 msgid "allow"
 msgstr "cho phép"
 
-#: models/foldermodels.py:275
+#: models/foldermodels.py:299
 msgid "deny"
 msgstr "không cho phép"
 
-#: models/foldermodels.py:287
+#: models/foldermodels.py:311
 msgid "type"
 msgstr "kiểu"
 
-#: models/foldermodels.py:304
+#: models/foldermodels.py:328
 msgid "group"
 msgstr "nhóm"
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:335
 msgid "everybody"
 msgstr "tất cả mọi người"
 
-#: models/foldermodels.py:316
+#: models/foldermodels.py:340
 msgid "can read"
 msgstr "có thể đọc"
 
-#: models/foldermodels.py:324
+#: models/foldermodels.py:348
 msgid "can edit"
 msgstr "có thể chỉnh sửa"
 
-#: models/foldermodels.py:332
+#: models/foldermodels.py:356
 msgid "can add children"
 msgstr "có thể thêm con"
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:364
 msgid "folder permission"
 msgstr "quyền thư mục"
 
-#: models/foldermodels.py:341
+#: models/foldermodels.py:365
 msgid "folder permissions"
 msgstr "những quyền thư mục"
 
-#: models/foldermodels.py:355
+#: models/foldermodels.py:379
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr "Không thể chọn thư mục với kiểu \"tất cả đồ\"."
 
-#: models/foldermodels.py:357
+#: models/foldermodels.py:381
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr "Phải chọn thư mục khi kiểu không phải là \"tất cả đồ\"."
 
-#: models/foldermodels.py:359
+#: models/foldermodels.py:383
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr "Không thể chọn người dùng hoặc nhóm cùng với \"tất cả mọi người\"."
 
-#: models/foldermodels.py:361
+#: models/foldermodels.py:385
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 "Phải chọn ít nhất một trong người dùng, nhóm, hoặc \"tất cả mọi người\"."
 
-#: models/foldermodels.py:367
+#: models/foldermodels.py:391
 msgid "All Folders"
 msgstr "Tất cả thư mục"
 
-#: models/foldermodels.py:369
+#: models/foldermodels.py:393
 msgid "Logical Path"
 msgstr "Đường dẫn logic"
 
-#: models/foldermodels.py:378
+#: models/foldermodels.py:402
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Người dùng: {user}"
 
-#: models/foldermodels.py:380
+#: models/foldermodels.py:404
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Nhóm: {group}"
 
-#: models/foldermodels.py:382
+#: models/foldermodels.py:406
 msgid "Everybody"
 msgstr "Tất cả mọi người"
 
-#: models/foldermodels.py:395 templates/admin/filer/widgets/admin_file.html:46
+#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
+#: templates/admin/filer/widgets/admin_file.html:49
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
-#: models/foldermodels.py:396
+#: models/foldermodels.py:420
 msgid "Read"
 msgstr "Đọc"
 
-#: models/foldermodels.py:397
+#: models/foldermodels.py:421
 msgid "Add children"
 msgstr "Thêm con"
 
@@ -551,10 +561,10 @@ msgstr "những tùy chọn thumbnail"
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
-#: templates/admin/filer/folder/directory_table_list.html:184
+#: templates/admin/filer/folder/directory_table_list.html:188
 #: templates/admin/filer/folder/directory_thumbnail_list.html:5
-#: templates/admin/filer/folder/directory_thumbnail_list.html:157
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/folder/directory_thumbnail_list.html:160
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Unsorted Uploads"
 msgstr "Những tải lên chưa sắp xếp"
 
@@ -562,9 +572,10 @@ msgstr "Những tải lên chưa sắp xếp"
 msgid "files with missing metadata"
 msgstr "những tệp với metadata bị mất"
 
-#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 msgid "root"
 msgstr "gốc"
 
@@ -584,55 +595,63 @@ msgstr "Chạy hành dộng đã chọn"
 msgid "Go"
 msgstr "Đi"
 
-#: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table_list.html:249
-#: templates/admin/filer/folder/directory_thumbnail_list.html:221
+#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/folder/directory_table_list.html:252
+#: templates/admin/filer/folder/directory_thumbnail_list.html:223
 msgid "Click here to select the objects across all pages"
 msgstr "Bấn ở đây để chọn những đối tượng xuyên suốt tất cả các trang"
 
-#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
 msgstr "Chọn tất cả %(total_count)s tệp và/hoặc thư mục"
 
-#: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table_list.html:251
-#: templates/admin/filer/folder/directory_thumbnail_list.html:223
+#: templates/admin/filer/actions.html:13
+#: templates/admin/filer/folder/directory_table_list.html:254
+#: templates/admin/filer/folder/directory_thumbnail_list.html:225
 msgid "Clear selection"
 msgstr "Xóa chọn"
 
-#: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/directory_listing.html:28
-#: templates/admin/filer/folder/legacy_listing.html:31
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/breadcrumbs.html:23
+#: templates/admin/filer/folder/listing_breadcrumbs.html:6
+#: templates/admin/filer/folder/listing_breadcrumbs.html:25
 msgid "Go back to admin homepage"
 msgstr "Trở lại trang chủ người quản trị"
 
-#: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/directory_listing.html:29
-#: templates/admin/filer/folder/legacy_listing.html:32
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/breadcrumbs.html:23
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/folder/listing_breadcrumbs.html:6
+#: templates/admin/filer/folder/listing_breadcrumbs.html:26
 msgid "Home"
 msgstr "Trang chủ"
 
-#: templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/directory_listing.html:32
-#: templates/admin/filer/folder/legacy_listing.html:35
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/breadcrumbs.html:24
+#: templates/admin/filer/folder/listing_breadcrumbs.html:7
+#: templates/admin/filer/folder/listing_breadcrumbs.html:29
 msgid "Go back to Filer app"
 msgstr "Trở lại ứng dụng Filer"
 
-#: templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/folder/legacy_listing.html:38
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:25
+#: templates/admin/filer/folder/listing_breadcrumbs.html:8
+#: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Go back to root folder"
 msgstr "Trở lại thư mục gốc"
 
-#: templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:18
-#: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:39
-#: templates/admin/filer/folder/directory_listing.html:47
-#: templates/admin/filer/folder/legacy_listing.html:42
-#: templates/admin/filer/folder/legacy_listing.html:50
+#: templates/admin/filer/breadcrumbs.html:10
+#: templates/admin/filer/breadcrumbs.html:14
+#: templates/admin/filer/breadcrumbs.html:27
+#: templates/admin/filer/breadcrumbs.html:37
+#: templates/admin/filer/folder/change_form.html:12
+#: templates/admin/filer/folder/change_form.html:22
+#: templates/admin/filer/folder/listing_breadcrumbs.html:10
+#: templates/admin/filer/folder/listing_breadcrumbs.html:14
+#: templates/admin/filer/folder/listing_breadcrumbs.html:36
+#: templates/admin/filer/folder/listing_breadcrumbs.html:44
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Trở lại '%(folder_name)s' thư mục"
@@ -677,42 +696,32 @@ msgid "Yes, I&#39;m sure"
 msgstr "Có, Tôi chắc chắn"
 
 #: templates/admin/filer/file/change_form.html:16
-#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/folder/change_form.html:34
 #: templates/admin/filer/image/change_form.html:15
 msgid "History"
 msgstr "Lịch sử"
 
 #: templates/admin/filer/file/change_form.html:18
-#: templates/admin/filer/folder/change_form.html:23
+#: templates/admin/filer/folder/change_form.html:36
 #: templates/admin/filer/image/change_form.html:17
 msgid "View on site"
 msgstr "Xem trên trang web"
 
-#: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/folder/change_form.html:19
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 msgid "Go back to"
 msgstr "Quay lại"
 
-#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/change_form.html:18
 msgid "admin homepage"
 msgstr "trang chủ người quản trị"
-
-#: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:98
-#: templates/admin/filer/folder/directory_listing.html:106
-#: templates/admin/filer/folder/directory_table_list.html:29
-#: templates/admin/filer/folder/directory_table_list.html:61
-#: templates/admin/filer/folder/directory_table_list.html:195
-#: templates/admin/filer/folder/directory_thumbnail_list.html:27
-#: templates/admin/filer/folder/directory_thumbnail_list.html:63
-#: templates/admin/filer/folder/directory_thumbnail_list.html:167
-#: templates/admin/filer/folder/legacy_listing.html:98
-#: templates/admin/filer/folder/legacy_listing.html:106
-msgid "Folder Icon"
-msgstr "Biểu tượng thư mục"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
@@ -754,12 +763,13 @@ msgstr "Thư mục đích:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:181
-#: templates/admin/filer/folder/legacy_listing.html:181
+#: templates/admin/filer/folder/directory_listing.html:145
+#: templates/admin/filer/folder/legacy_listing.html:145
 msgid "Copy"
 msgstr "Sao chép"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
+#: templates/admin/filer/folder/choose_copy_destination.html:70
 msgid "It is not allowed to copy files into same folder"
 msgstr "Không cho phép sao chép tệp tới cùng thư mục"
 
@@ -818,12 +828,13 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:61
 #: templates/admin/filer/folder/choose_move_destination.html:64
-#: templates/admin/filer/folder/directory_listing.html:184
-#: templates/admin/filer/folder/legacy_listing.html:184
+#: templates/admin/filer/folder/directory_listing.html:148
+#: templates/admin/filer/folder/legacy_listing.html:148
 msgid "Move"
 msgstr "Di chuyển"
 
 #: templates/admin/filer/folder/choose_move_destination.html:63
+#: templates/admin/filer/folder/choose_move_destination.html:66
 msgid "It is not allowed to move files into same folder"
 msgstr "Không cho phép di chuyển tệp vào cùng thư mục"
 
@@ -848,83 +859,111 @@ msgstr ""
 msgid "Rename"
 msgstr "Đổi tên"
 
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/legacy_listing.html:97
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/legacy_listing.html:52
+msgid "Show parent folders"
+msgstr "Hiển thị các thư mục cha"
+
+#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/legacy_listing.html:59
 msgid "Go back to the parent folder"
 msgstr "Trở lại thư mục cha"
 
-#: templates/admin/filer/folder/directory_listing.html:134
-#: templates/admin/filer/folder/legacy_listing.html:134
+#: templates/admin/filer/folder/directory_listing.html:92
+#: templates/admin/filer/folder/legacy_listing.html:92
+msgid "Folder actions"
+msgstr "Thao tác với thư mục"
+
+#: templates/admin/filer/folder/directory_listing.html:97
+#: templates/admin/filer/folder/legacy_listing.html:97
 msgid "Change current folder details"
 msgstr "Thay đổi thông tin chi tiết thư mục hiện tại"
 
-#: templates/admin/filer/folder/directory_listing.html:134
-#: templates/admin/filer/folder/legacy_listing.html:134
+#: templates/admin/filer/folder/directory_listing.html:97
+#: templates/admin/filer/folder/legacy_listing.html:97
 msgid "Change"
 msgstr "Thay đổi"
 
-#: templates/admin/filer/folder/directory_listing.html:144
-#: templates/admin/filer/folder/legacy_listing.html:144
+#: templates/admin/filer/folder/directory_listing.html:107
+#: templates/admin/filer/folder/legacy_listing.html:107
 msgid "Click here to run search for entered phrase"
 msgstr "Bấm vào đây để chạy tìm kiếm cho đoạn văn đã nhập"
 
-#: templates/admin/filer/folder/directory_listing.html:147
-#: templates/admin/filer/folder/legacy_listing.html:147
+#: templates/admin/filer/folder/directory_listing.html:107
+#: templates/admin/filer/folder/directory_listing.html:110
+#: templates/admin/filer/folder/legacy_listing.html:107
+#: templates/admin/filer/folder/legacy_listing.html:110
 msgid "Search"
 msgstr "Tìm kiếm"
 
-#: templates/admin/filer/folder/directory_listing.html:154
-#: templates/admin/filer/folder/legacy_listing.html:154
+#: templates/admin/filer/folder/directory_listing.html:113
+#: templates/admin/filer/folder/legacy_listing.html:113
+msgid "Search options"
+msgstr "Tùy chọn tìm kiếm"
+
+#: templates/admin/filer/folder/directory_listing.html:118
+#: templates/admin/filer/folder/legacy_listing.html:118
 msgid "Close"
 msgstr "Đóng"
 
-#: templates/admin/filer/folder/directory_listing.html:156
-#: templates/admin/filer/folder/legacy_listing.html:156
+#: templates/admin/filer/folder/directory_listing.html:120
+#: templates/admin/filer/folder/legacy_listing.html:120
 msgid "Limit"
 msgstr "Giới hạn"
 
-#: templates/admin/filer/folder/directory_listing.html:161
-#: templates/admin/filer/folder/legacy_listing.html:161
+#: templates/admin/filer/folder/directory_listing.html:125
+#: templates/admin/filer/folder/legacy_listing.html:125
 msgid "Check it to limit the search to current folder"
 msgstr "Chọn để giới hạn tìm kiếm cho thư mục hiện tại"
 
-#: templates/admin/filer/folder/directory_listing.html:162
-#: templates/admin/filer/folder/legacy_listing.html:162
+#: templates/admin/filer/folder/directory_listing.html:126
+#: templates/admin/filer/folder/legacy_listing.html:126
 msgid "Limit the search to current folder"
 msgstr "Giới hạn tìm kiếm cho thư mục hiện tại"
 
-#: templates/admin/filer/folder/directory_listing.html:178
-#: templates/admin/filer/folder/legacy_listing.html:178
+#: templates/admin/filer/folder/directory_listing.html:142
+#: templates/admin/filer/folder/legacy_listing.html:142
 msgid "Delete"
 msgstr "Xóa"
 
-#: templates/admin/filer/folder/directory_listing.html:206
-#: templates/admin/filer/folder/legacy_listing.html:206
+#: templates/admin/filer/folder/directory_listing.html:153
+#: templates/admin/filer/folder/legacy_listing.html:153
+msgid "More actions"
+msgstr "Thao tác khác"
+
+#: templates/admin/filer/folder/directory_listing.html:171
+#: templates/admin/filer/folder/legacy_listing.html:171
 msgid "Adds a new Folder"
 msgstr "Thêm một thư mục mới"
 
-#: templates/admin/filer/folder/directory_listing.html:209
-#: templates/admin/filer/folder/legacy_listing.html:209
+#: templates/admin/filer/folder/directory_listing.html:174
+#: templates/admin/filer/folder/legacy_listing.html:174
 msgid "New Folder"
 msgstr "Thư mục mới"
 
-#: templates/admin/filer/folder/directory_listing.html:214
-#: templates/admin/filer/folder/directory_listing.html:221
-#: templates/admin/filer/folder/directory_listing.html:224
-#: templates/admin/filer/folder/directory_listing.html:231
-#: templates/admin/filer/folder/directory_listing.html:238
-#: templates/admin/filer/folder/legacy_listing.html:214
-#: templates/admin/filer/folder/legacy_listing.html:221
-#: templates/admin/filer/folder/legacy_listing.html:224
-#: templates/admin/filer/folder/legacy_listing.html:231
-#: templates/admin/filer/folder/legacy_listing.html:238
+#: templates/admin/filer/folder/directory_listing.html:179
+#: templates/admin/filer/folder/directory_listing.html:186
+#: templates/admin/filer/folder/directory_listing.html:189
+#: templates/admin/filer/folder/directory_listing.html:196
+#: templates/admin/filer/folder/directory_listing.html:204
+#: templates/admin/filer/folder/legacy_listing.html:179
+#: templates/admin/filer/folder/legacy_listing.html:186
+#: templates/admin/filer/folder/legacy_listing.html:189
+#: templates/admin/filer/folder/legacy_listing.html:196
+#: templates/admin/filer/folder/legacy_listing.html:204
 msgid "Upload Files"
 msgstr "Tải tệp lên"
 
-#: templates/admin/filer/folder/directory_listing.html:236
-#: templates/admin/filer/folder/legacy_listing.html:236
+#: templates/admin/filer/folder/directory_listing.html:201
+#: templates/admin/filer/folder/directory_listing.html:206
+#: templates/admin/filer/folder/legacy_listing.html:201
+#: templates/admin/filer/folder/legacy_listing.html:206
 msgid "You have to select a folder first"
 msgstr "Bạn đầu tiên phải chọn một thư mục"
+
+#: templates/admin/filer/folder/directory_table_list.html:12
+msgid "Select all objects on this page for an action"
+msgstr "Chọn tất cả đối tượng trên trang này để thực hiện thao tác"
 
 #: templates/admin/filer/folder/directory_table_list.html:16
 msgid "Name"
@@ -946,149 +985,194 @@ msgstr "Hành động"
 
 #: templates/admin/filer/folder/directory_table_list.html:28
 #: templates/admin/filer/folder/directory_table_list.html:35
-#: templates/admin/filer/folder/directory_table_list.html:60
-#: templates/admin/filer/folder/directory_table_list.html:67
+#: templates/admin/filer/folder/directory_table_list.html:62
+#: templates/admin/filer/folder/directory_table_list.html:69
+#: templates/admin/filer/folder/directory_table_list.html:87
 #: templates/admin/filer/folder/directory_thumbnail_list.html:26
 #: templates/admin/filer/folder/directory_thumbnail_list.html:32
-#: templates/admin/filer/folder/directory_thumbnail_list.html:62
-#: templates/admin/filer/folder/directory_thumbnail_list.html:68
+#: templates/admin/filer/folder/directory_thumbnail_list.html:64
+#: templates/admin/filer/folder/directory_thumbnail_list.html:70
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr "Thay đổi thông tin chi tiết thư mục '%(item_label)s' "
 
-#: templates/admin/filer/folder/directory_table_list.html:78
+#: templates/admin/filer/folder/directory_table_list.html:52
+#: templates/admin/filer/folder/directory_thumbnail_list.html:54
+msgid "Select this folder"
+msgstr "Chọn thư mục này"
+
+#: templates/admin/filer/folder/directory_table_list.html:53
+#: templates/admin/filer/folder/directory_table_list.html:57
+#: templates/admin/filer/folder/directory_thumbnail_list.html:55
+#: templates/admin/filer/folder/directory_thumbnail_list.html:59
+#, python-format
+msgid "Select folder '%(item_label)s'"
+msgstr "Chọn thư mục '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table_list.html:80
 #: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] "%(counter)s thư mục"
 
-#: templates/admin/filer/folder/directory_table_list.html:79
+#: templates/admin/filer/folder/directory_table_list.html:81
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] "%(counter)s tệp"
 
-#: templates/admin/filer/folder/directory_table_list.html:85
+#: templates/admin/filer/folder/directory_table_list.html:87
 msgid "Change folder details"
 msgstr "Thay dổi thông tin chi tiết thư mục"
 
-#: templates/admin/filer/folder/directory_table_list.html:86
+#: templates/admin/filer/folder/directory_table_list.html:88
 msgid "Remove folder"
 msgstr "Xóa thư mục"
 
-#: templates/admin/filer/folder/directory_table_list.html:102
-#: templates/admin/filer/folder/directory_table_list.html:114
-#: templates/admin/filer/folder/directory_table_list.html:133
-#: templates/admin/filer/folder/directory_thumbnail_list.html:100
-#: templates/admin/filer/folder/directory_thumbnail_list.html:112
-#: templates/admin/filer/folder/directory_thumbnail_list.html:130
+#: templates/admin/filer/folder/directory_table_list.html:88
+#, python-format
+msgid "Remove folder '%(item_label)s'"
+msgstr "Xóa thư mục '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table_list.html:104
+#: templates/admin/filer/folder/directory_table_list.html:117
+#: templates/admin/filer/folder/directory_table_list.html:136
+#: templates/admin/filer/folder/directory_thumbnail_list.html:102
+#: templates/admin/filer/folder/directory_thumbnail_list.html:115
+#: templates/admin/filer/folder/directory_thumbnail_list.html:133
 msgid "Select this file"
 msgstr "Chọn tệp này"
 
-#: templates/admin/filer/folder/directory_table_list.html:117
-#: templates/admin/filer/folder/directory_table_list.html:136
-#: templates/admin/filer/folder/directory_table_list.html:168
-#: templates/admin/filer/folder/directory_thumbnail_list.html:115
-#: templates/admin/filer/folder/directory_thumbnail_list.html:133
+#: templates/admin/filer/folder/directory_table_list.html:105
+#: templates/admin/filer/folder/directory_table_list.html:107
+#: templates/admin/filer/folder/directory_thumbnail_list.html:103
+#: templates/admin/filer/folder/directory_thumbnail_list.html:105
+#, python-format
+msgid "Select file '%(item_label)s'"
+msgstr "Chọn tệp '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table_list.html:120
+#: templates/admin/filer/folder/directory_table_list.html:139
+#: templates/admin/filer/folder/directory_table_list.html:172
+#: templates/admin/filer/folder/directory_thumbnail_list.html:118
+#: templates/admin/filer/folder/directory_thumbnail_list.html:136
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Thay đổi thông tin chi tiết '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "Permissions"
 msgstr "Quyền"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "disabled"
 msgstr "đã vô hiệu hóa"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "enabled"
 msgstr "đã kích hoạt"
 
-#: templates/admin/filer/folder/directory_table_list.html:158
+#: templates/admin/filer/folder/directory_table_list.html:161
 msgid "URL copied to clipboard"
 msgstr "Đã sao chép URL vào bộ nhớ tạm"
 
-#: templates/admin/filer/folder/directory_table_list.html:161
+#: templates/admin/filer/folder/directory_table_list.html:164
 #, python-format
 msgid "Canonical url '%(item_label)s'"
 msgstr "Url hợp chuẩn '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:165
 #, python-format
+msgid "Copy canonical url of '%(item_label)s'"
+msgstr "Sao chép URL hợp chuẩn của '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table_list.html:169
+#, python-format
 msgid "Download '%(item_label)s'"
 msgstr "Tải '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:169
+#: templates/admin/filer/folder/directory_table_list.html:173
 msgid "Remove file"
 msgstr "Xóa tệp"
 
-#: templates/admin/filer/folder/directory_table_list.html:177
-#: templates/admin/filer/folder/directory_thumbnail_list.html:149
+#: templates/admin/filer/folder/directory_table_list.html:173
+#, python-format
+msgid "Remove file '%(item_label)s'"
+msgstr "Xóa tệp '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table_list.html:181
+#: templates/admin/filer/folder/directory_thumbnail_list.html:152
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr "Thả tệp ở đây hoặc sử dụng nút \"Tải tệp lên\""
 
-#: templates/admin/filer/folder/directory_table_list.html:192
-#: templates/admin/filer/folder/directory_thumbnail_list.html:164
+#: templates/admin/filer/folder/directory_table_list.html:196
+#: templates/admin/filer/folder/directory_thumbnail_list.html:167
 msgid "Drop your file to upload into:"
 msgstr "Thả tệp của bạn để tải lên:"
 
-#: templates/admin/filer/folder/directory_table_list.html:202
-#: templates/admin/filer/folder/directory_thumbnail_list.html:174
+#: templates/admin/filer/folder/directory_table_list.html:206
+#: templates/admin/filer/folder/directory_thumbnail_list.html:177
 msgid "Upload"
 msgstr "Tải lên"
 
-#: templates/admin/filer/folder/directory_table_list.html:214
-#: templates/admin/filer/folder/directory_thumbnail_list.html:186
+#: templates/admin/filer/folder/directory_table_list.html:218
+#: templates/admin/filer/folder/directory_thumbnail_list.html:189
 msgid "cancel"
 msgstr "hủy"
 
-#: templates/admin/filer/folder/directory_table_list.html:218
-#: templates/admin/filer/folder/directory_thumbnail_list.html:190
+#: templates/admin/filer/folder/directory_table_list.html:222
+#: templates/admin/filer/folder/directory_thumbnail_list.html:193
 msgid "Upload success!"
 msgstr "Tải lên thành công!"
 
-#: templates/admin/filer/folder/directory_table_list.html:222
-#: templates/admin/filer/folder/directory_thumbnail_list.html:194
+#: templates/admin/filer/folder/directory_table_list.html:226
+#: templates/admin/filer/folder/directory_thumbnail_list.html:197
 msgid "Upload canceled!"
 msgstr "Tải lên đã bị hủy!"
 
-#: templates/admin/filer/folder/directory_table_list.html:229
-#: templates/admin/filer/folder/directory_thumbnail_list.html:201
+#: templates/admin/filer/folder/directory_table_list.html:233
+#: templates/admin/filer/folder/directory_thumbnail_list.html:204
 msgid "previous"
 msgstr "trước đó"
 
-#: templates/admin/filer/folder/directory_table_list.html:234
-#: templates/admin/filer/folder/directory_thumbnail_list.html:206
+#: templates/admin/filer/folder/directory_table_list.html:238
+#: templates/admin/filer/folder/directory_thumbnail_list.html:209
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr "Trang %(number)s trên %(num_pages)s."
 
-#: templates/admin/filer/folder/directory_table_list.html:239
-#: templates/admin/filer/folder/directory_thumbnail_list.html:211
+#: templates/admin/filer/folder/directory_table_list.html:243
+#: templates/admin/filer/folder/directory_thumbnail_list.html:214
 msgid "next"
 msgstr "tiếp theo"
 
-#: templates/admin/filer/folder/directory_table_list.html:249
-#: templates/admin/filer/folder/directory_thumbnail_list.html:221
+#: templates/admin/filer/folder/directory_table_list.html:252
+#: templates/admin/filer/folder/directory_thumbnail_list.html:223
 #, python-format
 msgid "Select all %(total_count)s"
 msgstr "Chọn tất cả %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
-#: templates/admin/filer/folder/directory_thumbnail_list.html:82
+#: templates/admin/filer/folder/directory_thumbnail_list.html:84
 msgid "Select all"
 msgstr "Chọn tất cả"
 
-#: templates/admin/filer/folder/directory_thumbnail_list.html:79
+#: templates/admin/filer/folder/directory_thumbnail_list.html:16
+msgid "Select all folders"
+msgstr "Chọn tất cả thư mục"
+
+#: templates/admin/filer/folder/directory_thumbnail_list.html:81
 msgid "Files"
 msgstr "Những tệp"
+
+#: templates/admin/filer/folder/directory_thumbnail_list.html:85
+msgid "Select all files"
+msgstr "Chọn tất cả tệp"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
@@ -1108,6 +1192,10 @@ msgstr[0] "Hãy sửa lỗi dưới đây."
 msgid "Save"
 msgstr "Lưu"
 
+#: templates/admin/filer/image/expand.html:24
+msgid "Toggle zoom"
+msgstr "Bật/tắt thu phóng"
+
 #: templates/admin/filer/templatetags/file_icon.html:9
 msgid "Your browser does not support audio."
 msgstr "Trình duyệt của bạn không hỗ trợ âm thanh."
@@ -1116,23 +1204,30 @@ msgstr "Trình duyệt của bạn không hỗ trợ âm thanh."
 msgid "Your browser does not support video."
 msgstr "Trình duyệt của bạn không hỗ trợ video."
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:9
+#: templates/admin/filer/templatetags/file_icon.html:36
+msgid ""
+"Focal point. Use the arrow keys to move it, hold Shift for larger steps."
+msgstr ""
+"Điểm tiêu cự. Dùng các phím mũi tên để di chuyển, giữ Shift để di chuyển với "
+"bước lớn hơn."
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:8
 msgid "Clipboard"
 msgstr "Bộ nhớ tạm"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:21
+#: templates/admin/filer/tools/clipboard/clipboard.html:20
 msgid "Paste all items here"
 msgstr "Dán những thứ ở đây"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Move all clipboard files to"
 msgstr "Di chuyển tất cả tệp bộ nhớ tạm tới"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Empty Clipboard"
 msgstr "Làm rỗng bộ nhớ tạm"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:50
+#: templates/admin/filer/tools/clipboard/clipboard.html:49
 msgid "the clipboard is empty"
 msgstr "bộ nhớ tạm rỗng"
 
@@ -1149,8 +1244,8 @@ msgid "Expand"
 msgstr "Mở rộng"
 
 #: templates/admin/filer/tools/detail_info.html:20
-#: templates/admin/filer/widgets/admin_file.html:33
-#: templatetags/filer_admin_tags.py:114
+#: templates/admin/filer/widgets/admin_file.html:35
+#: templatetags/filer_admin_tags.py:132
 msgid "File is missing"
 msgstr "Tệp bị thiếu"
 
@@ -1183,25 +1278,31 @@ msgid "cancel search"
 msgstr "hủy tìm kiếm"
 
 #: templates/admin/filer/widgets/admin_file.html:11
-#: templates/admin/filer/widgets/admin_file.html:40
+#: templates/admin/filer/widgets/admin_file.html:42
 #: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "Xóa"
 
-#: templates/admin/filer/widgets/admin_file.html:23
+#: templates/admin/filer/widgets/admin_file.html:25
 msgid "or drop your file here"
 msgstr "hoặc thả tệp của bạn ở đây"
 
-#: templates/admin/filer/widgets/admin_file.html:36
+#: templates/admin/filer/widgets/admin_file.html:31
+#, python-format
+msgid "Open '%(item_label)s' in a new window"
+msgstr "Mở '%(item_label)s' trong cửa sổ mới"
+
+#: templates/admin/filer/widgets/admin_file.html:38
 msgid "no file selected"
 msgstr "không có tệp được chọn"
 
-#: templates/admin/filer/widgets/admin_file.html:51
+#: templates/admin/filer/widgets/admin_file.html:53
 #: templates/admin/filer/widgets/admin_folder.html:6
 msgid "Lookup"
 msgstr "Tìm kiếm"
 
-#: templates/admin/filer/widgets/admin_file.html:52
+#: templates/admin/filer/widgets/admin_file.html:54
+#: templates/admin/filer/widgets/admin_file.html:55
 msgid "Choose File"
 msgstr "Chọn tệp"
 
@@ -1237,7 +1338,7 @@ msgstr ""
 "Tệp \"{file_name}\": Bị từ chối do lỗ hổng tiềm ẩn về tấn công cross site "
 "scripting"
 
-#: validation.py:101
+#: validation.py:101 validation.py:137 validation.py:170
 #, python-brace-format
 msgid "File \"{file_name}\": Rejected due to incompatible format"
 msgstr "Tệp \"{file_name}\": Bị từ chối do định dạng không tương thích"

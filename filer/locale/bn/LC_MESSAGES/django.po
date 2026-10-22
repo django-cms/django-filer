@@ -6,119 +6,127 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-27 08:13+0200\n"
+"POT-Creation-Date: 2026-10-21 12:03+0200\n"
 "PO-Revision-Date: 2026-06-27 08:13+0000\n"
 "Last-Translator: \n"
-"Language-Team: Bengali (http://app.transifex.com/divio/django-filer/language/bn/)\n"
+"Language-Team: Bengali (http://app.transifex.com/divio/django-filer/language/"
+"bn/)\n"
 "Language: bn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/clipboardadmin.py:18
+#: admin/clipboardadmin.py:21
 msgid "You do not have permission to upload files."
 msgstr "ফাইল আপলোড করার অনুমতি আপনার নেই।"
 
-#: admin/clipboardadmin.py:19
+#: admin/clipboardadmin.py:22
 msgid "Can't find folder to upload. Please refresh and try again"
-msgstr "আপলোড করার জন্য ফোল্ডার খুঁজে পাওয়া যায়নি। অনুগ্রহ করে রিফ্রেশ করে আবার চেষ্টা করুন"
+msgstr ""
+"আপলোড করার জন্য ফোল্ডার খুঁজে পাওয়া যায়নি। অনুগ্রহ করে রিফ্রেশ করে আবার চেষ্টা করুন"
 
-#: admin/clipboardadmin.py:21
+#: admin/clipboardadmin.py:24
 msgid "Can't use this folder, Permission Denied. Please select another folder."
-msgstr "এই ফোল্ডারটি ব্যবহার করা যাবে না, অনুমতি অস্বীকৃত। অনুগ্রহ করে অন্য একটি ফোল্ডার নির্বাচন করুন।"
+msgstr ""
+"এই ফোল্ডারটি ব্যবহার করা যাবে না, অনুমতি অস্বীকৃত। অনুগ্রহ করে অন্য একটি ফোল্ডার "
+"নির্বাচন করুন।"
 
-#: admin/fileadmin.py:79
+#: admin/clipboardadmin.py:26
+msgid "Upload failed. Please refresh and try again."
+msgstr "আপলোড ব্যর্থ হয়েছে। পৃষ্ঠাটি রিফ্রেশ করে আবার চেষ্টা করুন।"
+
+#: admin/fileadmin.py:80
 msgid "Advanced"
 msgstr "উন্নত"
 
-#: admin/fileadmin.py:200
+#: admin/fileadmin.py:206
 msgid "canonical URL"
 msgstr "ক্যানোনিক্যাল URL"
 
-#: admin/folderadmin.py:424 admin/folderadmin.py:596
+#: admin/folderadmin.py:449 admin/folderadmin.py:640
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"আইটেমগুলিতে কাজ সম্পাদন করতে হলে সেগুলি নির্বাচন করতে হবে। কোনো আইটেম "
-"পরিবর্তন করা হয়নি।"
+"আইটেমগুলিতে কাজ সম্পাদন করতে হলে সেগুলি নির্বাচন করতে হবে। কোনো আইটেম পরিবর্তন "
+"করা হয়নি।"
 
-#: admin/folderadmin.py:447
+#: admin/folderadmin.py:472
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s টি নির্বাচিত"
 msgstr[1] "সবগুলি %(total_count)s টি নির্বাচিত"
 
-#: admin/folderadmin.py:473
+#: admin/folderadmin.py:502
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr "%(folder_name)s এর জন্য ডিরেক্টরি তালিকা"
 
-#: admin/folderadmin.py:489
+#: admin/folderadmin.py:520
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s এর মধ্যে ০ টি নির্বাচিত"
 
-#: admin/folderadmin.py:626
+#: admin/folderadmin.py:670
 msgid "No action selected."
 msgstr "কোনো কাজ নির্বাচন করা হয়নি।"
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:719
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "সফলভাবে %(count)d টি ফাইল ক্লিপবোর্ডে সরানো হয়েছে।"
 
-#: admin/folderadmin.py:683
+#: admin/folderadmin.py:724
 msgid "Move selected files to clipboard"
 msgstr "নির্বাচিত ফাইলগুলি ক্লিপবোর্ডে সরান"
 
-#: admin/folderadmin.py:723
+#: admin/folderadmin.py:762
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "সফলভাবে %(count)d টি ফাইলের জন্য অনুমতি নিষ্ক্রিয় করা হয়েছে।"
 
-#: admin/folderadmin.py:725
+#: admin/folderadmin.py:764
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "সফলভাবে %(count)d টি ফাইলের জন্য অনুমতি সক্রিয় করা হয়েছে।"
 
-#: admin/folderadmin.py:733
+#: admin/folderadmin.py:772
 msgid "Enable permissions for selected files"
 msgstr "নির্বাচিত ফাইলগুলির জন্য অনুমতি সক্রিয় করুন"
 
-#: admin/folderadmin.py:739
+#: admin/folderadmin.py:778
 msgid "Disable permissions for selected files"
 msgstr "নির্বাচিত ফাইলগুলির জন্য অনুমতি নিষ্ক্রিয় করুন"
 
-#: admin/folderadmin.py:820
+#: admin/folderadmin.py:867
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "সফলভাবে %(count)d টি ফাইল এবং/অথবা ফোল্ডার মুছে ফেলা হয়েছে।"
 
-#: admin/folderadmin.py:825
+#: admin/folderadmin.py:872
 msgid "Cannot delete files and/or folders"
 msgstr "ফাইল এবং/অথবা ফোল্ডার মুছে ফেলা যাবে না"
 
-#: admin/folderadmin.py:827
+#: admin/folderadmin.py:874
 msgid "Are you sure?"
 msgstr "আপনি কি নিশ্চিত?"
 
-#: admin/folderadmin.py:833
+#: admin/folderadmin.py:880
 msgid "Delete files and/or folders"
 msgstr "ফাইল এবং/অথবা ফোল্ডার মুছে ফেলুন"
 
-#: admin/folderadmin.py:854
+#: admin/folderadmin.py:901
 msgid "Delete selected files and/or folders"
 msgstr "নির্বাচিত ফাইল এবং/অথবা ফোল্ডার মুছে ফেলুন"
 
-#: admin/folderadmin.py:961
+#: admin/folderadmin.py:1050
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "নির্বাচিত গন্তব্যে %s নামের ফোল্ডার ইতিমধ্যে বিদ্যমান"
 
-#: admin/folderadmin.py:965
+#: admin/folderadmin.py:1054
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
@@ -127,25 +135,25 @@ msgstr ""
 "সফলভাবে %(count)d টি ফাইল এবং/অথবা ফোল্ডার '%(destination)s' ফোল্ডারে সরানো "
 "হয়েছে।"
 
-#: admin/folderadmin.py:973 admin/folderadmin.py:975
+#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
 msgid "Move files and/or folders"
 msgstr "ফাইল এবং/অথবা ফোল্ডার সরান"
 
-#: admin/folderadmin.py:990
+#: admin/folderadmin.py:1079
 msgid "Move selected files and/or folders"
 msgstr "নির্বাচিত ফাইল এবং/অথবা ফোল্ডার সরান"
 
-#: admin/folderadmin.py:1047
+#: admin/folderadmin.py:1138
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "সফলভাবে %(count)d টি ফাইলের নাম পরিবর্তন করা হয়েছে।"
 
-#: admin/folderadmin.py:1056 admin/folderadmin.py:1058
-#: admin/folderadmin.py:1073
+#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
+#: admin/folderadmin.py:1164
 msgid "Rename files"
 msgstr "ফাইলের নাম পরিবর্তন করুন"
 
-#: admin/folderadmin.py:1168
+#: admin/folderadmin.py:1261
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
@@ -154,24 +162,24 @@ msgstr ""
 "সফলভাবে %(count)d টি ফাইল এবং/অথবা ফোল্ডার '%(destination)s' ফোল্ডারে কপি করা "
 "হয়েছে।"
 
-#: admin/folderadmin.py:1186 admin/folderadmin.py:1188
+#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
 msgid "Copy files and/or folders"
 msgstr "ফাইল এবং/অথবা ফোল্ডার কপি করুন"
 
-#: admin/folderadmin.py:1205
+#: admin/folderadmin.py:1298
 msgid "Copy selected files and/or folders"
 msgstr "নির্বাচিত ফাইল এবং/অথবা ফোল্ডার কপি করুন"
 
-#: admin/folderadmin.py:1310
+#: admin/folderadmin.py:1412
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "সফলভাবে %(count)d টি ছবির আকার পরিবর্তন করা হয়েছে।"
 
-#: admin/folderadmin.py:1317 admin/folderadmin.py:1319
+#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
 msgid "Resize images"
 msgstr "ছবির আকার পরিবর্তন করুন"
 
-#: admin/folderadmin.py:1334
+#: admin/folderadmin.py:1436
 msgid "Resize selected images"
 msgstr "নির্বাচিত ছবির আকার পরিবর্তন করুন"
 
@@ -222,43 +230,45 @@ msgstr "আপস্কেল"
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "থাম্বনেইল অপশন অথবা আকার পরিবর্তনের প্যারামিটার নির্বাচন করতে হবে।"
 
-#: admin/imageadmin.py:21 admin/imageadmin.py:116
+#: admin/imageadmin.py:18 admin/imageadmin.py:96
 msgid "Subject location"
 msgstr "বিষয়ের অবস্থান"
 
-#: admin/imageadmin.py:22
+#: admin/imageadmin.py:19
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "দৃশ্যের প্রধান বিষয়ের অবস্থান। ফরম্যাট: \"x,y\"।"
 
-#: admin/imageadmin.py:59
+#: admin/imageadmin.py:56
 msgid "Invalid subject location format. "
 msgstr "অবৈধ বিষয় অবস্থান ফরম্যাট। "
 
-#: admin/imageadmin.py:67
+#: admin/imageadmin.py:64
 msgid "Subject location is outside of the image. "
 msgstr "বিষয়ের অবস্থান ছবির বাইরে। "
 
-#: admin/imageadmin.py:76
+#: admin/imageadmin.py:73
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr "আপনার ইনপুট: \"{subject_location}\"। "
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:387
+#: admin/permissionadmin.py:13 models/foldermodels.py:411
 msgid "Who"
 msgstr "কে"
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:408
+#: admin/permissionadmin.py:14 models/foldermodels.py:432
 msgid "What"
 msgstr "কী"
 
-#: admin/views.py:55
+#: admin/views.py:54
 msgid "Folder with this name already exists."
 msgstr "এই নামের একটি ফোল্ডার ইতিমধ্যে বিদ্যমান।"
 
-#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/admin/filer/folder/directory_listing.html:33
-#: templates/admin/filer/folder/legacy_listing.html:36
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/breadcrumbs.html:24
+#: templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/change_form.html:19
+#: templates/admin/filer/folder/listing_breadcrumbs.html:7
+#: templates/admin/filer/folder/listing_breadcrumbs.html:30
 msgid "Filer"
 msgstr "Filer"
 
@@ -286,7 +296,7 @@ msgstr "ছবি"
 msgid "images"
 msgstr "ছবিসমূহ"
 
-#: models/abstract.py:164
+#: models/abstract.py:183
 #, python-format
 msgid ""
 "Image format not recognized or image size exceeds limit of %(max_pixels)d "
@@ -298,7 +308,7 @@ msgstr ""
 "পরীক্ষা করুন অথবা ছবিটি %(width)d x %(height)d রেজোলিউশন বা তার কম আকারে "
 "পরিবর্তন করুন।"
 
-#: models/abstract.py:172
+#: models/abstract.py:191
 #, python-format
 msgid ""
 "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
@@ -309,11 +319,11 @@ msgstr ""
 "অতিক্রম করেছে। আবার আপলোড করার আগে, ছবিটি %(width)d x %(height)d রেজোলিউশন বা "
 "তার কম আকারে পরিবর্তন করুন।"
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:296
+#: models/clipboardmodels.py:11 models/foldermodels.py:320
 msgid "user"
 msgstr "ব্যবহারকারী"
 
-#: models/clipboardmodels.py:17 models/filemodels.py:157
+#: models/clipboardmodels.py:17 models/filemodels.py:168
 msgid "files"
 msgstr "ফাইলসমূহ"
 
@@ -325,8 +335,8 @@ msgstr "ক্লিপবোর্ড"
 msgid "clipboards"
 msgstr "ক্লিপবোর্ডসমূহ"
 
-#: models/clipboardmodels.py:44 models/filemodels.py:74
-#: models/filemodels.py:156
+#: models/clipboardmodels.py:44 models/filemodels.py:85
+#: models/filemodels.py:167
 msgid "file"
 msgstr "ফাইল"
 
@@ -338,186 +348,189 @@ msgstr "ক্লিপবোর্ড আইটেম"
 msgid "clipboard items"
 msgstr "ক্লিপবোর্ড আইটেমসমূহ"
 
-#: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: models/filemodels.py:77 templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
 msgstr "ফোল্ডার"
 
-#: models/filemodels.py:81
+#: models/filemodels.py:92
 msgid "file size"
 msgstr "ফাইলের আকার"
 
-#: models/filemodels.py:87
+#: models/filemodels.py:98
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:94
+#: models/filemodels.py:105
 msgid "has all mandatory data"
 msgstr "সমস্ত আবশ্যক ডেটা রয়েছে"
 
-#: models/filemodels.py:100
+#: models/filemodels.py:111
 msgid "original filename"
 msgstr "মূল ফাইলনাম"
 
-#: models/filemodels.py:110 models/foldermodels.py:109
+#: models/filemodels.py:121 models/foldermodels.py:123
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr "নাম"
 
-#: models/filemodels.py:116
+#: models/filemodels.py:127
 msgid "description"
 msgstr "বিবরণ"
 
-#: models/filemodels.py:125 models/foldermodels.py:115
+#: models/filemodels.py:136 models/foldermodels.py:129
 msgid "owner"
 msgstr "মালিক"
 
-#: models/filemodels.py:129 models/foldermodels.py:123
+#: models/filemodels.py:140 models/foldermodels.py:137
 msgid "uploaded at"
 msgstr "আপলোডের সময়"
 
-#: models/filemodels.py:134 models/foldermodels.py:133
+#: models/filemodels.py:145 models/foldermodels.py:147
 msgid "modified at"
 msgstr "পরিবর্তনের সময়"
 
-#: models/filemodels.py:140
+#: models/filemodels.py:151
 msgid "Permissions disabled"
 msgstr "অনুমতি নিষ্ক্রিয়"
 
-#: models/filemodels.py:141
+#: models/filemodels.py:152
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
 msgstr ""
-"এই ফাইলের জন্য যেকোনো অনুমতি যাচাই নিষ্ক্রিয় করুন। ফাইলটি সবার জন্য "
-"সর্বজনীনভাবে অ্যাক্সেসযোগ্য হবে।"
+"এই ফাইলের জন্য যেকোনো অনুমতি যাচাই নিষ্ক্রিয় করুন। ফাইলটি সবার জন্য সর্বজনীনভাবে "
+"অ্যাক্সেসযোগ্য হবে।"
 
-#: models/foldermodels.py:101
+#: models/foldermodels.py:115
 msgid "parent"
 msgstr "প্যারেন্ট"
 
-#: models/foldermodels.py:128
+#: models/foldermodels.py:142
 msgid "created at"
 msgstr "তৈরির সময়"
 
-#: models/foldermodels.py:143 templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/folder/legacy_listing.html:38
+#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:25
+#: templates/admin/filer/folder/listing_breadcrumbs.html:8
+#: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Folder"
 msgstr "ফোল্ডার"
 
-#: models/foldermodels.py:144
+#: models/foldermodels.py:158
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "ফোল্ডারসমূহ"
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:291
 msgid "all items"
 msgstr "সমস্ত আইটেম"
 
-#: models/foldermodels.py:268
+#: models/foldermodels.py:292
 msgid "this item only"
 msgstr "শুধুমাত্র এই আইটেম"
 
-#: models/foldermodels.py:269
+#: models/foldermodels.py:293
 msgid "this item and all children"
 msgstr "এই আইটেম এবং সমস্ত চাইল্ড"
 
-#: models/foldermodels.py:273
+#: models/foldermodels.py:297
 msgid "inherit"
 msgstr "ইনহেরিট"
 
-#: models/foldermodels.py:274
+#: models/foldermodels.py:298
 msgid "allow"
 msgstr "অনুমতি দিন"
 
-#: models/foldermodels.py:275
+#: models/foldermodels.py:299
 msgid "deny"
 msgstr "অস্বীকার করুন"
 
-#: models/foldermodels.py:287
+#: models/foldermodels.py:311
 msgid "type"
 msgstr "ধরন"
 
-#: models/foldermodels.py:304
+#: models/foldermodels.py:328
 msgid "group"
 msgstr "গ্রুপ"
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:335
 msgid "everybody"
 msgstr "সবাই"
 
-#: models/foldermodels.py:316
+#: models/foldermodels.py:340
 msgid "can read"
 msgstr "পড়তে পারে"
 
-#: models/foldermodels.py:324
+#: models/foldermodels.py:348
 msgid "can edit"
 msgstr "সম্পাদনা করতে পারে"
 
-#: models/foldermodels.py:332
+#: models/foldermodels.py:356
 msgid "can add children"
 msgstr "চাইল্ড যুক্ত করতে পারে"
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:364
 msgid "folder permission"
 msgstr "ফোল্ডার অনুমতি"
 
-#: models/foldermodels.py:341
+#: models/foldermodels.py:365
 msgid "folder permissions"
 msgstr "ফোল্ডার অনুমতিসমূহ"
 
-#: models/foldermodels.py:355
+#: models/foldermodels.py:379
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr "\"সমস্ত আইটেম\" ধরনের সাথে ফোল্ডার নির্বাচন করা যাবে না।"
 
-#: models/foldermodels.py:357
+#: models/foldermodels.py:381
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr "ধরন \"সমস্ত আইটেম\" না হলে একটি ফোল্ডার নির্বাচন করতে হবে।"
 
-#: models/foldermodels.py:359
+#: models/foldermodels.py:383
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr "\"সবাই\" এর সাথে একসাথে ব্যবহারকারী বা গ্রুপ নির্বাচন করা যাবে না।"
 
-#: models/foldermodels.py:361
+#: models/foldermodels.py:385
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr "ব্যবহারকারী, গ্রুপ অথবা \"সবাই\" এর মধ্যে অন্তত একটি নির্বাচন করতে হবে।"
 
-#: models/foldermodels.py:367
+#: models/foldermodels.py:391
 msgid "All Folders"
 msgstr "সমস্ত ফোল্ডার"
 
-#: models/foldermodels.py:369
+#: models/foldermodels.py:393
 msgid "Logical Path"
 msgstr "লজিক্যাল পাথ"
 
-#: models/foldermodels.py:378
+#: models/foldermodels.py:402
 #, python-brace-format
 msgid "User: {user}"
 msgstr "ব্যবহারকারী: {user}"
 
-#: models/foldermodels.py:380
+#: models/foldermodels.py:404
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "গ্রুপ: {group}"
 
-#: models/foldermodels.py:382
+#: models/foldermodels.py:406
 msgid "Everybody"
 msgstr "সবাই"
 
-#: models/foldermodels.py:395 templates/admin/filer/widgets/admin_file.html:46
+#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
+#: templates/admin/filer/widgets/admin_file.html:49
 msgid "Edit"
 msgstr "সম্পাদনা"
 
-#: models/foldermodels.py:396
+#: models/foldermodels.py:420
 msgid "Read"
 msgstr "পড়ুন"
 
-#: models/foldermodels.py:397
+#: models/foldermodels.py:421
 msgid "Add children"
 msgstr "চাইল্ড যুক্ত করুন"
 
@@ -551,10 +564,10 @@ msgstr "থাম্বনেইল অপশনসমূহ"
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
-#: templates/admin/filer/folder/directory_table_list.html:184
+#: templates/admin/filer/folder/directory_table_list.html:188
 #: templates/admin/filer/folder/directory_thumbnail_list.html:5
-#: templates/admin/filer/folder/directory_thumbnail_list.html:157
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/folder/directory_thumbnail_list.html:160
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Unsorted Uploads"
 msgstr "অসজ্জিত আপলোডসমূহ"
 
@@ -562,9 +575,10 @@ msgstr "অসজ্জিত আপলোডসমূহ"
 msgid "files with missing metadata"
 msgstr "অনুপস্থিত মেটাডেটা সহ ফাইলসমূহ"
 
-#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 msgid "root"
 msgstr "রুট"
 
@@ -584,55 +598,63 @@ msgstr "নির্বাচিত কাজটি চালান"
 msgid "Go"
 msgstr "যান"
 
-#: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table_list.html:249
-#: templates/admin/filer/folder/directory_thumbnail_list.html:221
+#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/folder/directory_table_list.html:252
+#: templates/admin/filer/folder/directory_thumbnail_list.html:223
 msgid "Click here to select the objects across all pages"
 msgstr "সমস্ত পৃষ্ঠা জুড়ে অবজেক্টগুলি নির্বাচন করতে এখানে ক্লিক করুন"
 
-#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
 msgstr "সবগুলি %(total_count)s টি ফাইল এবং/অথবা ফোল্ডার নির্বাচন করুন"
 
-#: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table_list.html:251
-#: templates/admin/filer/folder/directory_thumbnail_list.html:223
+#: templates/admin/filer/actions.html:13
+#: templates/admin/filer/folder/directory_table_list.html:254
+#: templates/admin/filer/folder/directory_thumbnail_list.html:225
 msgid "Clear selection"
 msgstr "নির্বাচন পরিষ্কার করুন"
 
-#: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/directory_listing.html:28
-#: templates/admin/filer/folder/legacy_listing.html:31
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/breadcrumbs.html:23
+#: templates/admin/filer/folder/listing_breadcrumbs.html:6
+#: templates/admin/filer/folder/listing_breadcrumbs.html:25
 msgid "Go back to admin homepage"
 msgstr "অ্যাডমিন হোমপেজে ফিরে যান"
 
-#: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/directory_listing.html:29
-#: templates/admin/filer/folder/legacy_listing.html:32
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/breadcrumbs.html:23
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/folder/listing_breadcrumbs.html:6
+#: templates/admin/filer/folder/listing_breadcrumbs.html:26
 msgid "Home"
 msgstr "হোম"
 
-#: templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/directory_listing.html:32
-#: templates/admin/filer/folder/legacy_listing.html:35
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/breadcrumbs.html:24
+#: templates/admin/filer/folder/listing_breadcrumbs.html:7
+#: templates/admin/filer/folder/listing_breadcrumbs.html:29
 msgid "Go back to Filer app"
 msgstr "Filer অ্যাপে ফিরে যান"
 
-#: templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/folder/legacy_listing.html:38
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:25
+#: templates/admin/filer/folder/listing_breadcrumbs.html:8
+#: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Go back to root folder"
 msgstr "রুট ফোল্ডারে ফিরে যান"
 
-#: templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:18
-#: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:39
-#: templates/admin/filer/folder/directory_listing.html:47
-#: templates/admin/filer/folder/legacy_listing.html:42
-#: templates/admin/filer/folder/legacy_listing.html:50
+#: templates/admin/filer/breadcrumbs.html:10
+#: templates/admin/filer/breadcrumbs.html:14
+#: templates/admin/filer/breadcrumbs.html:27
+#: templates/admin/filer/breadcrumbs.html:37
+#: templates/admin/filer/folder/change_form.html:12
+#: templates/admin/filer/folder/change_form.html:22
+#: templates/admin/filer/folder/listing_breadcrumbs.html:10
+#: templates/admin/filer/folder/listing_breadcrumbs.html:14
+#: templates/admin/filer/folder/listing_breadcrumbs.html:36
+#: templates/admin/filer/folder/listing_breadcrumbs.html:44
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "'%(folder_name)s' ফোল্ডারে ফিরে যান"
@@ -647,8 +669,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"নির্বাচিত ফাইল এবং/অথবা ফোল্ডার মুছে ফেললে সম্পর্কিত অবজেক্টগুলিও মুছে যাবে, "
-"কিন্তু নিম্নলিখিত ধরনের অবজেক্ট মুছে ফেলার অনুমতি আপনার অ্যাকাউন্টের নেই:"
+"নির্বাচিত ফাইল এবং/অথবা ফোল্ডার মুছে ফেললে সম্পর্কিত অবজেক্টগুলিও মুছে যাবে, কিন্তু "
+"নিম্নলিখিত ধরনের অবজেক্ট মুছে ফেলার অনুমতি আপনার অ্যাকাউন্টের নেই:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
@@ -677,42 +699,32 @@ msgid "Yes, I&#39;m sure"
 msgstr "হ্যাঁ, আমি নিশ্চিত"
 
 #: templates/admin/filer/file/change_form.html:16
-#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/folder/change_form.html:34
 #: templates/admin/filer/image/change_form.html:15
 msgid "History"
 msgstr "ইতিহাস"
 
 #: templates/admin/filer/file/change_form.html:18
-#: templates/admin/filer/folder/change_form.html:23
+#: templates/admin/filer/folder/change_form.html:36
 #: templates/admin/filer/image/change_form.html:17
 msgid "View on site"
 msgstr "সাইটে দেখুন"
 
-#: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:105
-#: templates/admin/filer/folder/legacy_listing.html:105
+#: templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/folder/change_form.html:19
+#: templates/admin/filer/folder/change_form.html:20
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/legacy_listing.html:67
 msgid "Go back to"
 msgstr "ফিরে যান"
 
-#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/change_form.html:18
 msgid "admin homepage"
 msgstr "অ্যাডমিন হোমপেজ"
-
-#: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:98
-#: templates/admin/filer/folder/directory_listing.html:106
-#: templates/admin/filer/folder/directory_table_list.html:29
-#: templates/admin/filer/folder/directory_table_list.html:61
-#: templates/admin/filer/folder/directory_table_list.html:195
-#: templates/admin/filer/folder/directory_thumbnail_list.html:27
-#: templates/admin/filer/folder/directory_thumbnail_list.html:63
-#: templates/admin/filer/folder/directory_thumbnail_list.html:167
-#: templates/admin/filer/folder/legacy_listing.html:98
-#: templates/admin/filer/folder/legacy_listing.html:106
-msgid "Folder Icon"
-msgstr "ফোল্ডার আইকন"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
@@ -744,8 +756,8 @@ msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
 msgstr ""
-"নিম্নলিখিত ফাইল এবং/অথবা ফোল্ডারগুলি একটি গন্তব্য ফোল্ডারে কপি করা হবে (তাদের "
-"ট্রি কাঠামো বজায় রেখে):"
+"নিম্নলিখিত ফাইল এবং/অথবা ফোল্ডারগুলি একটি গন্তব্য ফোল্ডারে কপি করা হবে (তাদের ট্রি "
+"কাঠামো বজায় রেখে):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:52
@@ -754,12 +766,13 @@ msgstr "গন্তব্য ফোল্ডার:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:181
-#: templates/admin/filer/folder/legacy_listing.html:181
+#: templates/admin/filer/folder/directory_listing.html:145
+#: templates/admin/filer/folder/legacy_listing.html:145
 msgid "Copy"
 msgstr "কপি করুন"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
+#: templates/admin/filer/folder/choose_copy_destination.html:70
 msgid "It is not allowed to copy files into same folder"
 msgstr "একই ফোল্ডারে ফাইল কপি করার অনুমতি নেই"
 
@@ -778,7 +791,8 @@ msgstr "নিম্নলিখিত ছবিগুলির আকার প
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "একটি বিদ্যমান থাম্বনেইল অপশন বেছে নিন অথবা আকার পরিবর্তনের প্যারামিটার লিখুন:"
+msgstr ""
+"একটি বিদ্যমান থাম্বনেইল অপশন বেছে নিন অথবা আকার পরিবর্তনের প্যারামিটার লিখুন:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
@@ -796,8 +810,7 @@ msgstr "আকার পরিবর্তন করুন"
 msgid ""
 "Your account doesn't have permissions to move all of the selected files and/"
 "or folders."
-msgstr ""
-"নির্বাচিত সমস্ত ফাইল এবং/অথবা ফোল্ডার সরানোর অনুমতি আপনার অ্যাকাউন্টের নেই।"
+msgstr "নির্বাচিত সমস্ত ফাইল এবং/অথবা ফোল্ডার সরানোর অনুমতি আপনার অ্যাকাউন্টের নেই।"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid "There are no files and/or folders available to move."
@@ -808,17 +821,18 @@ msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
 msgstr ""
-"নিম্নলিখিত ফাইল এবং/অথবা ফোল্ডারগুলি একটি গন্তব্য ফোল্ডারে সরানো হবে (তাদের "
-"ট্রি কাঠামো বজায় রেখে):"
+"নিম্নলিখিত ফাইল এবং/অথবা ফোল্ডারগুলি একটি গন্তব্য ফোল্ডারে সরানো হবে (তাদের ট্রি "
+"কাঠামো বজায় রেখে):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:61
 #: templates/admin/filer/folder/choose_move_destination.html:64
-#: templates/admin/filer/folder/directory_listing.html:184
-#: templates/admin/filer/folder/legacy_listing.html:184
+#: templates/admin/filer/folder/directory_listing.html:148
+#: templates/admin/filer/folder/legacy_listing.html:148
 msgid "Move"
 msgstr "সরান"
 
 #: templates/admin/filer/folder/choose_move_destination.html:63
+#: templates/admin/filer/folder/choose_move_destination.html:66
 msgid "It is not allowed to move files into same folder"
 msgstr "একই ফোল্ডারে ফাইল সরানোর অনুমতি নেই"
 
@@ -843,83 +857,111 @@ msgstr ""
 msgid "Rename"
 msgstr "নাম পরিবর্তন করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/legacy_listing.html:97
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/legacy_listing.html:52
+msgid "Show parent folders"
+msgstr "মূল ফোল্ডারগুলি দেখান"
+
+#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/legacy_listing.html:59
 msgid "Go back to the parent folder"
 msgstr "প্যারেন্ট ফোল্ডারে ফিরে যান"
 
-#: templates/admin/filer/folder/directory_listing.html:134
-#: templates/admin/filer/folder/legacy_listing.html:134
+#: templates/admin/filer/folder/directory_listing.html:92
+#: templates/admin/filer/folder/legacy_listing.html:92
+msgid "Folder actions"
+msgstr "ফোল্ডারের কার্যক্রম"
+
+#: templates/admin/filer/folder/directory_listing.html:97
+#: templates/admin/filer/folder/legacy_listing.html:97
 msgid "Change current folder details"
 msgstr "বর্তমান ফোল্ডারের বিবরণ পরিবর্তন করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:134
-#: templates/admin/filer/folder/legacy_listing.html:134
+#: templates/admin/filer/folder/directory_listing.html:97
+#: templates/admin/filer/folder/legacy_listing.html:97
 msgid "Change"
 msgstr "পরিবর্তন"
 
-#: templates/admin/filer/folder/directory_listing.html:144
-#: templates/admin/filer/folder/legacy_listing.html:144
+#: templates/admin/filer/folder/directory_listing.html:107
+#: templates/admin/filer/folder/legacy_listing.html:107
 msgid "Click here to run search for entered phrase"
 msgstr "প্রবেশ করানো শব্দগুচ্ছের জন্য অনুসন্ধান চালাতে এখানে ক্লিক করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:147
-#: templates/admin/filer/folder/legacy_listing.html:147
+#: templates/admin/filer/folder/directory_listing.html:107
+#: templates/admin/filer/folder/directory_listing.html:110
+#: templates/admin/filer/folder/legacy_listing.html:107
+#: templates/admin/filer/folder/legacy_listing.html:110
 msgid "Search"
 msgstr "অনুসন্ধান"
 
-#: templates/admin/filer/folder/directory_listing.html:154
-#: templates/admin/filer/folder/legacy_listing.html:154
+#: templates/admin/filer/folder/directory_listing.html:113
+#: templates/admin/filer/folder/legacy_listing.html:113
+msgid "Search options"
+msgstr "অনুসন্ধানের বিকল্পসমূহ"
+
+#: templates/admin/filer/folder/directory_listing.html:118
+#: templates/admin/filer/folder/legacy_listing.html:118
 msgid "Close"
 msgstr "বন্ধ করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:156
-#: templates/admin/filer/folder/legacy_listing.html:156
+#: templates/admin/filer/folder/directory_listing.html:120
+#: templates/admin/filer/folder/legacy_listing.html:120
 msgid "Limit"
 msgstr "সীমা"
 
-#: templates/admin/filer/folder/directory_listing.html:161
-#: templates/admin/filer/folder/legacy_listing.html:161
+#: templates/admin/filer/folder/directory_listing.html:125
+#: templates/admin/filer/folder/legacy_listing.html:125
 msgid "Check it to limit the search to current folder"
 msgstr "অনুসন্ধান বর্তমান ফোল্ডারে সীমাবদ্ধ করতে এটি চেক করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:162
-#: templates/admin/filer/folder/legacy_listing.html:162
+#: templates/admin/filer/folder/directory_listing.html:126
+#: templates/admin/filer/folder/legacy_listing.html:126
 msgid "Limit the search to current folder"
 msgstr "অনুসন্ধান বর্তমান ফোল্ডারে সীমাবদ্ধ করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:178
-#: templates/admin/filer/folder/legacy_listing.html:178
+#: templates/admin/filer/folder/directory_listing.html:142
+#: templates/admin/filer/folder/legacy_listing.html:142
 msgid "Delete"
 msgstr "মুছে ফেলুন"
 
-#: templates/admin/filer/folder/directory_listing.html:206
-#: templates/admin/filer/folder/legacy_listing.html:206
+#: templates/admin/filer/folder/directory_listing.html:153
+#: templates/admin/filer/folder/legacy_listing.html:153
+msgid "More actions"
+msgstr "আরও কার্যক্রম"
+
+#: templates/admin/filer/folder/directory_listing.html:171
+#: templates/admin/filer/folder/legacy_listing.html:171
 msgid "Adds a new Folder"
 msgstr "একটি নতুন ফোল্ডার যুক্ত করে"
 
-#: templates/admin/filer/folder/directory_listing.html:209
-#: templates/admin/filer/folder/legacy_listing.html:209
+#: templates/admin/filer/folder/directory_listing.html:174
+#: templates/admin/filer/folder/legacy_listing.html:174
 msgid "New Folder"
 msgstr "নতুন ফোল্ডার"
 
-#: templates/admin/filer/folder/directory_listing.html:214
-#: templates/admin/filer/folder/directory_listing.html:221
-#: templates/admin/filer/folder/directory_listing.html:224
-#: templates/admin/filer/folder/directory_listing.html:231
-#: templates/admin/filer/folder/directory_listing.html:238
-#: templates/admin/filer/folder/legacy_listing.html:214
-#: templates/admin/filer/folder/legacy_listing.html:221
-#: templates/admin/filer/folder/legacy_listing.html:224
-#: templates/admin/filer/folder/legacy_listing.html:231
-#: templates/admin/filer/folder/legacy_listing.html:238
+#: templates/admin/filer/folder/directory_listing.html:179
+#: templates/admin/filer/folder/directory_listing.html:186
+#: templates/admin/filer/folder/directory_listing.html:189
+#: templates/admin/filer/folder/directory_listing.html:196
+#: templates/admin/filer/folder/directory_listing.html:204
+#: templates/admin/filer/folder/legacy_listing.html:179
+#: templates/admin/filer/folder/legacy_listing.html:186
+#: templates/admin/filer/folder/legacy_listing.html:189
+#: templates/admin/filer/folder/legacy_listing.html:196
+#: templates/admin/filer/folder/legacy_listing.html:204
 msgid "Upload Files"
 msgstr "ফাইল আপলোড করুন"
 
-#: templates/admin/filer/folder/directory_listing.html:236
-#: templates/admin/filer/folder/legacy_listing.html:236
+#: templates/admin/filer/folder/directory_listing.html:201
+#: templates/admin/filer/folder/directory_listing.html:206
+#: templates/admin/filer/folder/legacy_listing.html:201
+#: templates/admin/filer/folder/legacy_listing.html:206
 msgid "You have to select a folder first"
 msgstr "আপনাকে প্রথমে একটি ফোল্ডার নির্বাচন করতে হবে"
+
+#: templates/admin/filer/folder/directory_table_list.html:12
+msgid "Select all objects on this page for an action"
+msgstr "কোনো কার্যক্রমের জন্য এই পৃষ্ঠার সব বস্তু নির্বাচন করুন"
 
 #: templates/admin/filer/folder/directory_table_list.html:16
 msgid "Name"
@@ -941,17 +983,31 @@ msgstr "কাজ"
 
 #: templates/admin/filer/folder/directory_table_list.html:28
 #: templates/admin/filer/folder/directory_table_list.html:35
-#: templates/admin/filer/folder/directory_table_list.html:60
-#: templates/admin/filer/folder/directory_table_list.html:67
+#: templates/admin/filer/folder/directory_table_list.html:62
+#: templates/admin/filer/folder/directory_table_list.html:69
+#: templates/admin/filer/folder/directory_table_list.html:87
 #: templates/admin/filer/folder/directory_thumbnail_list.html:26
 #: templates/admin/filer/folder/directory_thumbnail_list.html:32
-#: templates/admin/filer/folder/directory_thumbnail_list.html:62
-#: templates/admin/filer/folder/directory_thumbnail_list.html:68
+#: templates/admin/filer/folder/directory_thumbnail_list.html:64
+#: templates/admin/filer/folder/directory_thumbnail_list.html:70
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr "'%(item_label)s' ফোল্ডারের বিবরণ পরিবর্তন করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:78
+#: templates/admin/filer/folder/directory_table_list.html:52
+#: templates/admin/filer/folder/directory_thumbnail_list.html:54
+msgid "Select this folder"
+msgstr "এই ফোল্ডারটি নির্বাচন করুন"
+
+#: templates/admin/filer/folder/directory_table_list.html:53
+#: templates/admin/filer/folder/directory_table_list.html:57
+#: templates/admin/filer/folder/directory_thumbnail_list.html:55
+#: templates/admin/filer/folder/directory_thumbnail_list.html:59
+#, python-format
+msgid "Select folder '%(item_label)s'"
+msgstr "'%(item_label)s' ফোল্ডারটি নির্বাচন করুন"
+
+#: templates/admin/filer/folder/directory_table_list.html:80
 #: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
@@ -959,7 +1015,7 @@ msgid_plural "%(counter)s folders"
 msgstr[0] "%(counter)s টি ফোল্ডার"
 msgstr[1] "%(counter)s টি ফোল্ডার"
 
-#: templates/admin/filer/folder/directory_table_list.html:79
+#: templates/admin/filer/folder/directory_table_list.html:81
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
@@ -967,125 +1023,156 @@ msgid_plural "%(counter)s files"
 msgstr[0] "%(counter)s টি ফাইল"
 msgstr[1] "%(counter)s টি ফাইল"
 
-#: templates/admin/filer/folder/directory_table_list.html:85
+#: templates/admin/filer/folder/directory_table_list.html:87
 msgid "Change folder details"
 msgstr "ফোল্ডারের বিবরণ পরিবর্তন করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:86
+#: templates/admin/filer/folder/directory_table_list.html:88
 msgid "Remove folder"
 msgstr "ফোল্ডার সরান"
 
-#: templates/admin/filer/folder/directory_table_list.html:102
-#: templates/admin/filer/folder/directory_table_list.html:114
-#: templates/admin/filer/folder/directory_table_list.html:133
-#: templates/admin/filer/folder/directory_thumbnail_list.html:100
-#: templates/admin/filer/folder/directory_thumbnail_list.html:112
-#: templates/admin/filer/folder/directory_thumbnail_list.html:130
+#: templates/admin/filer/folder/directory_table_list.html:88
+#, python-format
+msgid "Remove folder '%(item_label)s'"
+msgstr "'%(item_label)s' ফোল্ডারটি সরান"
+
+#: templates/admin/filer/folder/directory_table_list.html:104
+#: templates/admin/filer/folder/directory_table_list.html:117
+#: templates/admin/filer/folder/directory_table_list.html:136
+#: templates/admin/filer/folder/directory_thumbnail_list.html:102
+#: templates/admin/filer/folder/directory_thumbnail_list.html:115
+#: templates/admin/filer/folder/directory_thumbnail_list.html:133
 msgid "Select this file"
 msgstr "এই ফাইলটি নির্বাচন করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:117
-#: templates/admin/filer/folder/directory_table_list.html:136
-#: templates/admin/filer/folder/directory_table_list.html:168
-#: templates/admin/filer/folder/directory_thumbnail_list.html:115
-#: templates/admin/filer/folder/directory_thumbnail_list.html:133
+#: templates/admin/filer/folder/directory_table_list.html:105
+#: templates/admin/filer/folder/directory_table_list.html:107
+#: templates/admin/filer/folder/directory_thumbnail_list.html:103
+#: templates/admin/filer/folder/directory_thumbnail_list.html:105
+#, python-format
+msgid "Select file '%(item_label)s'"
+msgstr "'%(item_label)s' ফাইলটি নির্বাচন করুন"
+
+#: templates/admin/filer/folder/directory_table_list.html:120
+#: templates/admin/filer/folder/directory_table_list.html:139
+#: templates/admin/filer/folder/directory_table_list.html:172
+#: templates/admin/filer/folder/directory_thumbnail_list.html:118
+#: templates/admin/filer/folder/directory_thumbnail_list.html:136
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "'%(item_label)s' এর বিবরণ পরিবর্তন করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "Permissions"
 msgstr "অনুমতিসমূহ"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "disabled"
 msgstr "নিষ্ক্রিয়"
 
-#: templates/admin/filer/folder/directory_table_list.html:145
-#: templates/admin/filer/folder/directory_thumbnail_list.html:141
+#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_thumbnail_list.html:144
 msgid "enabled"
 msgstr "সক্রিয়"
 
-#: templates/admin/filer/folder/directory_table_list.html:158
+#: templates/admin/filer/folder/directory_table_list.html:161
 msgid "URL copied to clipboard"
 msgstr "URL ক্লিপবোর্ডে কপি করা হয়েছে"
 
-#: templates/admin/filer/folder/directory_table_list.html:161
+#: templates/admin/filer/folder/directory_table_list.html:164
 #, python-format
 msgid "Canonical url '%(item_label)s'"
 msgstr "ক্যানোনিক্যাল url '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:165
 #, python-format
+msgid "Copy canonical url of '%(item_label)s'"
+msgstr "'%(item_label)s'-এর ক্যানোনিক্যাল URL অনুলিপি করুন"
+
+#: templates/admin/filer/folder/directory_table_list.html:169
+#, python-format
 msgid "Download '%(item_label)s'"
 msgstr "'%(item_label)s' ডাউনলোড করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:169
+#: templates/admin/filer/folder/directory_table_list.html:173
 msgid "Remove file"
 msgstr "ফাইল সরান"
 
-#: templates/admin/filer/folder/directory_table_list.html:177
-#: templates/admin/filer/folder/directory_thumbnail_list.html:149
+#: templates/admin/filer/folder/directory_table_list.html:173
+#, python-format
+msgid "Remove file '%(item_label)s'"
+msgstr "'%(item_label)s' ফাইলটি সরান"
+
+#: templates/admin/filer/folder/directory_table_list.html:181
+#: templates/admin/filer/folder/directory_thumbnail_list.html:152
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr "ফাইলগুলি এখানে ছাড়ুন অথবা \"ফাইল আপলোড করুন\" বোতামটি ব্যবহার করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:192
-#: templates/admin/filer/folder/directory_thumbnail_list.html:164
+#: templates/admin/filer/folder/directory_table_list.html:196
+#: templates/admin/filer/folder/directory_thumbnail_list.html:167
 msgid "Drop your file to upload into:"
 msgstr "আপলোড করতে আপনার ফাইলটি এখানে ছাড়ুন:"
 
-#: templates/admin/filer/folder/directory_table_list.html:202
-#: templates/admin/filer/folder/directory_thumbnail_list.html:174
+#: templates/admin/filer/folder/directory_table_list.html:206
+#: templates/admin/filer/folder/directory_thumbnail_list.html:177
 msgid "Upload"
 msgstr "আপলোড করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:214
-#: templates/admin/filer/folder/directory_thumbnail_list.html:186
+#: templates/admin/filer/folder/directory_table_list.html:218
+#: templates/admin/filer/folder/directory_thumbnail_list.html:189
 msgid "cancel"
 msgstr "বাতিল করুন"
 
-#: templates/admin/filer/folder/directory_table_list.html:218
-#: templates/admin/filer/folder/directory_thumbnail_list.html:190
+#: templates/admin/filer/folder/directory_table_list.html:222
+#: templates/admin/filer/folder/directory_thumbnail_list.html:193
 msgid "Upload success!"
 msgstr "আপলোড সফল!"
 
-#: templates/admin/filer/folder/directory_table_list.html:222
-#: templates/admin/filer/folder/directory_thumbnail_list.html:194
+#: templates/admin/filer/folder/directory_table_list.html:226
+#: templates/admin/filer/folder/directory_thumbnail_list.html:197
 msgid "Upload canceled!"
 msgstr "আপলোড বাতিল করা হয়েছে!"
 
-#: templates/admin/filer/folder/directory_table_list.html:229
-#: templates/admin/filer/folder/directory_thumbnail_list.html:201
+#: templates/admin/filer/folder/directory_table_list.html:233
+#: templates/admin/filer/folder/directory_thumbnail_list.html:204
 msgid "previous"
 msgstr "পূর্ববর্তী"
 
-#: templates/admin/filer/folder/directory_table_list.html:234
-#: templates/admin/filer/folder/directory_thumbnail_list.html:206
+#: templates/admin/filer/folder/directory_table_list.html:238
+#: templates/admin/filer/folder/directory_thumbnail_list.html:209
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr "%(num_pages)s এর মধ্যে পৃষ্ঠা %(number)s।"
 
-#: templates/admin/filer/folder/directory_table_list.html:239
-#: templates/admin/filer/folder/directory_thumbnail_list.html:211
+#: templates/admin/filer/folder/directory_table_list.html:243
+#: templates/admin/filer/folder/directory_thumbnail_list.html:214
 msgid "next"
 msgstr "পরবর্তী"
 
-#: templates/admin/filer/folder/directory_table_list.html:249
-#: templates/admin/filer/folder/directory_thumbnail_list.html:221
+#: templates/admin/filer/folder/directory_table_list.html:252
+#: templates/admin/filer/folder/directory_thumbnail_list.html:223
 #, python-format
 msgid "Select all %(total_count)s"
 msgstr "সবগুলি %(total_count)s টি নির্বাচন করুন"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
-#: templates/admin/filer/folder/directory_thumbnail_list.html:82
+#: templates/admin/filer/folder/directory_thumbnail_list.html:84
 msgid "Select all"
 msgstr "সব নির্বাচন করুন"
 
-#: templates/admin/filer/folder/directory_thumbnail_list.html:79
+#: templates/admin/filer/folder/directory_thumbnail_list.html:16
+msgid "Select all folders"
+msgstr "সব ফোল্ডার নির্বাচন করুন"
+
+#: templates/admin/filer/folder/directory_thumbnail_list.html:81
 msgid "Files"
 msgstr "ফাইলসমূহ"
+
+#: templates/admin/filer/folder/directory_thumbnail_list.html:85
+msgid "Select all files"
+msgstr "সব ফাইল নির্বাচন করুন"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
@@ -1106,6 +1193,10 @@ msgstr[1] "অনুগ্রহ করে নিচের ত্রুটিগ
 msgid "Save"
 msgstr "সংরক্ষণ করুন"
 
+#: templates/admin/filer/image/expand.html:24
+msgid "Toggle zoom"
+msgstr "জুম চালু বা বন্ধ করুন"
+
 #: templates/admin/filer/templatetags/file_icon.html:9
 msgid "Your browser does not support audio."
 msgstr "আপনার ব্রাউজার অডিও সমর্থন করে না।"
@@ -1114,23 +1205,30 @@ msgstr "আপনার ব্রাউজার অডিও সমর্থন
 msgid "Your browser does not support video."
 msgstr "আপনার ব্রাউজার ভিডিও সমর্থন করে না।"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:9
+#: templates/admin/filer/templatetags/file_icon.html:36
+msgid ""
+"Focal point. Use the arrow keys to move it, hold Shift for larger steps."
+msgstr ""
+"ফোকাস বিন্দু। এটি সরাতে তীরচিহ্নের কীগুলি ব্যবহার করুন, বড় ধাপে সরাতে Shift "
+"চেপে ধরে রাখুন।"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:8
 msgid "Clipboard"
 msgstr "ক্লিপবোর্ড"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:21
+#: templates/admin/filer/tools/clipboard/clipboard.html:20
 msgid "Paste all items here"
 msgstr "সমস্ত আইটেম এখানে পেস্ট করুন"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Move all clipboard files to"
 msgstr "সমস্ত ক্লিপবোর্ড ফাইল এখানে সরান"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Empty Clipboard"
 msgstr "ক্লিপবোর্ড খালি করুন"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:50
+#: templates/admin/filer/tools/clipboard/clipboard.html:49
 msgid "the clipboard is empty"
 msgstr "ক্লিপবোর্ড খালি"
 
@@ -1147,8 +1245,8 @@ msgid "Expand"
 msgstr "প্রসারিত করুন"
 
 #: templates/admin/filer/tools/detail_info.html:20
-#: templates/admin/filer/widgets/admin_file.html:33
-#: templatetags/filer_admin_tags.py:114
+#: templates/admin/filer/widgets/admin_file.html:35
+#: templatetags/filer_admin_tags.py:132
 msgid "File is missing"
 msgstr "ফাইল অনুপস্থিত"
 
@@ -1181,25 +1279,31 @@ msgid "cancel search"
 msgstr "অনুসন্ধান বাতিল করুন"
 
 #: templates/admin/filer/widgets/admin_file.html:11
-#: templates/admin/filer/widgets/admin_file.html:40
+#: templates/admin/filer/widgets/admin_file.html:42
 #: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "পরিষ্কার করুন"
 
-#: templates/admin/filer/widgets/admin_file.html:23
+#: templates/admin/filer/widgets/admin_file.html:25
 msgid "or drop your file here"
 msgstr "অথবা আপনার ফাইল এখানে ছাড়ুন"
 
-#: templates/admin/filer/widgets/admin_file.html:36
+#: templates/admin/filer/widgets/admin_file.html:31
+#, python-format
+msgid "Open '%(item_label)s' in a new window"
+msgstr "'%(item_label)s' একটি নতুন উইন্ডোতে খুলুন"
+
+#: templates/admin/filer/widgets/admin_file.html:38
 msgid "no file selected"
 msgstr "কোনো ফাইল নির্বাচন করা হয়নি"
 
-#: templates/admin/filer/widgets/admin_file.html:51
+#: templates/admin/filer/widgets/admin_file.html:53
 #: templates/admin/filer/widgets/admin_folder.html:6
 msgid "Lookup"
 msgstr "খুঁজুন"
 
-#: templates/admin/filer/widgets/admin_file.html:52
+#: templates/admin/filer/widgets/admin_file.html:54
+#: templates/admin/filer/widgets/admin_file.html:55
 msgid "Choose File"
 msgstr "ফাইল বেছে নিন"
 
@@ -1215,7 +1319,8 @@ msgstr "ফাইল \"{file_name}\": সাইট নিরাপত্তা �
 #: validation.py:23
 #, python-brace-format
 msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
-msgstr "ফাইল \"{file_name}\": সাইট নিরাপত্তা নীতি অনুযায়ী {file_type} আপলোড অস্বীকৃত"
+msgstr ""
+"ফাইল \"{file_name}\": সাইট নিরাপত্তা নীতি অনুযায়ী {file_type} আপলোড অস্বীকৃত"
 
 #: validation.py:34
 #, python-brace-format
@@ -1227,11 +1332,9 @@ msgstr "ফাইল \"{file_name}\": সাইট নিরাপত্তা �
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
-msgstr ""
-"ফাইল \"{file_name}\": সম্ভাব্য ক্রস সাইট স্ক্রিপ্টিং দুর্বলতার কারণে "
-"প্রত্যাখ্যাত"
+msgstr "ফাইল \"{file_name}\": সম্ভাব্য ক্রস সাইট স্ক্রিপ্টিং দুর্বলতার কারণে প্রত্যাখ্যাত"
 
-#: validation.py:101
+#: validation.py:101 validation.py:137 validation.py:170
 #, python-brace-format
 msgid "File \"{file_name}\": Rejected due to incompatible format"
 msgstr "ফাইল \"{file_name}\": বেমানান ফরম্যাটের কারণে প্রত্যাখ্যাত"
