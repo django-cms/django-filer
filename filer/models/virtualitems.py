@@ -101,11 +101,9 @@ class FolderRoot(DummyFolder):
     parent_url = None
 
     def contains_folder(self, folder_name):
-        try:
-            self.children.get(name=folder_name)
-            return True
-        except Folder.DoesNotExist:
-            return False
+        # Do not use self.children: with FILER_ENABLE_PERMISSIONS it lists
+        # all folders, not only the root folders.
+        return Folder.objects.filter(parent__isnull=True, name=folder_name).exists()
 
     def get_admin_directory_listing_url_path(self):
         return reverse('admin:filer-directory_listing-root')
