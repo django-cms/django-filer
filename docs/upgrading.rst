@@ -7,6 +7,30 @@ Usually upgrade procedure is straightforward: update the package and run migrati
 require special attention from the developer and here we provide upgrade instructions for such cases.
 
 
+Root folder name uniqueness
+---------------------------
+
+Migration ``0019_unique_root_folder_name`` prevents duplicate root folder names
+on databases supporting partial unique indexes (including PostgreSQL and SQLite).
+If duplicate roots already exist, the migration stops and asks you to rename
+conflicting folders before retrying. It does not rename or merge user data.
+You can find conflicts in the Django shell with:
+
+.. code-block:: python
+
+    from django.db.models import Count
+    from filer.models import Folder
+
+    Folder.objects.filter(parent__isnull=True).order_by().values("name").annotate(
+        total=Count("pk")
+    ).filter(total__gt=1)
+
+MySQL and MariaDB do not support partial unique indexes. Django reports
+``models.W036`` and skips this constraint on those backends; concurrent root
+creation remains unprotected there. The existing uniqueness constraint on
+non-root siblings continues to apply on all supported backends.
+
+
 from 3.x to 3.6
 ---------------
 
