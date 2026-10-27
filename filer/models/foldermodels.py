@@ -150,6 +150,11 @@ class Folder(models.Model, mixins.IconsMixin):
 
     class Meta:
         unique_together = (('parent', 'name'),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name'], condition=Q(parent__isnull=True), name='filer_unique_root_folder_name',
+            ),
+        ]
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
                         "Can use directory listing"),)

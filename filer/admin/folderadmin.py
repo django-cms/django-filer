@@ -14,7 +14,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db import models, router
+from django.db import IntegrityError, models, router, transaction
 from django.db.models import Case, Count, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
@@ -1019,8 +1019,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return list(self._list_all_destination_folders_recursive(request, current_folder, children, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
-        files_queryset.update(folder=destination)
-        folders_queryset.update(parent=destination)
+        # Roll back file moves too if a concurrent folder insert wins the name.
+        using = router.db_for_write(Folder, instance=destination)
+        with transaction.atomic(using=using):
+            files_queryset.using(using).update(folder=destination)
+            folders_queryset.using(using).update(parent=destination)
 
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
@@ -1050,7 +1053,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 messages.error(request, _("Folders with names %s already exist at the selected "
                                           "destination") % ", ".join(conflicting_names))
             elif n:
-                self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
+                try:
+                    self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
+                except IntegrityError:
+                    conflicting_names = list(Folder.objects.using(router.db_for_write(Folder, instance=destination)).filter(
+                        parent=destination, name__in=[folder.name for folder in selected],
+                    ).values_list('name', flat=True))
+                    if not conflicting_names:
+                        raise
+                    messages.error(request, _("Folders with names %s already exist at the selected "
+                                              "destination") % ", ".join(conflicting_names))
+                    return None
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
                     "count": n,
                     "destination": destination,
@@ -1205,16 +1218,21 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # TODO: Should we also allow not to overwrite the folder if it exists, but just copy into it?
 
-        # TODO: Is this a race-condition? Would this be a problem?
-        foldername = self._get_available_name(destination, folder.name)
-
         old_folder = Folder.objects.get(pk=folder.pk)
-
-        folder, _ = Folder.objects.get_or_create(
-            name=foldername,
-            owner=old_folder.owner,
-            parent=destination,
-        )
+        using = router.db_for_write(Folder, instance=destination)
+        while True:
+            foldername = self._get_available_name(destination, old_folder.name)
+            try:
+                with transaction.atomic(using=using):
+                    folder = Folder.objects.using(using).create(
+                        name=foldername, owner=old_folder.owner, parent=destination,
+                    )
+            except IntegrityError:
+                # Never merge a copy into a folder created by another request.
+                if not Folder.objects.using(using).filter(parent=destination, name=foldername).exists():
+                    raise
+            else:
+                break
 
         for perm in FolderPermission.objects.filter(folder=old_folder):
             perm.pk = None
