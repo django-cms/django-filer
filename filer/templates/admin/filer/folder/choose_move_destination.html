@@ -61,8 +61,9 @@
                             <input type="submit" value="{% translate 'Move' %}" class="default js-submit-copy-move">
                             <span class="js-disabled-btn-tooltip disabled-btn-tooltip js-filer-tooltip filer-tooltip-wrapper"
                                 title="{% translate 'It is not allowed to move files into same folder' %}" tabindex="-1">
-                                <a class="default navigator-button" disabled>{% translate 'Move' %}</a>
+                                <a class="default navigator-button" role="button" tabindex="0" aria-disabled="true" aria-describedby="filer-disabled-btn-reason">{% translate 'Move' %}</a>
                             </span>
+                            <span id="filer-disabled-btn-reason" class="sr-only">{% translate 'It is not allowed to move files into same folder' %}</span>
                         </div>
                     </div>
                 </form>

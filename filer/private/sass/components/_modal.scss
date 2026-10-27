@@ -51,19 +51,9 @@
     &.filebrowser #container #content {
         margin: 0 !important;
     }
-    .navigator-button-wrapper {
-        float: right;
-        @media screen and (max-width: $screen-tablet) {
-            float: none;
-        }
-    }
     .navigator-top-nav {
-        .tools-container {
-            width: 70%;
-        }
-        .breadcrumbs-container {
-            width: 30%;
-        }
+        // no fixed split: a 30% title column is too narrow for the folder name next to
+        // the search field, which then covers the name (see _navigator.scss)
         .tools-container,
         .breadcrumbs-container {
             @media screen and (max-width: $screen-tablet) {

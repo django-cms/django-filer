@@ -5,6 +5,55 @@ CHANGELOG
 unreleased
 ==========
 
+* Compatibility: ``FolderAdmin._list_all_destination_folders`` continues to
+  accept lists as well as querysets. Its private recursive helper now takes
+  ``(request, current_folder, children, folders, allow_self, level)``;
+  ``children`` is a mapping of parent ids to preloaded child folders and replaces
+  the old ``folders_queryset`` argument. Subclass overrides must be updated.
+  The private ``_check_copy_perms``, ``_check_move_perms`` and
+  ``_check_resize_perms`` helpers now also accept an optional ``tree`` preview.
+  ``_list_all_to_copy_or_move`` and ``_list_all_to_resize`` accept optional
+  ``subtrees``. Overrides must forward these arguments to reuse the combined
+  permission checks and preview traversal.
+* fix: Thumbnails picked through the file widget popup showed as broken images when
+  their URL contained a hyphen, e.g. UUID paths on S3 storage. ``file_icon_url`` JS-escaped
+  the URL although it is only used in an HTML ``data-`` attribute, turning ``-`` into
+  ``\u002D`` (#1645).
+* fix: Accessibility of the admin UI.
+
+  - Dropdown menus work with the keyboard again: arrow keys, Space and Escape
+    raised an error (invalid ``:visible`` selector). Clicking the toggle of an
+    open menu now closes it instead of reopening it.
+  - Icon-only buttons and links (delete, copy, move, row actions, dropdown
+    toggles, list type switcher, widget clear/edit/lookup, popup pick links),
+    the search field and all selection checkboxes have accessible names.
+    Decorative icons are hidden from screen readers, all images have ``alt``
+    text, and duplicate icon links are skipped by keyboard navigation.
+  - The focal point can be moved with the arrow keys (Shift for larger steps).
+  - Upload progress, upload results and "URL copied" are announced to screen
+    readers.
+  - Error messages no longer disappear after 5 seconds. They are shown as alerts,
+    can be dismissed, and several errors are listed together. After a failed
+    upload, the folder listing reloads only once the errors have been dismissed.
+    Messages are no longer parsed as HTML. filer's uploaders send an
+    ``X-Filer-Inline-Errors`` header; for these, the upload view no longer also
+    stores the error as a Django message, which showed it again after the reload.
+  - The file and image widgets show failed uploads the same way, right below the
+    widget, instead of in a browser ``alert()``. Inside django CMS, they use its
+    message bar, which now stays open until closed and no longer renders the
+    file name as HTML.
+  - Disabled Upload/Copy/Move buttons are reachable by keyboard, explain why they
+    are disabled, and show their tooltip on focus as well as on hover.
+  - Visible focus outlines for the search field, the focal point and button-style
+    links, which are no longer underlined on focus or, with Django 6.1+, at rest.
+  - The listing page has a heading, the image expand view is a complete HTML
+    document with keyboard zoom, and animations respect
+    ``prefers-reduced-motion``.
+
+* fix: The upload button showed failed uploads as ``[object Object]`` instead of
+  the reason.
+* fix: In the file and folder picker popup, the search field covered the folder
+  name and sat far from the buttons: the popup header used a fixed 30/70 split.
 * feat: Detect provenance information of uploaded images (#1636). The IPTC
   digital source type stated in an image's XMP metadata (e.g.,
   ``trainedAlgorithmicMedia`` for images created using generative AI) is stored in
@@ -32,6 +81,7 @@ unreleased
 
    The new fields are added to ``BaseImage``. If you use a custom image model
    (``FILER_IMAGE_MODEL``), run ``makemigrations`` for its app.
+   
 
 3.6.0 (2026-09-12)
 ==================

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
+from django.db.models import Count
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -32,13 +33,23 @@ class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
-        r = {}
-        for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
+        # Select duplicate groups in SQL, then return a stable snapshot.
+        digests = (
+            self.exclude(sha1='').order_by().values('sha1')
+            .annotate(total=Count('pk')).filter(total__gt=1)
+            .values_list('sha1', flat=True)
+        )
+        groups = {}
+        for file_obj in self.filter(sha1__in=digests).order_by('sha1', 'pk'):
+            groups.setdefault(file_obj.sha1, []).append(file_obj)
+        # Keep returning evaluated querysets, as callers may filter or delete them.
+        duplicates = {}
+        for sha1, files in groups.items():
+            queryset = self.filter(sha1=sha1).order_by('pk')
+            queryset._result_cache = files
+            queryset._prefetch_done = True
+            duplicates[sha1] = queryset
+        return duplicates
 
     def find_duplicates(self, file_obj):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
@@ -340,7 +351,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
             return False
         elif user.is_superuser:
             return True
-        elif user == self.owner:
+        # Compare keys to avoid loading the owner row; a missing owner never matches.
+        elif self.owner_id is not None and self.owner_id == user.pk:
             return True
         elif self.folder:
             return self.folder.has_generic_permission(request, permission_type)

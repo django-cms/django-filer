@@ -16,7 +16,7 @@
     {% else %}
     <img src="{{ icon_url }}"
          loading="lazy" width="{{ width }}" height="{{ height }}"
-         {% if alt_text %} alt="{{ alt_text }}"{% endif %}
+         alt="{{ alt_text|default:'' }}"
          {% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}
          {% if sidebar_image_ratio %} data-ratio="{{ sidebar_image_ratio }}"
          class="js-focal-point-image"{% endif %}
@@ -25,14 +25,15 @@
     {% endif %}
 {% else %}
     <img src="{{ icon_url }}" loading="lazy" width="{{ width }}" height="{{ height }}"
-         {% if alt_text %} alt="{{ alt_text }}"{% endif %}
+         alt="{{ alt_text|default:'' }}"
          {% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %} class="thumbnail_img"
          {{ add_styles|safe }}
     />
 {% endif %}
 {% if sidebar_image_ratio %}
     <div class="image-preview-field">
-        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+        <div class="js-focal-point-circle image-preview-circle hidden" role="img"
+             aria-label="{% translate 'Focal point. Use the arrow keys to move it, hold Shift for larger steps.' %}"></div>
     </div>
 </div>
 {% endif %}

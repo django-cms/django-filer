@@ -5,6 +5,7 @@
 import Dropzone from 'dropzone';
 
 import { getCsrfToken } from './csrf.js';
+import { showError as showInlineError } from './show-error.js';
 
 if (Dropzone) {
     Dropzone.autoDiscover = false;
@@ -40,21 +41,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const showError = (message) => {
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
+    const showError = (message, widget) => {
+        let cmsMessages;
         try {
-            window.parent.CMS.API.Messages.open({
-                message: message
-            });
+            cmsMessages = window.parent.CMS?.API?.Messages;
         } catch {
-            if (window.filerShowError) {
-                window.filerShowError(message);
-            } else {
-                alert(message);
-            }
+            // the parent frame belongs to another origin
+        }
+        if (cmsMessages) {
+            // Inside django CMS, use its message bar. It renders HTML, and only a
+            // negative delay keeps it open until closed (0 falls back to the default).
+            cmsMessages.open({ message: escapeHtml(message), error: true, delay: -1 });
+        } else {
+            showInlineError(message, { container: widget });
         }
     };
 
     const createDropzone = function (dropzone) {
+        const widget = dropzone.closest('.filer-widget') || dropzone;
         const dropzoneUrl = dropzone.dataset.url;
         const inputId = dropzone.querySelector(fileIdInputSelector);
         const isImage = inputId?.getAttribute('name') === 'image';
@@ -140,7 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         new Dropzone(dropzone, {
             url: dropzoneUrl,
-            headers: { 'X-CSRFToken': getCsrfToken() },
+            // filer shows upload errors itself: the server need not store them as Django messages
+            headers: { 'X-CSRFToken': getCsrfToken(), 'X-Filer-Inline-Errors': '1' },
             paramName: 'file',
             maxFiles: 1,
             maxFilesize: dropzone.dataset.maxFilesize,
@@ -245,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     discardPreviews(this);
                 } else {
                     if (response && response.error) {
-                        showError(`${file.name}: ${response.error}`);
+                        showError(`${file.name}: ${response.error}`, widget);
                     }
                     discardPreviews(this);
                 }
@@ -263,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // an upload; filer reports the reason in "error".
                 const message = (msg && (msg.error || msg.message)) || msg;
 
-                showError(`${file.name}: ${message}`);
+                showError(`${file.name}: ${message}`, widget);
                 // Restore the widget: the failed upload did not change the selection
                 discardPreviews(this);
                 showFileRepresentation(true);

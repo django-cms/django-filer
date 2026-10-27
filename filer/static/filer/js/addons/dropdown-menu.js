@@ -16,8 +16,9 @@
 
     class Dropdown {
         constructor(element) {
+            // clicks are handled by the delegated document listener below; binding one here
+            // as well toggled the menu twice per click, so an open menu reopened immediately
             this.element = element;
-            element.addEventListener('click', () => this.toggle());
         }
 
         toggle() {
@@ -70,12 +71,15 @@
             const element = this.element;
             const parent = getParent(element);
             const isActive = parent.classList.contains('open');
-            const desc = ' li:not(.disabled):visible a';
+            // `:visible` is jQuery-only and makes querySelectorAll throw; visibility is checked below
+            const desc = ' li:not(.disabled) a';
             const items = Array.from(parent.querySelectorAll(`.filer-dropdown-menu${desc}`))
                 .filter(item => item.offsetParent !== null); // visible check
             const index = items.indexOf(e.target);
+            // form controls inside a menu keep their own arrow/space handling, but Escape still closes the menu
+            const isFormControl = /input|textarea|select|button/i.test(e.target.tagName);
 
-            if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) {
+            if (!/(38|40|27|32)/.test(e.which) || (isFormControl && e.which !== 27)) {
                 return;
             }
 
@@ -200,7 +204,12 @@
     // APPLY TO STANDARD DROPDOWN ELEMENTS
     // ===================================
 
-    document.addEventListener('click', clearMenus);
+    document.addEventListener('click', (e) => {
+        // a click on a toggle is handled by Dropdown.toggle, which clears the other menus itself
+        if (!e.target.closest(toggleSelector)) {
+            clearMenus(e);
+        }
+    });
 
     document.addEventListener('click', (e) => {
         if (e.target.closest('.filer-dropdown form')) {
@@ -211,6 +220,8 @@
     document.addEventListener('click', (e) => {
         const toggle = e.target.closest(toggleSelector);
         if (toggle) {
+            // toggles are links to "#": do not jump to the top of the page
+            e.preventDefault();
             const instance = toggle._filerDropdownInstance || new Dropdown(toggle);
             if (!toggle._filerDropdownInstance) {
                 toggle._filerDropdownInstance = instance;

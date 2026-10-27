@@ -11,7 +11,24 @@ from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
+from ..utils.tree import walk_folder_levels
 from . import mixins
+
+
+def _descendant_rows(roots):
+    # Yield (id, parent_id) below the given subtrees, one query per level.
+    # Children come by name, and overlapping subtrees are visited once.
+    levels = walk_folder_levels(
+        dict.fromkeys(roots), Folder.objects.values_list('id', 'parent_id'), lambda row, level: row,
+    )
+    next(levels, None)  # Roots are included by the walker, but are not descendants.
+    for level in levels:
+        yield from level.items()
+
+
+def subtree_ids(roots):
+    """Return the ids of the given folders and of all their descendants."""
+    return set(roots) | {pk for pk, _ in _descendant_rows(roots)}
 
 
 class FolderPermissionManager(models.Manager):
@@ -36,47 +53,44 @@ class FolderPermissionManager(models.Manager):
         if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
         cached_id_list = get_folder_permission_cache(user, attr)
+        # Recheck empty results because grants can change outside the admin.
         if cached_id_list:
             return cached_id_list
 
-        allow_list = set()
-        deny_list = set()
+        id_lists = {FolderPermission.ALLOW: set(), FolderPermission.DENY: set()}
+        subtree_roots = {FolderPermission.ALLOW: set(), FolderPermission.DENY: set()}
+        global_grants = set()
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
-        perms = self.filter(q)
-
-        for perm in perms:
-            p = getattr(perm, attr)
-
-            if p is None:
-                # Not allow nor deny, we continue with the next permission
+        for folder_id, scope, permission in self.filter(q).values_list('folder_id', 'type', attr):
+            if permission is None:
                 continue
 
-            if not perm.folder:
-                assert perm.type == FolderPermission.ALL
-
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(Folder.objects.all().values_list('id', flat=True))
-                else:
-                    deny_list.update(Folder.objects.all().values_list('id', flat=True))
-
+            grant = FolderPermission.ALLOW if permission == FolderPermission.ALLOW else FolderPermission.DENY
+            if folder_id is None:
+                assert scope == FolderPermission.ALL
+                global_grants.add(grant)
                 continue
 
-            folder_id = perm.folder.id
+            id_lists[grant].add(folder_id)
+            if scope in (FolderPermission.ALL, FolderPermission.CHILDREN):
+                subtree_roots[grant].add(folder_id)
 
-            if p == FolderPermission.ALLOW:
-                allow_list.add(folder_id)
-            else:
-                deny_list.add(folder_id)
+        # A global denial overrides every grant without reading any folders.
+        if FolderPermission.DENY in global_grants:
+            id_list = set()
+            update_folder_permission_cache(user, attr, id_list)
+            return id_list
 
-            if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants_ids())
-                else:
-                    deny_list.update(perm.folder.get_descendants_ids())
+        for grant, roots in subtree_roots.items():
+            if grant in global_grants:
+                id_lists[grant].update(Folder.objects.order_by().values_list('id', flat=True).iterator())
+                continue
+
+            id_lists[grant].update(subtree_ids(roots))
 
         # Deny has precedence over allow
-        id_list = allow_list - deny_list
+        id_list = id_lists[FolderPermission.ALLOW] - id_lists[FolderPermission.DENY]
         update_folder_permission_cache(user, attr, id_list)
         return id_list
 
@@ -151,6 +165,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def file_count(self):
+        # FolderAdmin._with_folder_counts populates both count cache attributes.
         if not hasattr(self, '_file_count_cache'):
             self._file_count_cache = self.files.count()
         return self._file_count_cache
@@ -182,11 +197,19 @@ class Folder(models.Model, mixins.IconsMixin):
         return folder_path
 
     def get_descendants_ids(self):
-        desc = []
-        for child in self.children.all():
-            desc.append(child.id)
-            desc.extend(child.get_descendants_ids())
-        return desc
+        # Query per tree level instead of per folder.
+        children = {}
+        for pk, parent_id in _descendant_rows([self.pk]):
+            children.setdefault(parent_id, []).append(pk)
+
+        # Keep the name-ordered, depth-first order of the recursive version.
+        ordered = []
+        pending = list(reversed(children.get(self.pk, [])))
+        while pending:
+            pk = pending.pop()
+            ordered.append(pk)
+            pending.extend(reversed(children.get(pk, [])))
+        return ordered
 
     @property
     def pretty_logical_path(self):
@@ -211,7 +234,8 @@ class Folder(models.Model, mixins.IconsMixin):
             return False
         elif user.is_superuser:
             return True
-        elif user == self.owner:
+        # Compare keys to avoid loading the owner row; a missing owner never matches.
+        elif self.owner_id is not None and self.owner_id == user.pk:
             return True
         else:
             if not hasattr(self, "permission_cache") or\

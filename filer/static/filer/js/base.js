@@ -6,6 +6,8 @@
 import Mediator from 'mediator-js/lib/mediator';
 import FocalPoint from './addons/focal-point';
 import Toggler from './addons/toggler';
+import { announce } from './addons/announce';
+import { showError } from './addons/show-error';
 
 window.Cl = window.Cl || {};
 Cl.mediator = new Mediator();  // mediator init
@@ -14,32 +16,8 @@ Cl.Toggler = Toggler;
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    let showErrorTimeout;
-
-    window.filerShowError = (message) => {
-        const messages = document.querySelector('.messagelist');
-        const header = document.querySelector('#header');
-        const filerErrorClass = 'js-filer-error';
-        const tpl = `<ul class="messagelist"><li class="error ${filerErrorClass}">{msg}</li></ul>`;
-        const msg = tpl.replace('{msg}', message);
-
-        if (messages) {
-            messages.outerHTML = msg;
-        } else if (header) {
-            header.insertAdjacentHTML('afterend', msg);
-        }
-
-        if (showErrorTimeout) {
-            clearTimeout(showErrorTimeout);
-        }
-
-        showErrorTimeout = setTimeout(() => {
-            const errorEl = document.querySelector(`.${filerErrorClass}`);
-            if (errorEl) {
-                errorEl.remove();
-            }
-        }, 5000);
-    };
+    // kept on window for other scripts and third-party code
+    window.filerShowError = showError;
 
     const filterFiles = document.querySelector('.js-filter-files');
     if (filterFiles) {
@@ -385,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', function (e) {
             const url = new URL(this.dataset.url, document.location.href);
             const msg = this.dataset.msg || 'URL copied to clipboard';
-            const infobox = document.createElement('template');
+            const infobox = document.createElement('div');
             e.preventDefault();
 
             const existingTooltips = document.querySelectorAll('.info.filer-tooltip');
@@ -394,9 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             navigator.clipboard.writeText(url.href);
-            infobox.innerHTML = `<div class="info filer-tooltip">${msg}</div>`;
+            infobox.className = 'info filer-tooltip';
+            infobox.setAttribute('aria-hidden', 'true');
+            infobox.textContent = msg;
+            announce(msg);
             this.classList.add('filer-tooltip-wrapper');
-            this.appendChild(infobox.content.firstChild);
+            this.appendChild(infobox);
 
             const self = this;
             setTimeout(() => {

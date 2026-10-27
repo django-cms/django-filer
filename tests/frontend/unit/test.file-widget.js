@@ -113,6 +113,55 @@ describe('admin file widget', function () {
         }, 400);
     });
 
+    it('shows a failed upload as a dismissible error below the widget', function (done) {
+        stubUpload({
+            status: 400,
+            contentType: 'application/json',
+            responseText: JSON.stringify({error: '<b>Not</b> supported'})
+        });
+
+        drop();
+
+        setTimeout(function () {
+            var widget = document.querySelector('.filer-widget');
+            var list = widget.nextElementSibling;
+            var error = list && list.querySelector('.js-filer-error');
+
+            expect(error).not.toBe(null);
+            expect(error.getAttribute('role')).toBe('alert');
+            expect(error.textContent).toContain('new_image.png: <b>Not</b> supported');
+
+            error.querySelector('.js-filer-message-dismiss').click();
+            expect(widget.nextElementSibling).not.toBe(list);
+            done();
+        }, 400);
+    });
+
+    it('uses the django CMS message bar, kept open and escaped, inside django CMS', function (done) {
+        var open = jasmine.createSpy('open');
+
+        // the widget looks for the CMS API in the parent frame
+        window.parent.CMS = {API: {Messages: {open: open}}};
+        stubUpload({
+            status: 400,
+            contentType: 'application/json',
+            responseText: JSON.stringify({error: '<b>Not</b> supported'})
+        });
+
+        drop();
+
+        setTimeout(function () {
+            delete window.parent.CMS;
+            expect(open).toHaveBeenCalledWith({
+                message: 'new_image.png: &lt;b&gt;Not&lt;/b&gt; supported',
+                error: true,
+                delay: -1
+            });
+            expect(document.querySelector('.js-filer-error')).toBe(null);
+            done();
+        }, 400);
+    });
+
     it('keeps the drag state while the pointer moves over its own content', function () {
         var thumbnail = fileSelector().querySelector('.thumbnail_img');
         var description = fileSelector().querySelector('.description_text');

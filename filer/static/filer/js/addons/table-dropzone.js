@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { announce } from './announce.js';
+import { whenErrorsDismissed } from './error-dismissed.js';
 import { getCsrfToken } from './csrf.js';
 
 
@@ -84,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const dropzoneUrl = dropzoneElement.dataset.url;
             const dropzoneInstance = new Dropzone(dropzoneElement, {
                 url: dropzoneUrl,
-                headers: { 'X-CSRFToken': getCsrfToken() },
+                // filer shows upload errors itself: the server need not store them as Django messages
+                headers: { 'X-CSRFToken': getCsrfToken(), 'X-Filer-Inline-Errors': '1' },
                 paramName: 'file',
                 maxFiles: parseInt(dropzoneElement.dataset.maxFiles) || 100,
                 maxFilesize: parseInt(dropzoneElement.dataset.maxFilesize),  // no default
@@ -131,6 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         submitNum++;
                         maxSubmitNum++;
                         updateUploadNumber();
+                        if (uploadText && uploadNumber) {
+                            announce(`${uploadText.textContent.trim()} ${uploadNumber.textContent}`);
+                        }
                         done();
                     }
 
@@ -248,12 +254,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (uploadNumber) {
                             uploadNumber.classList.add(hiddenClass);
                         }
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                        // keep the errors on screen until the user has read and dismissed them
+                        whenErrorsDismissed(() => window.location.reload());
                     } else {
                         if (uploadSuccess) {
                             uploadSuccess.classList.remove(hiddenClass);
+                            announce(uploadSuccess.textContent);
                         }
                         window.location.reload();
                     }
@@ -280,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     cancelUpload.classList.add(hiddenClass);
                     if (uploadCanceled) {
                         uploadCanceled.classList.remove(hiddenClass);
+                        announce(uploadCanceled.textContent);
                     }
                     dropzoneInstance.removeAllFiles(true);
                 });

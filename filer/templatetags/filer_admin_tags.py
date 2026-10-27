@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.template import Library
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.html import escapejs, format_html_join
+from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -251,7 +251,7 @@ def file_icon_url(file):
     # Cache since it is called repeatedly by templates
     if not hasattr(file, "_file_icon_url_cache"):
         context = file_icon_context(file, False, 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE)
-        file._file_icon_url_cache = escapejs(context.get('highres_url', context['icon_url']))
+        file._file_icon_url_cache = context.get('highres_url', context['icon_url'])
     return file._file_icon_url_cache
 
 

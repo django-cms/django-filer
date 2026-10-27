@@ -9,14 +9,19 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
+from django.template import Context, Template
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.html import escape
 
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
@@ -130,17 +135,49 @@ class FilerFolderAdminUrlsTests(TestCase):
         # Polymorphic resolves content types once per process: warm that cache so
         # that the query count does not depend on which tests ran before
         self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             # Expected queries:
             # 1. Authentication check
-            # 2. Loading directory data and thumbnails (1 query)
-            # 3. Selecting file and owner data
+            # 2. Count files without materializing the directory
+            # 3. Load the page and thumbnail annotations
+            # 4. Select polymorphic image and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
         self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
         self.assertContains(response, "/media/my-preferred-base-url-for-thumbnails/")
         for thumbnail_url in thumbnail_urls:
             self.assertContains(response, thumbnail_url)
+
+    def test_folder_counts_batched(self):
+        parent = Folder.objects.create(name='parent')
+        populated = Folder.objects.create(name='populated', parent=parent)
+        empty = Folder.objects.create(name='empty', parent=parent)
+        Folder.objects.bulk_create([
+            Folder(name=f'child-{index}', parent=populated) for index in range(2)
+        ])
+        File.objects.bulk_create([
+            File(name=f'file-{index}', folder=populated) for index in range(3)
+        ])
+        request = RequestFactory().get('/')
+        request.user = self.superuser
+        request.session = {}
+        folder_admin = admin.site._registry[Folder]
+
+        for query in ('', 'p', 'empty'):
+            with self.subTest(query=query):
+                request.GET = request.GET.copy()
+                request.GET['q'] = query
+                response = folder_admin.directory_listing(request, parent.pk)
+                folders = list(response.context_data['folder_children'])
+
+                # Counts must be available without per-folder queries, including search.
+                with self.assertNumQueries(0):
+                    counts = {folder.pk: (folder.children_count, folder.file_count) for folder in folders}
+
+                if query != 'empty':
+                    self.assertEqual(counts[populated.pk], (2, 3))
+                if query != 'p':
+                    self.assertEqual(counts[empty.pk], (0, 0))
 
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
@@ -475,8 +512,10 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(url, self.file_object.get_admin_expand_view_url())
         self.assertContains(
             response,
-            f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
+            f"""<img id="img" src="{original_url}" alt="{escape(self.file_object.label)}" """
         )
+        self.assertContains(response, f"<title>{escape(self.file_object.label)}</title>")
+        self.assertContains(response, '<html lang="')
 
     def test_file_expand_view(self):
         """SVGs stored as File (not Image) have an expand view, too, see #1590"""
@@ -493,7 +532,7 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(url, file.get_admin_expand_view_url())
         self.assertContains(
             response,
-            f"""<img id="img" src="{file.url}" onclick="this.classList.toggle('zoom')"/>"""
+            f"""<img id="img" src="{file.url}" alt="{escape(file.label)}" """
         )
 
     def test_expand_view_requires_read_permission(self):
@@ -827,6 +866,27 @@ class FilerClipboardAdminUrlsTests(TestCase):
             # failing assertion would otherwise leak it into every later test.
             abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
+    def test_filer_upload_error_message_only_for_uploaders_without_inline_errors(self):
+        """filer's own uploaders show errors themselves; a session message would repeat
+        the error after the listing reloads"""
+        folder = Folder.objects.create(name='foo')
+        url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+        empty_file = SimpleUploadedFile('empty.html', b'', content_type='text/html')
+
+        response = self.client.post(url, {'file': empty_file}, HTTP_X_FILER_INLINE_ERRORS='1')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('empty', json.loads(response.content.decode('utf-8'))['error'])
+        self.assertEqual(list(get_messages(response.wsgi_request)), [])
+
+        empty_file = SimpleUploadedFile('empty.html', b'', content_type='text/html')
+        response = self.client.post(url, {'file': empty_file})
+
+        self.assertEqual(response.status_code, 400)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level, ERROR)
+
     def test_filer_max_pixel_deactivation(self):
         from django.core.checks import Warning
 
@@ -1070,7 +1130,23 @@ class FilerClipboardAdminUrlsTests(TestCase):
             image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
             image_obj.save()
         url = file_icon_url(image_obj)
-        self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
+        self.assertEqual(url, '/static/filer/icons/file-unknown.svg')
+
+    def test_templatetag_file_icon_url_is_html_escaped_only(self):
+        # The URL ends up in a data attribute read via ``dataset``, so it must be
+        # HTML-escaped, not JS-escaped (#1645)
+        file_obj = File.objects.create(name='test.pdf')
+        icon_url = 'https://cdn.example-test.de/a1621890-6d4b.svg?a=1&b="2"'
+        template = Template('{% load filer_admin_tags %}<img data-icon-url="{% file_icon_url file %}">')
+        with unittest.mock.patch(
+            'filer.templatetags.filer_admin_tags.file_icon_context',
+            return_value={'icon_url': icon_url},
+        ):
+            html = template.render(Context({'file': file_obj}))
+        self.assertEqual(
+            html,
+            '<img data-icon-url="https://cdn.example-test.de/a1621890-6d4b.svg?a=1&amp;b=&quot;2&quot;">',
+        )
 
 
 class BulkOperationsMixin:
@@ -1484,6 +1560,21 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         })
         self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
 
+    def test_delete_folders_action_logs_folders(self):
+        url = reverse('admin:filer-directory_listing', args=(self.folder.id,))
+        self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % self.sub_folder1.id],
+        })
+
+        # Selected folders must be logged, not only their files.
+        self.assertTrue(LogEntry.objects.filter(
+            action_flag=DELETION,
+            content_type__model='folder',
+            object_id=str(self.sub_folder1.id),
+        ).exists())
+
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
     # TODO: Test recursive (files and folders tree) processing.
@@ -1572,6 +1663,8 @@ class PermissionAdminTest(TestCase):
 class FolderListingTest(TestCase):
 
     def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
         superuser = create_superuser()
         self.staff_user = User.objects.create_user(
             username='joe', password='x', email='joe@mata.com')

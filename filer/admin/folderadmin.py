@@ -2,6 +2,7 @@ import itertools
 import os
 import re
 from collections import OrderedDict
+from dataclasses import dataclass, field
 from urllib.parse import quote as urlquote
 from urllib.parse import unquote as urlunquote
 
@@ -14,7 +15,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import Case, F, OuterRef, Subquery, When
+from django.db.models import Case, Count, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -31,6 +32,7 @@ from easy_thumbnails.models import Thumbnail
 from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
+from ..models.foldermodels import subtree_ids
 from ..settings import (
     FILER_IMAGE_MODEL,
     FILER_PAGINATE_BY,
@@ -43,20 +45,25 @@ from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
 from ..utils.provenance import Provenance, ai_digital_source_type_q
+from ..utils.queries import batched_querysets, chunked_by_pk
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
+from .pagination import FolderItems
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
     AdminContext,
     admin_url_params_encoded,
+    attach_ancestors,
     check_files_edit_permissions,
     check_files_read_permissions,
     check_folder_edit_permissions,
-    check_folder_read_permissions,
     get_directory_listing_type,
+    popup_pick_type,
     popup_status,
     userperms_for_request,
+    walk_folder_levels,
+    walk_subtrees,
 )
 
 
@@ -66,6 +73,13 @@ PROVENANCE_FILTERS = {
     'ai': _('Created or edited using generative AI'),
     'content_credentials': _('Uploaded with Content Credentials'),
 }
+
+
+@dataclass
+class _TreePreview:
+    children: dict = field(default_factory=dict)
+    files: dict = field(default_factory=dict)
+    denied: bool = False
 
 
 class AddFolderPopupForm(forms.ModelForm):
@@ -331,6 +345,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if len(search_terms) > 0 or provenance_filter:
             if folder and limit_search_to_folder and not folder.is_root:
+                # TODO: Keep descendants in SQL (recursive CTE or materialized
+                # path) to avoid backend parameter limits. Splitting IN clauses
+                # does not cap total parameters; results still need pagination.
                 desc_folder_ids = folder.get_descendants_ids()
                 # Do not include current folder itself in search results.
                 folder_qs = Folder.objects.filter(pk__in=desc_folder_ids)
@@ -340,7 +357,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
-            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
+            folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
             if provenance_filter:
                 # Folders have no provenance
@@ -353,25 +370,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             file_qs = folder.files.all()
             show_result_count = False
 
-        folder_qs = folder_qs.order_by('name').select_related("owner")
+        # Break ties on pk so LIMIT/OFFSET pages never overlap or skip items.
+        folder_qs = folder_qs.order_by('name', 'pk').select_related("owner")
+        folder_qs = self._with_folder_counts(folder_qs)
         order_by = request.GET.get('order_by', None)
-        order_by_annotation = None
-        if order_by is None:
-            order_by_annotation = Lower(Coalesce(
+        order_by = order_by.split(',') if order_by else []
+        order_by = [field for field in order_by
+                    if re.sub(r'^-', '', field) in self.order_by_file_fields]
+        if not order_by:
+            # Missing, empty or invalid sorts fall back to the display name.
+            order_by = [Lower(Coalesce(
                 Case(
                     When(name__exact='', then=None),
                     When(name__isnull=False, then='name')
                 ),
                 'original_filename'
-            ))
-
-        order_by = order_by.split(',') if order_by else []
-        order_by = [field for field in order_by
-                    if re.sub(r'^-', '', field) in self.order_by_file_fields]
-        if len(order_by) > 0:
-            file_qs = file_qs.order_by(*order_by)
-        elif order_by_annotation:
-            file_qs = file_qs.order_by(order_by_annotation)
+            ))]
+        # Break ties on pk so LIMIT/OFFSET pages never overlap or skip items.
+        file_qs = file_qs.order_by(*order_by, 'pk')
 
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders
@@ -405,7 +421,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         file_qs = file_qs.annotate(
             thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
             thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
-        ).select_related("owner")
+        ).select_related("owner", "folder")  # Permission checks read each file's folder.
 
         try:
             permissions = {
@@ -417,7 +433,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:  # noqa
             permissions = {}
 
-        items = list(itertools.chain(folder_qs, file_qs))
+        items = FolderItems(folder_qs, file_qs)
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
@@ -478,6 +494,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
 
+        if popup_pick_type(request) == 'folder':
+            # Folder labels walk ancestors; load each ancestor level once.
+            attach_ancestors([item for item in paginated_items.object_list if isinstance(item, Folder)])
+
         context = self.admin_site.each_context(request)
         context.update({
             'folder': folder,
@@ -499,6 +519,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
             'folder_files': file_qs,
+            'folder_count': items.folder_count,
+            'file_count': items.file_count,
             'thumbnail_size': FILER_TABLE_ICON_SIZE if list_type == TABLE_LIST_TYPE else FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
             'provenance_filter': provenance_filter,
@@ -527,6 +549,19 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             images = Image.objects.filter(has_content_credentials=True)
         return qs.filter(pk__in=images.values('pk'))
+
+    def _with_folder_counts(self, queryset):
+        children = Folder.objects.filter(parent_id=OuterRef('pk')).order_by().values('parent_id')
+        files = File.objects.filter(folder_id=OuterRef('pk')).order_by().values('folder_id')
+        # Separate aggregates avoid multiplying counts by joining both relations.
+        return queryset.annotate(
+            _children_count_cache=Coalesce(
+                Subquery(children.annotate(total=Count('pk')).values('total')), 0,
+            ),
+            _file_count_cache=Coalesce(
+                Subquery(files.annotate(total=Count('pk')).values('total')), 0,
+            ),
+        )
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa
@@ -699,13 +734,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def move_files(files):
             files_count[0] += tools.move_file_to_clipboard(files, clipboard)
 
-        def move_folders(folders):
-            for f in folders:
-                move_files(f.files)
-                move_folders(f.children.all())
-
         move_files(files_queryset)
-        move_folders(folders_queryset)
+        for level, files in walk_subtrees(folders_queryset):
+            move_files(files)
+            del files
 
         self.message_user(request, _("Successfully moved %(count)d files to "
                                      "clipboard.") % {"count": files_count[0]})
@@ -743,13 +775,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     f.save()
                     files_count[0] += 1
 
-        def set_folders(folders):
-            for f in folders:
-                set_files(f.files)
-                set_folders(f.children.all())
-
+        # Read subtree files after direct selections have been saved.
         set_files(files_queryset)
-        set_folders(folders_queryset)
+        for level, files in walk_subtrees(folders_queryset):
+            set_files(files)
+            del files
 
         if set_public:
             self.message_user(request, _("Successfully disabled permissions for %(count)d files.") % {"count": files_count[0], })
@@ -834,27 +864,28 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # This would happen automatically by ways of the delete
                 # cascade, but then the individual .delete() methods won't be
                 # called and the files won't be deleted from the filesystem.
-                folder_ids = set()
-                for folder in folders_queryset:
-                    folder_ids.add(folder.id)
-                    folder_ids.update(folder.get_descendants_ids())
-                if DJANGO_VERSION >= (5, 1):
-                    qs = File.objects.filter(folder__in=folder_ids)
-                    self.log_deletions(request, qs)
-                    # Still need to delete files individually (not only the database entries)
-                    for f in qs:
-                        f.delete()
-                else:
-                    for f in File.objects.filter(folder__in=folder_ids):
-                        self.log_deletion(request, f, force_str(f))
-                        f.delete()
+                folder_ids = subtree_ids([folder.pk for folder in folders_queryset])
+                # Log and delete a bounded number of files at a time, however
+                # many folders are selected or files a single folder holds.
+                for folder_batch in batched_querysets(File.objects.all(), 'folder_id', folder_ids):
+                    for files_to_delete in chunked_by_pk(folder_batch):
+                        if DJANGO_VERSION >= (5, 1):
+                            self.log_deletions(request, files_to_delete)
+                        for file_obj in files_to_delete:
+                            if DJANGO_VERSION < (5, 1):
+                                self.log_deletion(request, file_obj, force_str(file_obj))
+                            # Preserve storage cleanup and subclass delete hooks.
+                            file_obj.delete()
+                        del files_to_delete
                 # delete all folders
                 if DJANGO_VERSION >= (5, 1):
-                    self.log_deletions(request, files_queryset)
+                    self.log_deletions(request, folders_queryset)
                     folders_queryset.delete()
                 else:
+                    # Log every path before deleting a selected ancestor.
                     for f in folders_queryset:
                         self.log_deletion(request, f, force_str(f))
+                    for f in folders_queryset:
                         f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {"count": n, })
             # Return None to display the change list page again.
@@ -912,23 +943,29 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # admin or is edited inline.
             return f'{capfirst(opts.verbose_name)}: {force_str(obj)}'
 
-    def _check_copy_perms(self, request, files_queryset, folders_queryset):
-        try:
-            check_files_read_permissions(request, files_queryset)
-            check_folder_read_permissions(request, folders_queryset)
-        except PermissionDenied:
-            return True
-        return False
+    _READ_CHECKS = ('has_read_permission',)
+    _EDIT_CHECKS = ('has_read_permission', 'has_edit_permission')
 
-    def _check_move_perms(self, request, files_queryset, folders_queryset):
+    def _check_copy_perms(self, request, files_queryset, folders_queryset, tree=None):
+        # ``tree`` is the selection's _tree_labels() built with _READ_CHECKS.
+        if tree is None:
+            tree = self._tree_labels(request, list(folders_queryset), checks=self._READ_CHECKS)
         try:
             check_files_read_permissions(request, files_queryset)
-            check_folder_read_permissions(request, folders_queryset)
-            check_files_edit_permissions(request, files_queryset)
-            check_folder_edit_permissions(request, folders_queryset)
         except PermissionDenied:
             return True
-        return False
+        return tree.denied
+
+    def _check_move_perms(self, request, files_queryset, folders_queryset, tree=None):
+        # ``tree`` is the selection's _tree_labels() built with _EDIT_CHECKS.
+        if tree is None:
+            tree = self._tree_labels(request, list(folders_queryset), checks=self._EDIT_CHECKS)
+        try:
+            check_files_read_permissions(request, files_queryset)
+            check_files_edit_permissions(request, files_queryset)
+        except PermissionDenied:
+            return True
+        return tree.denied
 
     def _get_current_action_folder(self, request, files_queryset,
                                    folders_queryset):
@@ -939,36 +976,70 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             return None
 
-    def _list_folders_to_copy_or_move(self, request, folders):
+    def _tree_labels(self, request, folders, file_type=File, checks=()):
+        # Retain labels for the confirmation page, not every polymorphic file.
+        attach_ancestors(folders)
+        preview = _TreePreview()
+        for level, files in walk_subtrees(folders):
+            if checks and not preview.denied:
+                # One denial decides the outcome; skip checking the rest.
+                preview.denied = not all(
+                    getattr(obj, check)(request)
+                    for obj in itertools.chain(level.values(), files) for check in checks
+                )
+            for folder in level.values():
+                # Selected folders inside another selected subtree are also
+                # listed there, since the actions process them twice too.
+                preview.children.setdefault(folder.parent_id, []).append(folder)
+            for file_obj in sorted(files):
+                if isinstance(file_obj, file_type):
+                    label = self._format_callback(file_obj, request.user, self.admin_site, set())
+                    preview.files.setdefault(file_obj.folder_id, []).append(label)
+            del files
+        for siblings in preview.children.values():
+            siblings.sort(key=lambda folder: folder.name)
+        return preview
+
+    def _list_folders_to_copy_or_move(self, request, folders, subtrees=None):
+        if subtrees is None:
+            # Load the selected trees and label ancestors once, not per folder.
+            folders = list(folders)
+            subtrees = self._tree_labels(request, folders)
+        children_by_id, files_by_id = subtrees.children, subtrees.files
         for fo in folders:
             yield self._format_callback(fo, request.user, self.admin_site, set())
-            children = list(self._list_folders_to_copy_or_move(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files)])
+            children = list(self._list_folders_to_copy_or_move(request, children_by_id.get(fo.pk, ()), subtrees))
+            children.extend(files_by_id.get(fo.pk, ()))
             if children:
                 yield children
 
-    def _list_all_to_copy_or_move(self, request, files_queryset, folders_queryset):
-        to_copy_or_move = list(self._list_folders_to_copy_or_move(request, folders_queryset))
+    def _list_all_to_copy_or_move(self, request, files_queryset, folders_queryset, subtrees=None):
+        to_copy_or_move = list(self._list_folders_to_copy_or_move(request, folders_queryset, subtrees))
         to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset)])
         return to_copy_or_move
 
-    def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
+    def _list_all_destination_folders_recursive(self, request, current_folder, children, folders, allow_self, level):
         for fo in folders:
-            if not allow_self and fo in folders_queryset:
-                # We do not allow moving to selected folders or their descendants
-                continue
-
-            if not fo.has_read_permission(request):
-                continue
-
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
-            yield from self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1)
+            yield from self._list_all_destination_folders_recursive(request, current_folder, children, children.get(fo.pk, ()), allow_self, level + 1)
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
-        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
+        # We do not allow moving to selected folders or their descendants
+        excluded = set() if allow_self else {folder.pk for folder in folders_queryset}
+
+        def accept(folder):
+            return folder.pk not in excluded and folder.has_read_permission(request)
+
+        roots = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
+        children = {}
+        for level in walk_folder_levels(roots, accept):
+            for folder in level.values():
+                children.setdefault(folder.parent_id, []).append(folder)
+
+        root_folders = children.get(None, [])
+        return list(self._list_all_destination_folders_recursive(request, current_folder, children, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         files_queryset.update(folder=destination)
@@ -979,9 +1050,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         app_label = opts.app_label
 
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
-        perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
-        to_move = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
+        selected = list(folders_queryset)
+        tree = self._tree_labels(request, selected, File, self._EDIT_CHECKS)
+        perms_needed = self._check_move_perms(request, files_queryset, selected, tree)
+        to_move = self._list_all_to_copy_or_move(request, files_queryset, selected, tree)
+        folders = self._list_all_destination_folders(request, selected, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             if perms_needed:
@@ -1073,8 +1146,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         app_label = opts.app_label
 
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
-        perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
-        to_rename = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
+        selected = list(folders_queryset)
+        tree = self._tree_labels(request, selected, File, self._EDIT_CHECKS)
+        perms_needed = self._check_move_perms(request, files_queryset, selected, tree)
+        to_rename = self._list_all_to_copy_or_move(request, files_queryset, selected, tree)
 
         if request.method == 'POST' and request.POST.get('post'):
             if perms_needed:
@@ -1185,9 +1260,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         app_label = opts.app_label
 
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
-        perms_needed = self._check_copy_perms(request, files_queryset, folders_queryset)
-        to_copy = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
+        selected = list(folders_queryset)
+        tree = self._tree_labels(request, selected, File, self._READ_CHECKS)
+        perms_needed = self._check_copy_perms(request, files_queryset, selected, tree)
+        to_copy = self._list_all_to_copy_or_move(request, files_queryset, selected, tree)
+        folders = self._list_all_destination_folders(request, selected, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             if perms_needed:
@@ -1243,25 +1320,32 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
-    def _check_resize_perms(self, request, files_queryset, folders_queryset):
+    def _check_resize_perms(self, request, files_queryset, folders_queryset, tree=None):
+        # ``tree`` is the selection's _tree_labels() built with _READ_CHECKS.
+        if tree is None:
+            tree = self._tree_labels(request, list(folders_queryset), Image, self._READ_CHECKS)
         try:
             check_files_read_permissions(request, files_queryset)
-            check_folder_read_permissions(request, folders_queryset)
             check_files_edit_permissions(request, files_queryset)
         except PermissionDenied:
             return True
-        return False
+        return tree.denied
 
-    def _list_folders_to_resize(self, request, folders):
+    def _list_folders_to_resize(self, request, folders, subtrees=None):
+        if subtrees is None:
+            # Load the selected trees and label ancestors once, not per folder.
+            folders = list(folders)
+            subtrees = self._tree_labels(request, folders, Image)
+        children_by_id, files_by_id = subtrees.children, subtrees.files
         for fo in folders:
-            children = list(self._list_folders_to_resize(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files) if isinstance(f, Image)])
+            children = list(self._list_folders_to_resize(request, children_by_id.get(fo.pk, ()), subtrees))
+            children.extend(files_by_id.get(fo.pk, ()))
             if children:
                 yield self._format_callback(fo, request.user, self.admin_site, set())
                 yield children
 
-    def _list_all_to_resize(self, request, files_queryset, folders_queryset):
-        to_resize = list(self._list_folders_to_resize(request, folders_queryset))
+    def _list_all_to_resize(self, request, files_queryset, folders_queryset, subtrees=None):
+        to_resize = list(self._list_folders_to_resize(request, folders_queryset, subtrees))
         to_resize.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset) if isinstance(f, Image)])
         return to_resize
 
@@ -1336,8 +1420,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         app_label = opts.app_label
 
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
-        perms_needed = self._check_resize_perms(request, files_queryset, folders_queryset)
-        to_resize = self._list_all_to_resize(request, files_queryset, folders_queryset)
+        selected = list(folders_queryset)
+        tree = self._tree_labels(request, selected, Image, self._READ_CHECKS)
+        perms_needed = self._check_resize_perms(request, files_queryset, selected, tree)
+        to_resize = self._list_all_to_resize(request, files_queryset, selected, tree)
 
         if request.method == 'POST' and request.POST.get('post'):
             if perms_needed:

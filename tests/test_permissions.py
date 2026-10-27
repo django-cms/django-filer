@@ -150,6 +150,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
+            # Direct ORM writes bypass the permission admin cache invalidation.
+            cache.clear()
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
             delattr(self.folder_perm, 'permission_cache')
@@ -197,6 +199,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
+            # Direct ORM writes bypass the permission admin cache invalidation.
+            cache.clear()
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
 
@@ -243,6 +247,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
+            # Direct ORM writes bypass the permission admin cache invalidation.
+            cache.clear()
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
@@ -288,6 +294,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
+            # Direct ORM writes bypass the permission admin cache invalidation.
+            cache.clear()
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
 
@@ -303,7 +311,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(self.test_user1.groups.count(), 2)
 
-            # We have to invalidate cache
+            # Group changes also invalidate cached empty permission sets.
+            cache.clear()
             delattr(self.folder, 'permission_cache')
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
@@ -334,6 +343,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
+            # Direct ORM writes bypass the permission admin cache invalidation.
+            cache.clear()
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
@@ -349,7 +360,8 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(self.test_user2.groups.count(), 2)
 
-            # We have to invalidate cache
+            # Group changes also invalidate cached empty permission sets.
+            cache.clear()
             delattr(self.folder_perm, 'permission_cache')
 
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)

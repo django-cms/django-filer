@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { announce } from './announce.js';
+import { whenErrorsDismissed } from './error-dismissed.js';
 import { getCsrfToken } from './csrf.js';
 
 /* globals Cl */
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadInfoContainer = document.querySelector('.js-filer-dropzone-upload-info-container');
     const uploadInfo = document.querySelector('.js-filer-dropzone-upload-info');
     const uploadNumber = document.querySelector('.js-filer-dropzone-upload-number');
+    const uploadText = document.querySelector('.js-filer-upload-text');
     const uploadFileNameSelector = '.js-filer-dropzone-file-name';
     const uploadProgressSelector = '.js-filer-dropzone-progress';
     const uploadSuccess = document.querySelector('.js-filer-dropzone-upload-success');
@@ -69,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     Dropzone.autoDiscover = false;
     const dropzone = new Dropzone(uploadButton, {
         url: uploadUrl,
-        headers: { 'X-CSRFToken': getCsrfToken() },
+        // filer shows upload errors itself: the server need not store them as Django messages
+        headers: { 'X-CSRFToken': getCsrfToken(), 'X-Filer-Inline-Errors': '1' },
         paramName: 'file',
         maxFilesize: maxFilesize,  // already in MB
         parallelUploads: maxUploaderConnections,
@@ -106,6 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateUploadNumber();
+        if (uploadNumber) {
+            announce(`${uploadText ? uploadText.textContent.trim() : ''} ${uploadNumber.textContent}`);
+        }
     });
 
     dropzone.on('uploadprogress', (file, progress) => {
@@ -168,19 +175,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (uploadCancel) {
                 uploadCancel.classList.add(hiddenClass);
             }
-            if (uploadSuccess) {
+            if (uploadSuccess && !hasErrors) {
                 uploadSuccess.classList.remove(hiddenClass);
+                announce(uploadSuccess.textContent);
             }
 
             if (hasErrors) {
-                setTimeout(reloadOrdered, 1000);
+                // keep the errors on screen until the user has read and dismissed them
+                whenErrorsDismissed(reloadOrdered);
             } else {
                 reloadOrdered();
             }
         }
     });
 
-    dropzone.on('error', (file, errorMessage) => {
+    dropzone.on('error', (file, error) => {
+        // Dropzone passes the parsed JSON body when the server rejects an upload;
+        // filer reports the reason in "error".
+        const errorMessage = (error && (error.error || error.message)) || error;
         const fileId = `file-${encodeURIComponent(file.name)}${file.size}${file.lastModified}`;
         const fileEl = document.getElementById(fileId);
         if (fileEl) {
@@ -208,11 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (uploadCancel) {
                 uploadCancel.classList.add(hiddenClass);
             }
-            if (uploadSuccess) {
-                uploadSuccess.classList.remove(hiddenClass);
-            }
 
-            setTimeout(reloadOrdered, 1000);
+            whenErrorsDismissed(reloadOrdered);
         }
     });
 
@@ -228,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (uploadCanceled) {
                 uploadCanceled.classList.remove(hiddenClass);
+                announce(uploadCanceled.textContent);
             }
 
             setTimeout(() => {
