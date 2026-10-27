@@ -5,6 +5,11 @@ CHANGELOG
 unreleased
 ==========
 
+* fix: Handle folder-name races during creation, copying, and moving. Copies
+  reserve a fresh name instead of merging into a concurrently created folder;
+  failed moves roll back file updates. Enforce unique root names on databases
+  supporting partial unique indexes (see the upgrade notes).
+
 * Compatibility: ``FolderAdmin._list_all_destination_folders`` continues to
   accept lists as well as querysets. Its private recursive helper now takes
   ``(request, current_folder, children, folders, allow_self, level)``;

@@ -843,7 +843,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(messages[0].level, ERROR)
 
             abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
-            folder = Folder.objects.create(name='foo')
+            folder = Folder.objects.create(name='warning')
             with open(self.filename, 'rb') as fh:
                 file_obj = django.core.files.File(fh)
                 url = reverse(

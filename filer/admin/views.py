@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError, router, transaction
 from django.http.response import HttpResponseBadRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
@@ -56,8 +57,17 @@ def make_folder(request, folder_id=None):
                 context = admin.site.each_context(request)
                 new_folder.parent = folder
                 new_folder.owner = request.user
-                new_folder.save()
-                return TemplateResponse(request, 'admin/filer/dismiss_popup.html', context)
+                using = router.db_for_write(Folder, instance=new_folder)
+                try:
+                    with transaction.atomic(using=using):
+                        new_folder.save(using=using)
+                except IntegrityError:
+                    # The name may have been taken since the form was validated.
+                    if not Folder.objects.using(using).filter(parent=folder, name=new_folder.name).exists():
+                        raise
+                    new_folder_form.add_error('name', _('Folder with this name already exists.'))
+                else:
+                    return TemplateResponse(request, 'admin/filer/dismiss_popup.html', context)
     else:
         new_folder_form = NewFolderForm()
 
