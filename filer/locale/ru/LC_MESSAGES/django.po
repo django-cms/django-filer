@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:03+0200\n"
+"POT-Creation-Date: 2026-11-01 12:02+0100\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Alexander Naydenko <an@zeppelinen.com>, 2020\n"
 "Language-Team: Russian (http://app.transifex.com/divio/django-filer/language/"
@@ -134,61 +134,61 @@ msgstr "Удалить файлы/папки"
 msgid "Delete selected files and/or folders"
 msgstr "Удалить выбранные файлы/папки"
 
-#: admin/folderadmin.py:1050
+#: admin/folderadmin.py:1053 admin/folderadmin.py:1064
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Папки с именами %s уже существуют в указанном месте"
 
-#: admin/folderadmin.py:1054
+#: admin/folderadmin.py:1067
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Успешно перемещено %(count)d файлов/папок в папку '%(destination)s'."
 
-#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
+#: admin/folderadmin.py:1075 admin/folderadmin.py:1077
 msgid "Move files and/or folders"
 msgstr "Переместить файлы/папки"
 
-#: admin/folderadmin.py:1079
+#: admin/folderadmin.py:1092
 msgid "Move selected files and/or folders"
 msgstr "Переместить выбранные файлы/папки"
 
-#: admin/folderadmin.py:1138
+#: admin/folderadmin.py:1151
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Успешно переименовано %(count)d файлов."
 
-#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
-#: admin/folderadmin.py:1164
+#: admin/folderadmin.py:1160 admin/folderadmin.py:1162
+#: admin/folderadmin.py:1177
 msgid "Rename files"
 msgstr "Переименовать файлы"
 
-#: admin/folderadmin.py:1261
+#: admin/folderadmin.py:1281
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Успешно скопировано %(count)d файлов/папок в папку '%(destination)s'."
 
-#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
+#: admin/folderadmin.py:1299 admin/folderadmin.py:1301
 msgid "Copy files and/or folders"
 msgstr "Скопировать файлы/папки"
 
-#: admin/folderadmin.py:1298
+#: admin/folderadmin.py:1318
 msgid "Copy selected files and/or folders"
 msgstr "Скопировать выбранные файлы/папки"
 
-#: admin/folderadmin.py:1412
+#: admin/folderadmin.py:1432
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Успешно изменен размер %(count)d изображений."
 
-#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
+#: admin/folderadmin.py:1439 admin/folderadmin.py:1441
 msgid "Resize images"
 msgstr "Изменить размер изображений"
 
-#: admin/folderadmin.py:1436
+#: admin/folderadmin.py:1456
 msgid "Resize selected images"
 msgstr "Изменить размер выбранных изображений"
 
@@ -260,15 +260,15 @@ msgstr "Расположение объекта указано за предел
 msgid "Your input: \"{subject_location}\". "
 msgstr "Вы ввели: \"{subject_location}\". "
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:411
+#: admin/permissionadmin.py:13 models/foldermodels.py:416
 msgid "Who"
 msgstr "Кто"
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:432
+#: admin/permissionadmin.py:14 models/foldermodels.py:437
 msgid "What"
 msgstr "Что"
 
-#: admin/views.py:54
+#: admin/views.py:57 admin/views.py:68
 msgid "Folder with this name already exists."
 msgstr "Папка с таким именем уже существует"
 
@@ -328,7 +328,7 @@ msgstr ""
 "%(max_pixels)d миллионов пикселей. Перед повторной загрузкой измените размер "
 "изображения до разрешения %(width)d x %(height)d или ниже."
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:320
+#: models/clipboardmodels.py:11 models/foldermodels.py:325
 msgid "user"
 msgstr "пользователь"
 
@@ -424,122 +424,122 @@ msgstr "родитель"
 msgid "created at"
 msgstr "создан"
 
-#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
+#: models/foldermodels.py:162 templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:25
 #: templates/admin/filer/folder/listing_breadcrumbs.html:8
 #: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Folder"
 msgstr "Папка"
 
-#: models/foldermodels.py:158
+#: models/foldermodels.py:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Папки"
 
-#: models/foldermodels.py:291
+#: models/foldermodels.py:296
 msgid "all items"
 msgstr "все элементы"
 
-#: models/foldermodels.py:292
+#: models/foldermodels.py:297
 msgid "this item only"
 msgstr "только этот элемент"
 
-#: models/foldermodels.py:293
+#: models/foldermodels.py:298
 msgid "this item and all children"
 msgstr "этот элемент и потомки"
 
-#: models/foldermodels.py:297
+#: models/foldermodels.py:302
 msgid "inherit"
 msgstr "наследовать"
 
-#: models/foldermodels.py:298
+#: models/foldermodels.py:303
 msgid "allow"
 msgstr "разрешить"
 
-#: models/foldermodels.py:299
+#: models/foldermodels.py:304
 msgid "deny"
 msgstr "запретить"
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:316
 msgid "type"
 msgstr "тип"
 
-#: models/foldermodels.py:328
+#: models/foldermodels.py:333
 msgid "group"
 msgstr "группа"
 
-#: models/foldermodels.py:335
+#: models/foldermodels.py:340
 msgid "everybody"
 msgstr "все"
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:345
 msgid "can read"
 msgstr "могут читать"
 
-#: models/foldermodels.py:348
+#: models/foldermodels.py:353
 msgid "can edit"
 msgstr "могут редактировать"
 
-#: models/foldermodels.py:356
+#: models/foldermodels.py:361
 msgid "can add children"
 msgstr "могут добавлять потомков"
 
-#: models/foldermodels.py:364
+#: models/foldermodels.py:369
 msgid "folder permission"
 msgstr "разрешение папки"
 
-#: models/foldermodels.py:365
+#: models/foldermodels.py:370
 msgid "folder permissions"
 msgstr "разрешения папки"
 
-#: models/foldermodels.py:379
+#: models/foldermodels.py:384
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr "Папку нельзя выбрать с типом \"все элементы\"."
 
-#: models/foldermodels.py:381
+#: models/foldermodels.py:386
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr "Папку необходимо выбрать, если тип не \"все элементы\"."
 
-#: models/foldermodels.py:383
+#: models/foldermodels.py:388
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr "Пользователя или группу нельзя выбрать вместе с \"все\"."
 
-#: models/foldermodels.py:385
+#: models/foldermodels.py:390
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr "Необходимо выбрать хотя бы одно из: пользователь, группа или \"все\"."
 
-#: models/foldermodels.py:391
+#: models/foldermodels.py:396
 msgid "All Folders"
 msgstr "Все папки"
 
-#: models/foldermodels.py:393
+#: models/foldermodels.py:398
 msgid "Logical Path"
 msgstr "Логический путь"
 
-#: models/foldermodels.py:402
+#: models/foldermodels.py:407
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Пользователь: {user}"
 
-#: models/foldermodels.py:404
+#: models/foldermodels.py:409
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Группа: {group}"
 
-#: models/foldermodels.py:406
+#: models/foldermodels.py:411
 msgid "Everybody"
 msgstr "Все"
 
-#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
+#: models/foldermodels.py:424 templates/admin/filer/widgets/admin_file.html:48
 #: templates/admin/filer/widgets/admin_file.html:49
 msgid "Edit"
 msgstr "Редактировать"
 
-#: models/foldermodels.py:420
+#: models/foldermodels.py:425
 msgid "Read"
 msgstr "Читать"
 
-#: models/foldermodels.py:421
+#: models/foldermodels.py:426
 msgid "Add children"
 msgstr "Добавлять потомков"
 
