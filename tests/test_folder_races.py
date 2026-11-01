@@ -1,3 +1,4 @@
+from importlib import import_module
 from unittest.mock import patch
 
 from django.contrib import admin
@@ -67,8 +68,8 @@ class FolderRaceTests(TestCase):
                 destination.children.all().delete()
                 winners = []
 
-                def take_name(parent, name):
-                    available = original(parent, name)
+                def take_name(parent, name, *, using):
+                    available = original(parent, name, using=using)
                     if not winners:
                         winners.append(Folder.objects.create(name=available, parent=parent, owner=owner))
                     return available
@@ -86,6 +87,22 @@ class FolderRaceTests(TestCase):
         with patch.object(Folder, 'save', side_effect=IntegrityError('unrelated')):
             with self.assertRaisesMessage(IntegrityError, 'unrelated'):
                 self.folder_admin._copy_folder(source, destination, '', False)
+
+    def test_copy_checks_available_names_on_write_database(self):
+        source = Folder.objects.create(name='source')
+        destination = Folder.objects.create(name='destination')
+        Folder.objects.create(name='source', parent=destination)
+        Folder.objects.create(name='source_1', parent=destination)
+
+        def read_database(model, **hints):
+            if model is Folder and hints.get('instance') == destination:
+                return 'unavailable_replica'
+            return 'default'
+
+        with patch('django.db.router.db_for_read', side_effect=read_database):
+            self.assertEqual(self.folder_admin._copy_folder(source, destination, '', False), 1)
+
+        self.assertTrue(destination.children.filter(name='source_2').exists())
 
     def test_move_conflict_rolls_back_files_and_returns_error(self):
         source = Folder.objects.create(name='source')
@@ -114,6 +131,47 @@ class FolderRaceTests(TestCase):
 
 @skipUnlessDBFeature('supports_partial_indexes')
 class RootMigrationTests(TransactionTestCase):
+    def test_duplicates_created_after_check_require_manual_resolution(self):
+        before = [('filer', '0018_alter_file_options')]
+        after = [('filer', '0019_unique_root_folder_name')]
+        migration = import_module('filer.migrations.0019_unique_root_folder_name')
+        for transactional_ddl in (True, False):
+            with self.subTest(transactional_ddl=transactional_ddl):
+                executor = MigrationExecutor(connection)
+                executor.migrate(before)
+                old_folder = executor.loader.project_state(before).apps.get_model('filer', 'Folder')
+                old_folder.objects.create(name='duplicate')
+
+                def create_duplicate_after_check(apps, schema_editor):
+                    migration.check_duplicate_roots(apps, schema_editor)
+                    old_folder.objects.create(name='duplicate')
+
+                try:
+                    executor = MigrationExecutor(connection)
+                    with patch.object(connection.features, 'can_rollback_ddl', transactional_ddl):
+                        with patch.object(migration.Migration.operations[0], 'code', create_duplicate_after_check):
+                            with self.assertRaisesMessage(RuntimeError, 'Rename the conflicting root folders'):
+                                executor.migrate(after)
+                finally:
+                    old_folder.objects.all().delete()
+                    MigrationExecutor(connection).migrate(after)
+
+    def test_constraint_creation_preserves_unrelated_integrity_errors(self):
+        before = [('filer', '0018_alter_file_options')]
+        after = [('filer', '0019_unique_root_folder_name')]
+        for transactional_ddl in (True, False):
+            with self.subTest(transactional_ddl=transactional_ddl):
+                MigrationExecutor(connection).migrate(before)
+                error = IntegrityError('unrelated constraint failure')
+                try:
+                    with patch.object(connection.features, 'can_rollback_ddl', transactional_ddl):
+                        with patch.object(connection.SchemaEditorClass, 'add_constraint', side_effect=error):
+                            with self.assertRaises(IntegrityError) as raised:
+                                MigrationExecutor(connection).migrate(after)
+                    self.assertIs(raised.exception, error)
+                finally:
+                    MigrationExecutor(connection).migrate(after)
+
     def test_existing_duplicates_require_manual_resolution(self):
         executor = MigrationExecutor(connection)
         before = [('filer', '0018_alter_file_options')]

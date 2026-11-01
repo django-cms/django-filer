@@ -14,6 +14,9 @@ Migration ``0019_unique_root_folder_name`` prevents duplicate root folder names
 on databases supporting partial unique indexes (including PostgreSQL and SQLite).
 If duplicate roots already exist, the migration stops and asks you to rename
 conflicting folders before retrying. It does not rename or merge user data.
+If a concurrent write creates duplicates after the initial check, constraint
+creation stops with the same instructions. Pause folder writes while resolving
+the conflicts and retrying the migration to avoid repeated failures.
 You can find conflicts in the Django shell with:
 
 .. code-block:: python

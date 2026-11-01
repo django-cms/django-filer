@@ -1204,10 +1204,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             self._copy_file(f, destination, suffix, overwrite)
         return len(files)
 
-    def _get_available_name(self, destination, name):
+    def _get_available_name(self, destination, name, *, using):
         count = itertools.count(1)
         original = name
-        while destination.contains_folder(name):
+        # Replica reads may keep returning a name that has already been taken.
+        siblings = Folder.objects.using(using).filter(parent=destination)
+        while siblings.filter(name=name).exists():
             name = f"{original}_{next(count)}"
         return name
 
@@ -1221,7 +1223,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         old_folder = Folder.objects.get(pk=folder.pk)
         using = router.db_for_write(Folder, instance=destination)
         while True:
-            foldername = self._get_available_name(destination, old_folder.name)
+            foldername = self._get_available_name(destination, old_folder.name, using=using)
             try:
                 with transaction.atomic(using=using):
                     folder = Folder.objects.using(using).create(
