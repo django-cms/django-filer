@@ -89,6 +89,23 @@ class FilerFolderAdminUrlsTests(TestCase):
         # TODO: not sure why the status code is 200
         self.assertEqual(response.status_code, 200)
 
+    def test_filer_make_root_folder_post_with_name_of_subfolder(self):
+        parent = Folder.objects.create(name="parent")
+        Folder.objects.create(name="sub", parent=parent)
+        url = reverse('admin:filer-directory_listing-make_root_folder')
+
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            # A subfolder with the same name does not block a new root folder
+            response = self.client.post(url, {"name": "sub"})
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, "Folder with this name already exists.")
+            self.assertTrue(Folder.objects.filter(parent__isnull=True, name="sub").exists())
+
+            # A root folder with the same name does
+            response = self.client.post(url, {"name": "sub"})
+            self.assertContains(response, "Folder with this name already exists.")
+            self.assertEqual(Folder.objects.filter(parent__isnull=True, name="sub").count(), 1)
+
     def test_filer_remember_last_opened_directory(self):
         folder = Folder.objects.create(name='remember me please')
 
