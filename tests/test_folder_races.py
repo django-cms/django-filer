@@ -58,6 +58,36 @@ class FolderRaceTests(TestCase):
             with self.assertRaisesMessage(IntegrityError, 'unrelated'):
                 self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {'name': 'new'})
 
+    def test_child_creation_allows_existing_root_name(self):
+        root = Folder.objects.create(name='same')
+        parent = Folder.objects.create(name='parent')
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            {'name': root.name, 'parent_id': parent.pk},
+        )
+        self.assertTemplateUsed(response, 'admin/filer/dismiss_popup.html')
+        child = Folder.objects.get(parent=parent, name=root.name)
+        self.assertEqual(child.owner, self.user)
+        self.assertEqual(Folder.objects.filter(parent=None, name=root.name).count(), 1)
+
+    def test_child_creation_rejects_existing_sibling_name(self):
+        parent = Folder.objects.create(name='parent')
+        Folder.objects.create(name='same', parent=parent)
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            {'name': 'same', 'parent_id': parent.pk},
+        )
+        self.assertContains(response, 'Folder with this name already exists.')
+        self.assertEqual(Folder.objects.filter(parent=parent, name='same').count(), 1)
+
+    def test_root_creation_rejects_existing_root_name(self):
+        Folder.objects.create(name='same')
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'), {'name': 'same'},
+        )
+        self.assertContains(response, 'Folder with this name already exists.')
+        self.assertEqual(Folder.objects.filter(parent=None, name='same').count(), 1)
+
     def test_copy_retries_without_merging_into_concurrent_folder(self):
         source = Folder.objects.create(name='source', owner=self.user)
         Folder.objects.create(name='child', parent=source)

@@ -47,7 +47,9 @@ def make_folder(request, folder_id=None):
         raise PermissionDenied
 
     if request.method == 'POST':
-        new_folder_form = NewFolderForm(request.POST)
+        new_folder_form = NewFolderForm(
+            request.POST, instance=Folder(parent=folder, owner=request.user),
+        )
         if new_folder_form.is_valid():
             new_folder = new_folder_form.save(commit=False)
             if (folder or FolderRoot()).contains_folder(new_folder.name):
@@ -55,8 +57,6 @@ def make_folder(request, folder_id=None):
                     [_('Folder with this name already exists.')])
             else:
                 context = admin.site.each_context(request)
-                new_folder.parent = folder
-                new_folder.owner = request.user
                 using = router.db_for_write(Folder, instance=new_folder)
                 try:
                     with transaction.atomic(using=using):
