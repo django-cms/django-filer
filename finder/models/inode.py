@@ -111,6 +111,8 @@ class InodeManager(Manager):
     def get_query(self, model, **lookup):
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
+        if isinstance(mime_types, str) and '/' in mime_types:
+            mime_types = [mime_types]
         tags_included = lookup.pop('tags__in', None)
         tags_excluded = lookup.pop('tags__not_in', None)
         can_view = lookup.pop('has_read_permission', None)
@@ -126,7 +128,7 @@ class InodeManager(Manager):
             query &= Q(can_change=True)
 
         # query to filter by mime types
-        if mime_types:
+        if mime_types and 'mime_type' in model_field_names:
             queries = []
             for mime_type in mime_types:
                 main_type, sub_type = mime_type.split('/', 1)
@@ -232,8 +234,10 @@ class InodeManager(Manager):
 
         if lookup.pop('is_folder', None) is False:
             folder_qs = FolderModel.objects.none()
-        elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
-            return folder_qs.get()
+        else:
+            folder_qs = FolderModel.objects.filter(self.get_query(FolderModel, **lookup))
+            if folder_qs.exists():
+                return folder_qs.get()
         try:
             values = folder_qs.values('id', mime_type=Value(None, output_field=CharField())).union(*[
                 model.objects.values('id', 'mime_type').filter(self.get_query(model, **lookup))
