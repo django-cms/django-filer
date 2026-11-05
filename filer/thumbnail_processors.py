@@ -14,12 +14,13 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 
-RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
+RE_SUBJECT_LOCATION = re.compile(r'^(\d+)\s*,\s*(\d+)$')
 
 
 def normalize_subject_location(subject_location):
     if subject_location:
         if isinstance(subject_location, str):
+            subject_location = subject_location.strip()
             m = RE_SUBJECT_LOCATION.match(subject_location)
             if m:
                 return (int(m.group(1)), int(m.group(2)))
@@ -149,11 +150,11 @@ def whitespace(image, size, whitespace=False, whitespace_color=None, **kwargs):
     image = Image.new('RGBA', (target_x, target_y), whitespace_color)
     if source_x < target_x and source_y < target_y:  # whitespace all around
         image.paste(old_image, (
-            (target_x - source_x) / 2, (target_y - source_y) / 2))
+            (target_x - source_x) // 2, (target_y - source_y) // 2))
     elif source_x < target_x:  # whitespace on top and bottom only
-        image.paste(old_image, ((target_x - source_x) / 2, 0))
+        image.paste(old_image, ((target_x - source_x) // 2, 0))
     elif source_y < target_y:  # whitespace on sides only
-        image.paste(old_image, (0, (target_y - source_y) / 2))
+        image.paste(old_image, (0, (target_y - source_y) // 2))
     else:  # no whitespace needed
         image = old_image
 

@@ -2,7 +2,6 @@ import hashlib
 import json
 import mimetypes
 import zipfile
-
 from functools import partial
 from pathlib import Path
 

@@ -82,7 +82,7 @@ const FilePreview = memo(({selectedFile, openDialog, removeFile}: {
 		<div className="finder-file-select">
 			<figure>{selectedFile ? <>
 				<div>
-					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} />
+					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} draggable={false} />
 				</div>
 				<figcaption>
 					<dl>
@@ -174,6 +174,7 @@ export default function FinderFileSelect(props) {
 			inputElement.value = '';
 			inputElement.dataset.selected_file = null;
 			inputElement.checkValidity();
+			inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 		}
 	}
 
@@ -185,6 +186,7 @@ export default function FinderFileSelect(props) {
 				inputElement.value = file.id;
 				inputElement.dataset.selected_file = JSON.stringify(parseDataset(file));
 				inputElement.checkValidity();
+				inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 			}
 		}
 	}

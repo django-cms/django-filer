@@ -38,6 +38,12 @@ export function useCookie(key, initial) : [any, (value: any) => any] {
 				v => Number(v),
 			];
 		}
+		if (typeof initial === 'object') {
+			return [
+				v => JSON.stringify(v),
+				v => JSON.parse(v),
+			];
+		}
 		return [
 			v => v,
 			v => v,

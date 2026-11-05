@@ -69,7 +69,7 @@ class ImageFileModel(AbstractFileModel):
             try:
                 self.crop(ambit, thumbnail_path, self.thumbnail_size, self.thumbnail_size)
             except Exception as exception:
-                logger.warning(f"Thumbnail generation failed for image {self.pk}: {exception}")
+                logger.warning(f"Thumbnail generation failed for image {self.id}: {exception}")
                 return self.fallback_thumbnail_url
         return ambit.sample_storage.url(thumbnail_path)
 

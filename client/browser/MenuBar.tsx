@@ -1,7 +1,7 @@
 import React, {forwardRef, useImperativeHandle, useMemo, useRef} from 'react';
 import DropDownMenu from '../common/DropDownMenu';
 import SortingOptions from '../common/SortingOptions';
-import FilterByTag from '../common/FilterByTag';
+import {FilterByLabelTag} from '../common/LabelTags';
 import VolumeControl from '../common/VolumeControl';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
@@ -9,7 +9,17 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
 const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
-	const {openUploader, tags, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, fileUploadDisabled, webAudio} = props;
+	const {
+		openUploader,
+		labelTags,
+		refreshFilesList,
+		setDirty,
+		setSearchQuery,
+		searchZone,
+		setSearchZone,
+		fileUploadDisabled,
+		webAudio
+	} = props;
 	const ref = useRef(null);
 	const searchRef = useRef(null);
 
@@ -82,7 +92,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			</li>
 			<VolumeControl webAudio={webAudio} />
 			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
-			{tags && <FilterByTag refreshFilesList={refreshFilesList} tags={tags} root={rootNode} />}
+			{labelTags && <FilterByLabelTag refreshFilesList={refreshFilesList} tags={labelTags} root={rootNode} />}
 			{!fileUploadDisabled && <Tooltip>
 				<TooltipTrigger>
 					<li role="menuitem" onClick={openUploader}>

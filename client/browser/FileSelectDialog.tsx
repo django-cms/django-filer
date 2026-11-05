@@ -11,7 +11,7 @@ import React, {
 	useState,
 } from 'react';
 import {useInView} from 'react-intersection-observer';
-import FileTags from '../common/FileTags';
+import {LabelTags} from '../common/LabelTags';
 import FileUploader from '../common/FileUploader';
 import {useAudioSettings, useSearchZone} from '../common/Storage';
 import BrowserEditor from './BrowserEditor';
@@ -42,9 +42,9 @@ function Figure(props) {
 	return (
 		<figure className="figure" aria-selected={props.isSelected}>
 			<FigBody {...props}>
-				<FileTags tags={props.tags}>
+				<LabelTags tags={props.label_tags}>
 					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-				</FileTags>
+				</LabelTags>
 			</FigBody>
 			<figcaption>
 				{props.name}
@@ -345,12 +345,12 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 			<BrowserEditor
 				uploadedFile={uploadedFile}
 				mainContent={ref.current}
-				settings={{csrfToken, baseUrl, selectFile, dismissAndClose, tags: structure.tags}}
+				settings={{csrfToken, baseUrl, selectFile, dismissAndClose, labelTags: structure.label_tags}}
 			/> : <>
 				<MenuBar
 					ref={menuBarRef}
 					openUploader={() => uploaderRef.current.openUploader()}
-					tags={structure.tags}
+					labelTags={structure.label_tags}
 					refreshFilesList={refreshFilesList}
 					setDirty={setDirty}
 					setSearchQuery={setSearchQuery}

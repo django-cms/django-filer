@@ -1,6 +1,4 @@
-from . import file
-from . import folder
-from . import filetag
-from . import permission
+from . import file, filetag, folder, permission
+
 
 __all__ = ['file', 'folder', 'filetag', 'permission']

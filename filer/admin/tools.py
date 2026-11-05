@@ -22,6 +22,22 @@ def check_folder_edit_permissions(request, folders):
         check_folder_edit_permissions(request, f.children.all())
 
 
+def has_admin_read_permission(request, item):
+    """
+    Return whether ``item`` may be disclosed to the user in the admin.
+
+    This is ``item.has_read_permission()`` plus the exception the directory
+    listing already makes: unfiled files (``folder`` is ``NULL``) are a shared
+    inbox and are deliberately listed for every user of the file browser, see
+    the queryset filter in ``FolderAdmin.directory_listing()``. Without that
+    exception, checking read permissions would hide the icons and change views
+    of files the listing does show.
+    """
+    if hasattr(item, 'folder_id') and item.folder_id is None:
+        return True
+    return bool(item.has_read_permission(request))
+
+
 def check_files_read_permissions(request, files):
     for f in files:
         if not f.has_read_permission(request):

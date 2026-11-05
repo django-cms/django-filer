@@ -202,11 +202,11 @@ dialog {
 					margin: 0;
 					cursor: pointer;
 
-					div:has(> .file-tags) {
+					div:has(> .label-tags) {
 						position: relative;
 					}
 
-					.file-tags {
+					.label-tags {
 						position: absolute;
 						line-height: 0;
 						text-align: right;
