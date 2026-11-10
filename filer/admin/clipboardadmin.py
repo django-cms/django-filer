@@ -136,13 +136,24 @@ def ajax_upload(request, folder_id=None):
                 fields=('original_filename', 'owner', 'file')
             )
             break
+    try:
+        validate_upload(filename, upload, request.user, mime_type)
+    except ValidationError as error:
+        # ValidationError carries a message written for the uploading user
+        # (e.g. "HTML upload denied by site security policy"), so it is safe
+        # - and useful - to pass on.
+        return _upload_error(request, '; '.join(error.messages), status=400)
+    # Validators may rewrite the upload. Refresh UploadedFile.size before the
+    # form assigns it to the model and calculates the file metadata.
+    upload.seek(0, 2)
+    upload.size = upload.tell()
+    upload.seek(0)
     uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                           {'file': upload})
     uploadform.request = request
     uploadform.instance.mime_type = mime_type
     if uploadform.is_valid():
         try:
-            validate_upload(filename, upload, request.user, mime_type)
             file_obj = uploadform.save(commit=False)
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
