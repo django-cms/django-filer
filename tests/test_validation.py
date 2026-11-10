@@ -1,13 +1,15 @@
+import hashlib
 import io
 import json
 import os
+from unittest.mock import patch
 
 import django.core
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Permission, User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 
@@ -196,6 +198,39 @@ stroke="#004400"/>
             img = File.objects.get(pk=file_id)
             content = img.file.file.read().decode("utf-8")
             self.assertNotIn(disallowed, content)
+
+    def test_upload_metadata_matches_rewritten_file(self):
+        svg = (
+            b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            b'<script>alert(1)</script><rect width="10" height="10"/></svg>'
+        )
+        config = apps.get_app_config("filer")
+        for name, payload, mime_type, validator in (
+            ("logo.svg", svg, "image/svg+xml", sanitize_svg),
+            ("photo.jpg", self._jpeg_with_exif().getvalue(), "image/jpeg", strip_exif),
+        ):
+            # Force Django's memory and temporary-file upload handlers in turn.
+            for memory_limit in (1024 * 1024, 0):
+                with self.subTest(name=name, memory_limit=memory_limit):
+                    with override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=memory_limit), patch.dict(
+                        config.FILE_VALIDATORS, {mime_type: [validator]}
+                    ):
+                        response = self.client.post(
+                            reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk}),
+                            {'Filedata': SimpleUploadedFile(name, payload, content_type=mime_type)},
+                        )
+                    self.assertEqual(response.status_code, 200, response.content)
+                    file_obj = File.objects.get(pk=response.json()["file_id"])
+                    with file_obj.file.open("rb") as stored_file:
+                        stored = stored_file.read()
+                    self.assertNotEqual(stored, payload)
+                    self.assertEqual(file_obj.size, len(stored))
+                    self.assertEqual(file_obj.sha1, hashlib.sha1(stored).hexdigest())
+                    if mime_type == "image/svg+xml":
+                        self.assertNotIn(b"<script>", stored)
+                    else:
+                        with Image.open(io.BytesIO(stored)) as image:
+                            self.assertFalse(image.getexif())
 
     def _jpeg_with_exif(self):
         image = Image.new("RGB", (8, 8), color=(255, 0, 0))
