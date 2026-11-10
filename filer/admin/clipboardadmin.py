@@ -143,7 +143,13 @@ def ajax_upload(request, folder_id=None):
     if uploadform.is_valid():
         try:
             validate_upload(filename, upload, request.user, mime_type)
+            # Validators may rewrite the upload after form validation calculated
+            # its metadata. UploadedFile.size also retains the original length.
+            upload.seek(0, 2)
+            upload.size = upload.tell()
+            upload.seek(0)
             file_obj = uploadform.save(commit=False)
+            file_obj.file_data_changed()
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
         except ValidationError as error:
