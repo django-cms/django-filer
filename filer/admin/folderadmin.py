@@ -44,7 +44,12 @@ from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
-from ..utils.provenance import Provenance, ai_digital_source_type_q
+from ..utils.provenance import (
+    Provenance,
+    ai_digital_source_type_q,
+    digital_source_type_q,
+    get_offered_digital_source_types,
+)
 from ..utils.queries import batched_querysets, chunked_by_pk
 from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
@@ -69,10 +74,13 @@ from .tools import (
 
 Image = load_model(FILER_IMAGE_MODEL)
 
-PROVENANCE_FILTERS = {
-    'ai': _('Created or edited using generative AI'),
-    'content_credentials': _('Uploaded with Content Credentials'),
-}
+def get_provenance_filters():
+    """Filters of the directory listing by the digital source type of images:
+    any denoting generative AI, or one of the offered IPTC terms."""
+    return {
+        'ai': _('Created or edited using generative AI'),
+        **get_offered_digital_source_types(),
+    }
 
 
 @dataclass
@@ -338,9 +346,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
-        # Filter images by their provenance information
+        # Filter images by their digital source type
         provenance_filter = request.GET.get('provenance', '')
-        if provenance_filter not in PROVENANCE_FILTERS:
+        provenance_filters = get_provenance_filters()
+        if provenance_filter not in provenance_filters:
             provenance_filter = ''
 
         if len(search_terms) > 0 or provenance_filter:
@@ -524,7 +533,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'thumbnail_size': FILER_TABLE_ICON_SIZE if list_type == TABLE_LIST_TYPE else FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
             'provenance_filter': provenance_filter,
-            'provenance_filters': PROVENANCE_FILTERS.items(),
+            'provenance_filters': provenance_filters.items(),
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
             # needed in the admin/base.html template for logout links
@@ -547,7 +556,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if provenance_filter == 'ai':
             images = Image.objects.filter(ai_digital_source_type_q())
         else:
-            images = Image.objects.filter(has_content_credentials=True)
+            images = Image.objects.filter(digital_source_type_q(provenance_filter))
         return qs.filter(pk__in=images.values('pk'))
 
     def _with_folder_counts(self, queryset):
@@ -1379,10 +1388,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # The provenance describes the uploaded image: keep it, although the
         # resized file cannot carry the Content Credentials of the original.
         provenance = Provenance(image.digital_source_type, image.has_content_credentials)
+        edited = image.digital_source_type_edited
         # Since only file data was changed, there is no way for file field to know about the change.
         # To update size, sha1, width and height fields let's call file_data_changed callback directly.
         image.file_data_changed()
-        image._set_provenance(provenance)
+        image._set_provenance(provenance, edited=edited)
         image.save()
 
         subject_location = normalize_subject_location(image.subject_location)

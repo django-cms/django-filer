@@ -13,7 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='image',
             name='digital_source_type',
-            field=models.CharField(blank=True, default='', editable=False, help_text="IPTC digital source type found in the image's metadata on upload, e.g., stating that it was created using generative AI.", max_length=255, verbose_name='digital source type'),
+            field=models.CharField(blank=True, default='', help_text="IPTC digital source type, e.g., stating that the image was created using generative AI. Detected in the image's metadata on upload.", max_length=255, verbose_name='digital source type'),
+        ),
+        migrations.AddField(
+            model_name='image',
+            name='digital_source_type_edited',
+            field=models.BooleanField(default=False, editable=False, help_text="The digital source type was set by a user. It is not replaced by the one detected in the image's metadata.", verbose_name='digital source type edited'),
         ),
         migrations.AddField(
             model_name='image',

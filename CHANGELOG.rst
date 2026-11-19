@@ -60,9 +60,18 @@ unreleased
   the new ``digital_source_type`` field, the presence of embedded C2PA Content
   Credentials in ``has_content_credentials``. Their signature is not verified.
   Both are shown in the admin, and ``Image.is_ai_generated`` tells whether an
-  image was created or edited using generative AI. The directory listing's search
-  options can filter for either. Run ``manage.py filer_detect_provenance`` to scan
+  image was created or edited using generative AI. If an image has no XMP digital
+  source type, the one stated by its Content Credentials is used. The directory
+  listing marks such images with an "AI" icon, and its search options can filter
+  by digital source type. Run ``manage.py filer_detect_provenance`` to scan
   images uploaded before upgrading.
+* feat: Users can set, change or remove an image's digital source type on its
+  change form, e.g. to mark it as created using generative AI. The types offered,
+  also as filters, default to those denoting generative AI
+  (``FILER_DIGITAL_SOURCE_TYPE_CHOICES``); other detected types are kept.
+  ``FILER_AI_DIGITAL_SOURCE_TYPES`` sets which types count as generative AI. The
+  uploaded file and its Content Credentials are left untouched; thumbnails are
+  generated again to carry the new value.
 * feat: The ``strip_exif`` upload sanitizer keeps the IPTC digital source type.
   Set ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to strip it, too.
 * feat: Thumbnails and images resized with the admin's resize action carry the

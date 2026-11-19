@@ -161,20 +161,22 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
     generative AI, is written back in a minimal XMP packet unless
     ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE`` is set to ``False``. Embedded
     C2PA Content Credentials cannot survive re-encoding: their signature covers
-    the original bytes."""
+    the original bytes. If the image has no XMP digital source type, the one
+    stated in its Content Credentials is written instead."""
     from PIL import Image, UnidentifiedImageError
 
     from . import settings as filer_settings
     from .utils.provenance import (
         build_xmp_packet,
-        detect_content_credentials,
         detect_digital_source_type,
         embed_xmp,
+        get_c2pa_digital_source_type,
+        read_content_credentials,
         read_xmp_packet,
         xmp_save_options,
     )
 
-    has_content_credentials = detect_content_credentials(file)
+    content_credentials = read_content_credentials(file)
     file.seek(0)
     try:
         image = Image.open(file)
@@ -195,7 +197,7 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
             or (marker == "APP2" and not content.startswith(b"ICC_PROFILE"))
             for marker, content in getattr(image, "applist", ())
         )
-        or has_content_credentials
+        or content_credentials is not None
         # XMP Pillow does not expose: GIF, or PNG after the image data
         or bool(read_xmp_packet(file))
     )
@@ -224,7 +226,11 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
 
     xmp = None
     if filer_settings.FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE:
-        digital_source_type = detect_digital_source_type(image, file)
+        # Without XMP, the removed Content Credentials may state it
+        digital_source_type = (
+            detect_digital_source_type(image, file)
+            or get_c2pa_digital_source_type(content_credentials)
+        )
         if digital_source_type:
             xmp = build_xmp_packet(digital_source_type)
             save_kwargs.update(xmp_save_options(image_format, xmp))

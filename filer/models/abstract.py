@@ -21,6 +21,7 @@ from ..utils.provenance import (
     detect_provenance,
     get_digital_source_type_label,
     is_ai_digital_source_type,
+    normalize_digital_source_type,
 )
 from .filemodels import File
 
@@ -106,9 +107,16 @@ class BaseImage(File):
         max_length=255,
         blank=True,
         default='',
+        help_text=_("IPTC digital source type, e.g., stating that the image was created using "
+                    "generative AI. Detected in the image's metadata on upload."),
+    )
+
+    digital_source_type_edited = models.BooleanField(
+        _("digital source type edited"),
+        default=False,
         editable=False,
-        help_text=_("IPTC digital source type found in the image's metadata on upload, "
-                    "e.g., stating that it was created using generative AI."),
+        help_text=_("The digital source type was set by a user. "
+                    "It is not replaced by the one detected in the image's metadata."),
     )
 
     has_content_credentials = models.BooleanField(
@@ -132,6 +140,14 @@ class BaseImage(File):
         verbose_name_plural = _("images")
         abstract = True
         default_manager_name = 'objects'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._remember_digital_source_type()
+
+    def _remember_digital_source_type(self):
+        # Not for a deferred field: reading it would query the database
+        self._old_digital_source_type = self.__dict__.get('digital_source_type')
 
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
@@ -182,9 +198,18 @@ class BaseImage(File):
                         )
         return attrs_updated
 
-    def _set_provenance(self, provenance):
+    def _set_provenance(self, provenance, edited=False):
         self.digital_source_type = provenance.digital_source_type
+        self.digital_source_type_edited = edited
         self.has_content_credentials = provenance.has_content_credentials
+
+    def set_digital_source_type(self, digital_source_type):
+        """Set the digital source type on behalf of a user, e.g., to mark an
+        image as created using generative AI or to remove that mark. Pass an
+        IPTC term, a URI or an empty string. The image's file is not changed,
+        but the thumbnails generated from it carry the new value."""
+        self.digital_source_type = normalize_digital_source_type(digital_source_type)
+        self.digital_source_type_edited = True
 
     @property
     def digital_source_type_label(self):
@@ -238,6 +263,16 @@ class BaseImage(File):
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
         super().save(*args, **kwargs)
+        old_digital_source_type = self._old_digital_source_type
+        self._remember_digital_source_type()
+        if old_digital_source_type not in (None, self.digital_source_type):
+            # Thumbnails carry the digital source type: have them generated again
+            try:
+                self.file.delete_thumbnails()
+            except Exception as exc:
+                logger.warning(
+                    "Failed to delete the thumbnails of image %s after its digital "
+                    "source type changed.", self.pk, exc_info=exc)
 
     def _check_validity(self):
         if not self.name:

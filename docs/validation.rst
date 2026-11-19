@@ -247,7 +247,8 @@ Animated GIFs and WebPs keep all their frames, durations and loop count.
 ``strip_exif`` keeps an image's `IPTC digital source type
 <https://cv.iptc.org/newscodes/digitalsourcetype/>`_, which states e.g. that the
 image was created using generative AI (``trainedAlgorithmicMedia``). It writes it
-back in a minimal XMP packet holding nothing else. Set
+back in a minimal XMP packet holding nothing else. If the image states it in
+its Content Credentials only, it is taken from there. Set
 ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to remove it, too.
 
 Embedded C2PA Content Credentials are removed: their signature covers the

@@ -145,7 +145,12 @@
                 return;
             }
 
-            if (e && e.type === 'click' && /input|textarea/i.test(e.target.tagName) && parent.contains(e.target)) {
+            // form controls inside a menu do not close it; the menu may follow its container
+            // instead of being part of it (search options)
+            const sibling = parent.nextElementSibling;
+            const inMenu = parent.contains(e?.target) ||
+                (sibling?.classList.contains('filer-dropdown-menu') && sibling.contains(e?.target));
+            if (e && e.type === 'click' && /^(input|textarea|select|option|label)$/i.test(e.target.tagName) && inMenu) {
                 return;
             }
 

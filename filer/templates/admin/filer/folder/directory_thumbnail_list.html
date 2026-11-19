@@ -139,6 +139,7 @@
                                       {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                           </a>
                                       {% endif %}
+                                      {% if file.is_ai_generated %} <img class="filer-ai-label" src="{% static 'filer/icons/ai-label.svg' %}" alt="{% translate 'AI' %}" title="{{ file.digital_source_type_label }}" width="20" height="20">{% endif %}
                                   </div>
                                   {% if enable_permissions %}
                                       <div>{% translate "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>

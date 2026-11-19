@@ -143,10 +143,8 @@
                                             </a>
                                         {% endif %}
                                     </strong>
+                                    {% if file.is_ai_generated %} <img class="filer-ai-label" src="{% static 'filer/icons/ai-label.svg' %}" alt="{% translate 'AI' %}" title="{{ file.digital_source_type_label }}" width="20" height="20">{% endif %}
                                 </div>
-                                {% if file.is_ai_generated %}
-                                    <div>{% translate "Origin" %}: {{ file.digital_source_type_label }}</div>
-                                {% endif %}
                                 {% if enable_permissions %}
                                     <div>{% translate "Permissions" %}: {% if file.is_public %}{% translate "disabled" %}{% else %}{% translate "enabled" %}{% endif %}</div>
                                 {% endif %}

@@ -28,11 +28,14 @@ from filer.utils.provenance import (
     detect_file_provenance,
     detect_provenance,
     embed_xmp,
+    get_c2pa_digital_source_type,
+    get_digital_source_type_choices,
     get_digital_source_type_label,
     get_xmp_packet,
     insert_jpeg_xmp,
     is_ai_digital_source_type,
     normalize_digital_source_type,
+    read_content_credentials,
     read_xmp_packet,
 )
 from filer.validation import strip_exif
@@ -76,9 +79,30 @@ def xmp_packet(digital_source_type=AI_GENERATED, form="attribute"):
     ).encode()
 
 
-def jumbf_c2pa_box():
+def cbor_text(value):
+    value = value.encode()
+    if len(value) < 24:
+        return bytes((0x60 + len(value),)) + value
+    if len(value) < 256:
+        return b"\x78" + bytes((len(value),)) + value
+    return b"\x79" + struct.pack(">H", len(value)) + value
+
+
+def c2pa_action(digital_source_type):
+    """The part of a CBOR actions assertion stating the digital source type."""
+    return (
+        cbor_text("action") + cbor_text("c2pa.created")
+        + cbor_text("digitalSourceType") + cbor_text(digital_source_type)
+    )
+
+
+def jumbf_c2pa_box(digital_source_type=True):
+    """A stand-in for a C2PA manifest store. Pass a digital source type to have
+    it stated by an action."""
     description = b"jumd" + bytes(16) + b"\x03" + b"c2pa\x00"
     description = struct.pack(">I", len(description) + 4) + description
+    if digital_source_type is not True:
+        description += c2pa_action(digital_source_type)
     return struct.pack(">I", len(description) + 8) + b"jumb" + description
 
 
@@ -94,7 +118,7 @@ def jpeg_bytes(xmp=None, c2pa=False):
     if xmp is not None:
         segments += jpeg_segment(0xE1, b"http://ns.adobe.com/xap/1.0/\x00" + xmp)
     if c2pa:
-        segments += jpeg_segment(0xEB, b"JP" + b"\x00\x01" + b"\x00\x00\x00\x01" + jumbf_c2pa_box())
+        segments += jpeg_segment(0xEB, b"JP" + b"\x00\x01" + b"\x00\x00\x00\x01" + jumbf_c2pa_box(c2pa))
     return data[:2] + segments + data[2:]
 
 
@@ -113,7 +137,7 @@ def png_bytes(xmp=None, c2pa=False):
     data = buffer.getvalue()
     if c2pa:
         iend = data.rindex(b"IEND") - 4
-        data = data[:iend] + png_chunk(b"caBX", jumbf_c2pa_box()) + data[iend:]
+        data = data[:iend] + png_chunk(b"caBX", jumbf_c2pa_box(c2pa)) + data[iend:]
     return data
 
 
@@ -140,7 +164,7 @@ def gif_bytes(xmp=None, c2pa=False, comment=None):
     data = buffer.getvalue()
     if c2pa:
         # C2PA_GIF application extension before the first image
-        extension = b"!\xff\x0b" + b"C2PA_GIF\x01\x00\x00" + gif_sub_blocks(jumbf_c2pa_box())
+        extension = b"!\xff\x0b" + b"C2PA_GIF\x01\x00\x00" + gif_sub_blocks(jumbf_c2pa_box(c2pa))
         position = data.index(b"!") if b"!" in data[13:] else data.index(b",", 13)
         data = data[:position] + extension + data[position:]
     if xmp is None:
@@ -158,7 +182,7 @@ def riff_chunk(fourcc, data):
 def webp_bytes(c2pa=False):
     chunks = riff_chunk(b"VP8X", bytes(10)) + riff_chunk(b"ICCP", b"odd")
     if c2pa:
-        chunks += riff_chunk(b"C2PA", jumbf_c2pa_box())
+        chunks += riff_chunk(b"C2PA", jumbf_c2pa_box(c2pa))
     return b"RIFF" + struct.pack("<I", len(chunks) + 4) + b"WEBP" + chunks
 
 
@@ -171,7 +195,7 @@ def avif_bytes(c2pa=False, other_uuid=False):
     if other_uuid:
         boxes += isobmff_box(b"uuid", bytes(16) + b"payload")
     if c2pa:
-        boxes += isobmff_box(b"uuid", C2PA_ISOBMFF_UUID + bytes(4) + b"manifest" + jumbf_c2pa_box())
+        boxes += isobmff_box(b"uuid", C2PA_ISOBMFF_UUID + bytes(4) + b"manifest" + jumbf_c2pa_box(c2pa))
     return boxes + isobmff_box(b"mdat", bytes(32))
 
 
@@ -380,6 +404,120 @@ class ProvenanceEdgeCaseTests(TestCase):
                 self.assertEqual(detect_file_provenance(file), provenance.Provenance())
 
 
+class ContentCredentialsDigitalSourceTypeTests(TestCase):
+    """The digital source type of the Content Credentials is used if the image
+    has no XMP digital source type."""
+
+    def files(self):
+        return (
+            jpeg_bytes(c2pa=AI_GENERATED),
+            png_bytes(c2pa=AI_GENERATED),
+            gif_bytes(c2pa=AI_GENERATED),
+            webp_bytes(c2pa=AI_GENERATED),
+            avif_bytes(c2pa=AI_GENERATED),
+        )
+
+    def test_all_formats(self):
+        for data in self.files():
+            with self.subTest(data=data[:12]):
+                store = read_content_credentials(io.BytesIO(data))
+                self.assertEqual(get_c2pa_digital_source_type(store), AI_GENERATED)
+
+    def test_without_digital_source_type(self):
+        store = read_content_credentials(io.BytesIO(jpeg_bytes(c2pa=True)))
+        self.assertEqual(get_c2pa_digital_source_type(store), "")
+        self.assertEqual(get_c2pa_digital_source_type(None), "")
+        self.assertEqual(get_c2pa_digital_source_type(b""), "")
+
+    def test_value_encodings(self):
+        key = cbor_text("digitalSourceType")
+        long_uri = "http://example.com/" + "a" * 230
+        for value, expected in (
+            (key + cbor_text("digitalCapture"), CAPTURE),  # Short CBOR text
+            (key + cbor_text(AI_EDITED), AI_EDITED),  # One byte length
+            (key + b"\x79" + struct.pack(">H", len(AI_EDITED)) + AI_EDITED.encode(), AI_EDITED),  # Two byte length
+            (b'{"digitalSourceType": "%s"}' % AI_GENERATED.encode(), AI_GENERATED),  # JSON
+            (key + cbor_text(long_uri), long_uri),
+            (key + cbor_text("not a term"), ""),
+            (key + b"\x01", ""),  # Not a text
+            (key, ""),  # Truncated
+            (key + b"\x79\x00", ""),
+        ):
+            with self.subTest(value=value[-20:]):
+                self.assertEqual(get_c2pa_digital_source_type(value), expected)
+
+    def test_generative_ai_takes_precedence(self):
+        # A manifest store keeps the history of an image
+        self.assertEqual(
+            get_c2pa_digital_source_type(c2pa_action(AI_GENERATED) + c2pa_action(CAPTURE)), AI_GENERATED)
+        self.assertEqual(
+            get_c2pa_digital_source_type(c2pa_action(AI_GENERATED) + c2pa_action(AI_EDITED)), AI_EDITED)
+        self.assertEqual(
+            get_c2pa_digital_source_type(c2pa_action(CAPTURE) + c2pa_action("humanEdits")),
+            IPTC_DIGITAL_SOURCE_TYPE_BASE + "humanEdits")
+
+    def test_jpeg_manifest_store_split_into_segments(self):
+        # A JUMBF box larger than a segment continues in the next one, which
+        # repeats the box header: the value is split between them here
+        box = jumbf_c2pa_box(AI_GENERATED)
+        split = len(box) - 20
+        header = b"JP" + b"\x00\x01"
+        segments = (
+            jpeg_segment(0xEB, header + struct.pack(">I", 1) + box[:split])
+            + jpeg_segment(0xEB, header + struct.pack(">I", 2) + box[:8] + box[split:])
+        )
+        data = jpeg_bytes()
+        data = data[:2] + segments + data[2:]
+        store = read_content_credentials(io.BytesIO(data))
+        self.assertEqual(store, box)
+        self.assertEqual(get_c2pa_digital_source_type(store), AI_GENERATED)
+
+    def test_jpeg_large_box_header_and_other_segments(self):
+        box = jumbf_c2pa_box(AI_GENERATED)
+        large_header = struct.pack(">I4sQ", 1, b"jumb", len(box) + 8)
+        header = b"JP" + b"\x00\x01"
+        segments = (
+            jpeg_segment(0xEB, b"XX" + bytes(20))  # Not a JPEG XT box
+            + jpeg_segment(0xEB, header + struct.pack(">I", 1) + large_header + box[8:-20])
+            + jpeg_segment(0xEB, header + struct.pack(">I", 2) + large_header + box[-20:])
+        )
+        data = jpeg_bytes()
+        store = read_content_credentials(io.BytesIO(data[:2] + segments + data[2:]))
+        self.assertEqual(store, large_header + box[8:])
+        self.assertEqual(get_c2pa_digital_source_type(store), AI_GENERATED)
+
+    def test_manifest_store_size_is_limited(self):
+        with mock.patch.object(provenance, "MAX_C2PA_SIZE", 10):
+            for data in self.files():
+                with self.subTest(data=data[:12]):
+                    store = read_content_credentials(io.BytesIO(data))
+                    # Still detected, but too little is read to find the value
+                    self.assertIsNotNone(store)
+                    self.assertLess(len(store), 300)
+                    self.assertEqual(get_c2pa_digital_source_type(store[:10]), "")
+
+    def test_isobmff_box_extending_to_end_of_file(self):
+        ftyp = isobmff_box(b"ftyp", b"avif" + bytes(4) + b"mif1avif")
+        payload = jumbf_c2pa_box(AI_GENERATED)
+        to_end = struct.pack(">I4s", 0, b"uuid") + C2PA_ISOBMFF_UUID + payload
+        self.assertEqual(read_content_credentials(io.BytesIO(ftyp + to_end)), payload)
+        # A box smaller than its header has no content
+        too_small = struct.pack(">I4s", 8, b"uuid") + C2PA_ISOBMFF_UUID
+        self.assertEqual(read_content_credentials(io.BytesIO(ftyp + too_small)), b"")
+
+    def test_xmp_takes_precedence(self):
+        result = detect_file_provenance(io.BytesIO(jpeg_bytes(xmp_packet(CAPTURE), c2pa=AI_GENERATED)))
+        self.assertEqual(result.digital_source_type, CAPTURE)
+        self.assertTrue(result.has_content_credentials)
+
+    def test_fallback(self):
+        for data in self.files()[:3]:  # The formats the test images are valid for
+            with self.subTest(data=data[:8]):
+                result = detect_file_provenance(io.BytesIO(data))
+                self.assertEqual(result.digital_source_type, AI_GENERATED)
+                self.assertTrue(result.has_content_credentials)
+
+
 class ImageProvenanceTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
@@ -433,6 +571,55 @@ class ImageProvenanceTests(TestCase):
         self.assertEqual(image.digital_source_type, "")
         self.assertFalse(image.has_content_credentials)
 
+    def test_content_credentials_state_digital_source_type(self):
+        image = self.create(jpeg_bytes(c2pa=AI_GENERATED))
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertTrue(image.is_ai_generated)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_set_digital_source_type(self):
+        image = self.create(jpeg_bytes())
+        image.set_digital_source_type("trainedAlgorithmicMedia")
+        image.save()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertTrue(image.digital_source_type_edited)
+        self.assertTrue(image.is_ai_generated)
+
+        image.set_digital_source_type("")
+        image.save()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, "")
+        self.assertTrue(image.digital_source_type_edited)
+
+    def test_set_digital_source_type_keeps_file(self):
+        data = jpeg_bytes(xmp_packet(), c2pa=True)
+        image = self.create(data)
+        image.set_digital_source_type("")
+        image.save()
+        image.refresh_from_db()
+        self.assertTrue(image.has_content_credentials)
+        with image.file.open("rb") as fh:
+            self.assertEqual(fh.read(), data)
+
+    def test_replacing_file_replaces_edited_digital_source_type(self):
+        image = self.create(jpeg_bytes())
+        image.set_digital_source_type(AI_GENERATED)
+        image.save()
+        image.file = DjangoFile(io.BytesIO(jpeg_bytes(xmp_packet(CAPTURE))), name="other.jpg")
+        image.save()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, CAPTURE)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_deferred_digital_source_type_is_not_loaded(self):
+        self.create(jpeg_bytes(xmp_packet()))
+        with self.assertNumQueries(1):
+            image = Image.objects.defer("digital_source_type").get()
+            self.assertIsNone(image._old_digital_source_type)
+            self.assertNotIn("digital_source_type", image.__dict__)
+
     def test_detection_does_not_consume_file(self):
         # Upload validators read the same file object after the model did
         data = jpeg_bytes(xmp_packet(), c2pa=True)
@@ -484,12 +671,148 @@ class ImageProvenanceAdminTests(TestCase):
         ))
         self.assertNotContains(response, "Content Credentials")
 
-    def test_directory_listing_shows_ai_origin(self):
+    def test_directory_listing_shows_ai_label(self):
         self.upload(jpeg_bytes(xmp_packet(AI_EDITED)))
         self.upload(jpeg_bytes(xmp_packet(CAPTURE)), name="photo.jpg")
-        response = self.client.get(reverse("admin:filer-directory_listing", kwargs={"folder_id": self.folder.pk}))
-        self.assertContains(response, "Edited using generative AI", count=1)
-        self.assertNotContains(response, "Original digital capture")
+        url = reverse("admin:filer-directory_listing", kwargs={"folder_id": self.folder.pk})
+        label = (
+            '<img class="filer-ai-label" src="/static/filer/icons/ai-label.svg" alt="AI" '
+            'title="Edited using generative AI" width="20" height="20">'
+        )
+        for list_type in ("tb", "th"):
+            with self.subTest(list_type=list_type):
+                response = self.client.get(url, {"_list_type": list_type})
+                self.assertContains(response, label, count=1, html=True)
+                self.assertNotContains(response, 'title="Original digital capture"')
+
+    def change(self, image, **data):
+        url = reverse(f"admin:{Image._meta.app_label}_{Image._meta.model_name}_change", args=(image.pk,))
+        response = self.client.post(url, {
+            "name": image.name or "",
+            "owner": self.superuser.pk,
+            "description": "",
+            "subject_location": "",
+            "_continue": "1",
+            **data,
+        })
+        self.assertEqual(response.status_code, 302, response.content[-2000:])
+        image.refresh_from_db()
+        return image
+
+    def test_change_form_offers_digital_source_types(self):
+        image = self.upload(jpeg_bytes(xmp_packet()))
+        response = self.client.get(reverse(
+            f"admin:{Image._meta.app_label}_{Image._meta.model_name}_change", args=(image.pk,)
+        ))
+        self.assertContains(
+            response, f'<option value="{AI_GENERATED}" selected>Created using generative AI</option>', html=True)
+        self.assertContains(response, '<option value="">Not specified</option>', html=True)
+
+    def test_ai_digital_source_types_setting(self):
+        synthetic = IPTC_DIGITAL_SOURCE_TYPE_BASE + "compositeSynthetic"
+        image = self.upload(jpeg_bytes(xmp_packet(synthetic)), name="synthetic.jpg")
+        self.upload(jpeg_bytes(xmp_packet()))
+        url = reverse("admin:filer-directory_listing", kwargs={"folder_id": self.folder.pk})
+        self.assertFalse(image.is_ai_generated)
+        self.assertEqual(Image.objects.filter(provenance.ai_digital_source_type_q()).count(), 1)
+        self.assertContains(self.client.get(url), 'class="filer-ai-label"', count=1)
+
+        # Terms or URIs
+        types = ("trainedAlgorithmicMedia", synthetic, "")
+        with mock.patch.object(filer_settings, "FILER_AI_DIGITAL_SOURCE_TYPES", types):
+            self.assertTrue(image.is_ai_generated)
+            self.assertEqual(Image.objects.filter(provenance.ai_digital_source_type_q()).count(), 2)
+            self.assertContains(self.client.get(url), 'class="filer-ai-label"', count=2)
+
+        with mock.patch.object(filer_settings, "FILER_AI_DIGITAL_SOURCE_TYPES", ()):
+            self.assertFalse(image.is_ai_generated)
+            self.assertEqual(Image.objects.filter(provenance.ai_digital_source_type_q()).count(), 0)
+
+    def test_change_form_offers_generative_ai_by_default(self):
+        self.assertEqual(
+            [value for value, _label in get_digital_source_type_choices()], ["", AI_GENERATED, AI_EDITED])
+        choices = ("digitalCapture", CAPTURE, "not a term", AI_EDITED)
+        with mock.patch.object(filer_settings, "FILER_DIGITAL_SOURCE_TYPE_CHOICES", choices):
+            self.assertEqual(
+                [value for value, _label in get_digital_source_type_choices()], ["", CAPTURE, AI_EDITED])
+
+    def test_change_form_keeps_other_digital_source_type(self):
+        # A detected digital source type that is not offered stays as it is
+        image = self.upload(jpeg_bytes(xmp_packet(CAPTURE)), name="photo.jpg")
+        response = self.client.get(reverse(
+            f"admin:{Image._meta.app_label}_{Image._meta.model_name}_change", args=(image.pk,)
+        ))
+        self.assertContains(
+            response, f'<option value="{CAPTURE}" selected>Original digital capture</option>', html=True)
+        self.assertNotContains(response, "Screen capture")
+        image = self.change(image, name="Photo", digital_source_type=CAPTURE)
+        self.assertEqual(image.digital_source_type, CAPTURE)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_change_form_sets_digital_source_type(self):
+        image = self.upload(jpeg_bytes(), name="plain.jpg")
+        image = self.change(image, digital_source_type=AI_GENERATED)
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertTrue(image.digital_source_type_edited)
+        self.assertTrue(image.is_ai_generated)
+
+    def test_change_form_unsets_digital_source_type(self):
+        data = jpeg_bytes(xmp_packet(), c2pa=True)
+        image = self.upload(data)
+        image = self.change(image, digital_source_type="")
+        self.assertEqual(image.digital_source_type, "")
+        self.assertTrue(image.digital_source_type_edited)
+        # Neither the file nor what is known about its Content Credentials changed
+        self.assertTrue(image.has_content_credentials)
+        with image.file.open("rb") as fh:
+            self.assertEqual(fh.read(), data)
+
+    def test_change_form_without_change_is_no_edit(self):
+        image = self.upload(jpeg_bytes(xmp_packet()))
+        image = self.change(image, name="Renamed", digital_source_type=AI_GENERATED)
+        self.assertEqual(image.name, "Renamed")
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_change_form_rejects_unknown_digital_source_type(self):
+        image = self.upload(jpeg_bytes(), name="plain.jpg")
+        url = reverse(f"admin:{Image._meta.app_label}_{Image._meta.model_name}_change", args=(image.pk,))
+        response = self.client.post(url, {
+            "name": "", "owner": self.superuser.pk, "description": "", "subject_location": "",
+            "digital_source_type": "javascript:alert(1)",
+        })
+        self.assertEqual(response.status_code, 200)
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, "")
+
+    def test_change_form_keeps_digital_source_type_outside_vocabulary(self):
+        custom = "http://example.com/vocabulary/custom"
+        image = self.upload(jpeg_bytes(xmp_packet(custom)))
+        self.assertIn((custom, "custom"), get_digital_source_type_choices(custom))
+        image = self.change(image, digital_source_type=custom)
+        self.assertEqual(image.digital_source_type, custom)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_change_form_new_file_replaces_digital_source_type(self):
+        image = self.upload(jpeg_bytes(), name="plain.jpg")
+        image = self.change(image, digital_source_type=AI_GENERATED)
+        image = self.change(
+            image,
+            digital_source_type=AI_GENERATED,
+            file=SimpleUploadedFile("photo.jpg", jpeg_bytes(xmp_packet(CAPTURE)), content_type="image/jpeg"),
+        )
+        self.assertEqual(image.digital_source_type, CAPTURE)
+        self.assertFalse(image.digital_source_type_edited)
+
+    def test_change_form_choice_wins_over_new_file(self):
+        image = self.upload(jpeg_bytes(), name="plain.jpg")
+        image = self.change(
+            image,
+            digital_source_type=AI_EDITED,
+            file=SimpleUploadedFile("photo.jpg", jpeg_bytes(xmp_packet(CAPTURE)), content_type="image/jpeg"),
+        )
+        self.assertEqual(image.digital_source_type, AI_EDITED)
+        self.assertTrue(image.digital_source_type_edited)
 
 
 
@@ -605,6 +928,12 @@ class StripExifProvenanceTests(TestCase):
         self.assertFalse(detect_content_credentials(io.BytesIO(stripped)))
         self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stripped))), AI_GENERATED)
 
+    def test_digital_source_type_of_content_credentials_is_kept(self):
+        # Without XMP, the removed Content Credentials are the only statement
+        stripped = self.strip(jpeg_bytes(c2pa=AI_GENERATED), "ai.jpg", "image/jpeg")
+        self.assertFalse(detect_content_credentials(io.BytesIO(stripped)))
+        self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stripped))), AI_GENERATED)
+
     def test_setting_disables_keeping_digital_source_type(self):
         with mock.patch.object(filer_settings, "FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE", False):
             stripped = self.strip(jpeg_bytes(xmp_packet()), "ai.jpg", "image/jpeg")
@@ -708,6 +1037,39 @@ class ThumbnailProvenanceTests(TestCase):
                 self.assertEqual(self.detect(data), AI_EDITED)
                 self.assertFalse(detect_content_credentials(io.BytesIO(data)))
                 self.assertEqual(PILImage.open(io.BytesIO(data)).size[0], width)
+
+    def test_changed_digital_source_type_regenerates_thumbnails(self):
+        image = self.create(jpeg_bytes(xmp_packet()))
+        options = {"size": (20, 20)}
+        thumbnail = image.file.get_thumbnail(options, generate=True)
+        self.assertEqual(self.detect(self.read(thumbnail)), AI_GENERATED)
+
+        image.set_digital_source_type("")
+        image.save()
+        self.assertFalse(thumbnail.storage.exists(thumbnail.name))
+        self.assertEqual(self.detect(self.read(image.file.get_thumbnail(options, generate=True))), "")
+
+        image = Image.objects.get(pk=image.pk)
+        image.set_digital_source_type(AI_EDITED)
+        image.save()
+        self.assertEqual(self.detect(self.read(image.file.get_thumbnail(options, generate=True))), AI_EDITED)
+
+    def test_unchanged_digital_source_type_keeps_thumbnails(self):
+        image = self.create(jpeg_bytes(xmp_packet()))
+        thumbnail = image.file.get_thumbnail({"size": (20, 20)}, generate=True)
+        image = Image.objects.get(pk=image.pk)
+        image.name = "Renamed"
+        image.save()
+        self.assertTrue(thumbnail.storage.exists(thumbnail.name))
+
+    def test_failing_thumbnail_deletion_does_not_fail_save(self):
+        image = self.create(jpeg_bytes(xmp_packet()))
+        image.set_digital_source_type("")
+        with mock.patch.object(type(image.file), "delete_thumbnails", side_effect=OSError), \
+                self.assertLogs("filer.models.abstract", "WARNING"):
+            image.save()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, "")
 
     def test_admin_icons_keep_digital_source_type(self):
         image = self.create(jpeg_bytes(xmp_packet()))
@@ -882,6 +1244,23 @@ class DetectProvenanceCommandTests(TestCase):
         image.refresh_from_db()
         self.assertTrue(image.has_content_credentials)
 
+    def test_keeps_digital_source_type_removed_by_user(self):
+        image = self.create(jpeg_bytes(xmp_packet(), c2pa=True), "ai.jpg")
+        Image.objects.filter(pk=image.pk).update(digital_source_type_edited=True)
+        self.call()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, "")
+        # ... but still completes the other information
+        self.assertTrue(image.has_content_credentials)
+
+        self.assertIn("Scanned 0 images", self.call())
+
+    def test_backfill_from_content_credentials(self):
+        image = self.create(jpeg_bytes(c2pa=AI_EDITED), "ai.jpg")
+        self.call()
+        image.refresh_from_db()
+        self.assertEqual(image.digital_source_type, AI_EDITED)
+
     def test_missing_file(self):
         image = self.create(jpeg_bytes(), "gone.jpg")
         image.file.storage.delete(image.file.name)
@@ -932,9 +1311,44 @@ class ProvenanceFilterTests(TestCase):
         names, _response = self.listing(self.subfolder, provenance="ai", limit_search_to_folder="on")
         self.assertEqual(names, {"edited.jpg"})
 
-    def test_content_credentials_filter(self):
-        names, _response = self.listing(provenance="content_credentials")
-        self.assertEqual(names, {"credentials.jpg"})
+    def test_specific_digital_source_type_filter(self):
+        names, response = self.listing(provenance="trainedAlgorithmicMedia")
+        self.assertEqual(names, {"generated.jpg"})
+        self.assertEqual(response.context["provenance_filter"], "trainedAlgorithmicMedia")
+        names, _response = self.listing(provenance="compositeWithTrainedAlgorithmicMedia")
+        self.assertEqual(names, {"edited.jpg"})
+
+    def test_only_offered_digital_source_types_are_filters(self):
+        # By default, those denoting generative AI
+        names, response = self.listing(self.folder, provenance="digitalCapture")
+        self.assertEqual(names, {"generated.jpg", "credentials.jpg", "plain.jpg"})
+        self.assertEqual(response.context["provenance_filter"], "")
+        self.assertNotContains(response, '<option value="digitalCapture">')
+
+        choices = ("digitalCapture", IPTC_DIGITAL_SOURCE_TYPE_BASE + "screenCapture", "not a term")
+        with mock.patch.object(filer_settings, "FILER_DIGITAL_SOURCE_TYPE_CHOICES", choices):
+            names, response = self.listing(provenance="digitalCapture")
+            self.assertEqual(names, {"credentials.jpg"})
+            self.assertContains(
+                response, '<option value="digitalCapture" selected>Original digital capture</option>', html=True)
+            self.assertNotContains(response, '<option value="trainedAlgorithmicMedia">')
+            names, _response = self.listing(provenance="screenCapture")
+            self.assertEqual(names, set())
+
+    def test_filter_follows_edited_digital_source_type(self):
+        image = Image.objects.get(original_filename="plain.jpg")
+        image.set_digital_source_type("trainedAlgorithmicMedia")
+        image.save()
+        image = Image.objects.get(original_filename="edited.jpg")
+        image.set_digital_source_type("")
+        image.save()
+        names, _response = self.listing(provenance="ai")
+        self.assertEqual(names, {"generated.jpg", "plain.jpg"})
+
+    def test_content_credentials_are_no_filter(self):
+        names, response = self.listing(self.folder, provenance="content_credentials")
+        self.assertEqual(names, {"generated.jpg", "credentials.jpg", "plain.jpg"})
+        self.assertEqual(response.context["provenance_filter"], "")
 
     def test_filter_combined_with_search(self):
         names, _response = self.listing(provenance="ai", q="edited")
@@ -947,5 +1361,8 @@ class ProvenanceFilterTests(TestCase):
 
     def test_filter_options_are_rendered(self):
         _names, response = self.listing(self.folder, provenance="ai")
-        self.assertContains(response, 'name="provenance" value="ai"')
-        self.assertContains(response, "Created or edited using generative AI")
+        self.assertContains(response, '<select name="provenance" id="provenance_filter">')
+        self.assertContains(
+            response, '<option value="ai" selected>Created or edited using generative AI</option>', html=True)
+        self.assertContains(
+            response, '<option value="trainedAlgorithmicMedia">Created using generative AI</option>', html=True)

@@ -14,7 +14,8 @@ class Command(BaseCommand):
         "Detect provenance information - the IPTC digital source type and embedded "
         "C2PA Content Credentials - of images uploaded before filer detected it on "
         "upload. Only adds missing information: an upload validator such as "
-        "strip_exif may have removed it from the stored file since."
+        "strip_exif may have removed it from the stored file since. A digital "
+        "source type set or removed by a user is kept."
     )
 
     def add_arguments(self, parser):
@@ -30,7 +31,10 @@ class Command(BaseCommand):
         # Iterate over primary keys to keep memory consumption stable
         pks = list(
             Image.objects
-            .filter(Q(digital_source_type='') | Q(has_content_credentials=False))
+            .filter(
+                Q(digital_source_type='', digital_source_type_edited=False)
+                | Q(has_content_credentials=False)
+            )
             .exclude(mime_type='image/svg+xml')
             .values_list('pk', flat=True)
         )
@@ -46,7 +50,11 @@ class Command(BaseCommand):
                 continue
 
             changes = {}
-            if provenance.digital_source_type and not image.digital_source_type:
+            # A user who removed the digital source type does not want it back
+            if (
+                provenance.digital_source_type and not image.digital_source_type
+                and not image.digital_source_type_edited
+            ):
                 changes['digital_source_type'] = provenance.digital_source_type
             if provenance.has_content_credentials and not image.has_content_credentials:
                 changes['has_content_credentials'] = True

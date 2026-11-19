@@ -294,6 +294,18 @@ IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = getattr(
     settings, 'FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE', True)
 
+# The IPTC digital source types (terms or URIs) that mark an image as created
+# or edited using generative AI
+FILER_AI_DIGITAL_SOURCE_TYPES = getattr(
+    settings, 'FILER_AI_DIGITAL_SOURCE_TYPES',
+    ('trainedAlgorithmicMedia', 'compositeWithTrainedAlgorithmicMedia'))
+
+# The IPTC digital source types (terms or URIs) the admin offers to set for an
+# image and to filter by: by default those denoting generative AI. Images keep
+# any other digital source type detected in their metadata.
+FILER_DIGITAL_SOURCE_TYPE_CHOICES = getattr(
+    settings, 'FILER_DIGITAL_SOURCE_TYPE_CHOICES', FILER_AI_DIGITAL_SOURCE_TYPES)
+
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
     # Other browser-rendered document formats that can execute JavaScript in the

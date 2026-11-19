@@ -8,8 +8,10 @@ Two standards mark an image as created or edited by generative AI:
 * C2PA Content Credentials, a signed manifest store embedded in the file
   (see https://spec.c2pa.org/).
 
-Only the *presence* of a C2PA manifest store is detected here. Its signature is
-not validated, so its claims must not be treated as verified.
+The XMP property is the one filer works with. A C2PA manifest store is detected,
+and if the image has no XMP digital source type, the one stated in the manifest
+store is used instead. The manifest's signature is not validated, so its claims
+must not be treated as verified.
 
 All functions are best effort: malformed files never raise, they simply yield
 no provenance information.
@@ -25,12 +27,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 IPTC_DIGITAL_SOURCE_TYPE_BASE = "http://cv.iptc.org/newscodes/digitalsourcetype/"
-
-# IPTC digital source types denoting content created or edited by generative AI
-AI_DIGITAL_SOURCE_TYPES = frozenset((
-    "trainedAlgorithmicMedia",
-    "compositeWithTrainedAlgorithmicMedia",
-))
 
 DIGITAL_SOURCE_TYPE_LABELS = {
     "digitalCapture": _("Original digital capture"),
@@ -79,6 +75,12 @@ C2PA_ISOBMFF_UUID = bytes.fromhex("d8fec3d61b0e483c92975828877ec481")
 C2PA_JUMBF_LABEL = b"c2pa"
 C2PA_GIF_IDENTIFIER = b"C2PA_GIF"
 
+# Upper bound for the part of a manifest store read to find its digital source type
+MAX_C2PA_SIZE = 16 * 1024 * 1024
+# Assertions are CBOR or JSON: the key is followed by a text value in either
+C2PA_DIGITAL_SOURCE_TYPE_KEY = b"digitalSourceType"
+_C2PA_JSON_VALUE = re.compile(rb'"\s*:\s*"([^"\\]{1,%d})"' % MAX_DIGITAL_SOURCE_TYPE_LENGTH)
+
 # Safety limit for the number of segments, chunks or boxes walked per file
 MAX_BLOCKS = 10000
 
@@ -99,8 +101,17 @@ def get_digital_source_type_label(digital_source_type):
     return DIGITAL_SOURCE_TYPE_LABELS.get(term, term)
 
 
+def get_ai_digital_source_types():
+    """Return the terms of the digital source types denoting content created or
+    edited using generative AI, see ``FILER_AI_DIGITAL_SOURCE_TYPES``."""
+    from .. import settings as filer_settings
+
+    terms = (get_digital_source_type_term(value) for value in filer_settings.FILER_AI_DIGITAL_SOURCE_TYPES)
+    return frozenset(term for term in terms if term)
+
+
 def is_ai_digital_source_type(digital_source_type):
-    return get_digital_source_type_term(digital_source_type) in AI_DIGITAL_SOURCE_TYPES
+    return get_digital_source_type_term(digital_source_type) in get_ai_digital_source_types()
 
 
 def normalize_digital_source_type(value):
@@ -116,11 +127,48 @@ def normalize_digital_source_type(value):
     return ""
 
 
+def get_offered_digital_source_types():
+    """Return the digital source types users can set and filter by as a dict
+    of IPTC term and label, see ``FILER_DIGITAL_SOURCE_TYPE_CHOICES``."""
+    from .. import settings as filer_settings
+
+    offered = {}
+    for value in filer_settings.FILER_DIGITAL_SOURCE_TYPE_CHOICES:
+        if normalize_digital_source_type(value):
+            offered[get_digital_source_type_term(value)] = get_digital_source_type_label(value)
+    return offered
+
+
+def get_digital_source_type_choices(current=""):
+    """Return the digital source types users can set as form field choices of
+    URI and label. ``current``, the value of an image, is added if it is not
+    one of them, so that the image keeps it unless the user chooses another."""
+    from .. import settings as filer_settings
+
+    choices = [("", _("Not specified"))]
+    for value in filer_settings.FILER_DIGITAL_SOURCE_TYPE_CHOICES:
+        uri = normalize_digital_source_type(value)
+        if uri and uri not in dict(choices):
+            choices.append((uri, get_digital_source_type_label(uri)))
+    if current and current not in dict(choices):
+        choices.append((current, get_digital_source_type_label(current)))
+    return choices
+
+
+def digital_source_type_q(term, field="digital_source_type"):
+    """Return a ``Q`` object matching images with the given IPTC digital source
+    type term, e.g. ``trainedAlgorithmicMedia``."""
+    return Q(**{f"{field}__endswith": "/" + term})
+
+
 def ai_digital_source_type_q(field="digital_source_type"):
     """Return a ``Q`` object matching images created or edited using generative AI."""
+    terms = get_ai_digital_source_types()
+    if not terms:
+        return Q(pk__in=[])  # An empty Q would match all images
     q = Q()
-    for term in AI_DIGITAL_SOURCE_TYPES:
-        q |= Q(**{f"{field}__endswith": "/" + term})
+    for term in terms:
+        q |= digital_source_type_q(term, field)
     return q
 
 
@@ -323,112 +371,188 @@ def _read_exactly(file, size):
     return data
 
 
-def _jpeg_has_c2pa(file):
-    # C2PA manifest stores are JUMBF boxes in APP11 segments before the image data
+def _read_limited(file, size):
+    """Read ``size`` bytes, keeping at most ``MAX_C2PA_SIZE`` of them."""
+    data = _read_exactly(file, min(size, MAX_C2PA_SIZE))
+    file.seek(size - len(data), 1)
+    return data
+
+
+def _jpeg_c2pa(file):
+    # C2PA manifest stores are JUMBF boxes in APP11 segments before the image data.
+    # A box larger than a segment is split: each segment repeats the box header.
     file.seek(2)  # Skip SOI marker
-    for _i in range(MAX_BLOCKS):
-        marker = _read_exactly(file, 2)
-        if marker[0] != 0xFF:
-            return False
-        if marker[1] == 0xFF:  # Fill byte
-            file.seek(-1, 1)
-            continue
-        if marker[1] in (0x01, *range(0xD0, 0xD8)):  # Markers without payload
-            continue
-        if marker[1] in (0xD9, 0xDA):  # End of image, start of scan
-            return False
-        length = struct.unpack(">H", _read_exactly(file, 2))[0] - 2
-        if length < 0:
-            return False
-        if marker[1] == 0xEB:  # APP11
-            payload = _read_exactly(file, length)
-            # "JP" common identifier, followed by a JUMBF superbox
-            if payload[:2] == b"JP" and b"jumb" in payload and C2PA_JUMBF_LABEL in payload:
-                return True
-        else:
-            file.seek(length, 1)
-    return False
+    store, instances = b"", set()
+    try:
+        for _i in range(MAX_BLOCKS):
+            marker = _read_exactly(file, 2)
+            if marker[0] != 0xFF:
+                break
+            if marker[1] == 0xFF:  # Fill byte
+                file.seek(-1, 1)
+                continue
+            if marker[1] in (0x01, *range(0xD0, 0xD8)):  # Markers without payload
+                continue
+            if marker[1] in (0xD9, 0xDA):  # End of image, start of scan
+                break
+            length = struct.unpack(">H", _read_exactly(file, 2))[0] - 2
+            if length < 0:
+                break
+            if marker[1] == 0xEB:  # APP11
+                payload = _read_exactly(file, length)
+                if payload[:2] != b"JP":  # Common identifier of JPEG XT boxes
+                    continue
+                # Box instance number (2 bytes) and packet sequence number (4 bytes)
+                # precede the box, whose header takes 8 bytes, or 16 with a large size
+                start = 8
+                if payload[2:4] in instances:
+                    start += 16 if payload[8:12] == b"\x00\x00\x00\x01" else 8
+                instances.add(payload[2:4])
+                if len(store) < MAX_C2PA_SIZE:
+                    store += payload[start:]
+            else:
+                file.seek(length, 1)
+    except EOFError:
+        # A truncated file: what was found so far still counts
+        pass
+    if b"jumb" in store and C2PA_JUMBF_LABEL in store:
+        return store
+    return None
 
 
-def _png_has_c2pa(file):
+def _png_c2pa(file):
     file.seek(8)  # Skip signature
     for _i in range(MAX_BLOCKS):
         length, chunk_type = struct.unpack(">I4s", _read_exactly(file, 8))
         if chunk_type == b"caBX":
-            return True
+            return _read_limited(file, length)
         if chunk_type == b"IEND":
-            return False
+            return None
         file.seek(length + 4, 1)  # Chunk data and CRC
-    return False
+    return None
 
 
-def _riff_has_c2pa(file):
+def _riff_c2pa(file):
     file.seek(12)  # Skip RIFF header and form type
     for _i in range(MAX_BLOCKS):
         fourcc, size = struct.unpack("<4sI", _read_exactly(file, 8))
         if fourcc == b"C2PA":
-            return True
+            return _read_limited(file, size)
         file.seek(size + (size & 1), 1)  # Chunks are padded to an even size
-    return False
+    return None
 
 
-def _isobmff_has_c2pa(file):
+def _isobmff_c2pa(file):
     # AVIF, HEIF: the manifest store is a top-level ``uuid`` box with the C2PA UUID
     file.seek(0)
     for _i in range(MAX_BLOCKS):
         header = file.read(8)
         if len(header) < 8:
-            return False
+            return None
         size, box_type = struct.unpack(">I4s", header)
         header_size = 8
         if size == 1:
             size = struct.unpack(">Q", _read_exactly(file, 8))[0]
             header_size = 16
-        if box_type == b"uuid" and _read_exactly(file, 16) == C2PA_ISOBMFF_UUID:
-            return True
-        if size == 0:  # Box extends to the end of the file
-            return False
-        if size < header_size:
-            return False
-        file.seek(size - header_size - (16 if box_type == b"uuid" else 0), 1)
-    return False
+        if box_type == b"uuid":
+            header_size += 16
+            if _read_exactly(file, 16) == C2PA_ISOBMFF_UUID:
+                # A size of 0 means the box extends to the end of the file
+                return file.read(min(max(size - header_size, 0), MAX_C2PA_SIZE) if size else MAX_C2PA_SIZE)
+        if size < header_size:  # Including 0: the last box of the file
+            return None
+        file.seek(size - header_size, 1)
+    return None
 
 
-def _gif_has_c2pa(file):
+def _gif_c2pa(file):
     # An application extension "C2PA_GIF" with the manifest store in its sub-blocks
-    return _find_gif_application_extension(file, lambda identifier: identifier[:8] == C2PA_GIF_IDENTIFIER) is not None
+    if _find_gif_application_extension(file, lambda identifier: identifier[:8] == C2PA_GIF_IDENTIFIER) is None:
+        return None
+    store = b""
+    while len(store) < MAX_C2PA_SIZE:
+        size = file.read(1)
+        if not size or not size[0]:
+            break
+        store += file.read(size[0])
+    return store
 
 
-def detect_content_credentials(file):
-    """Return ``True`` if the file embeds a C2PA manifest store. The manifest
-    is not validated. Supports JPEG, PNG, GIF, WebP and ISO base media files
-    (AVIF, HEIF). The file position is not restored."""
+def read_content_credentials(file):
+    """Return the C2PA manifest store embedded in the file, or ``None`` if there
+    is none. At most ``MAX_C2PA_SIZE`` bytes are returned, and the store is not
+    validated. Supports JPEG, PNG, GIF, WebP and ISO base media files (AVIF,
+    HEIF). The file position is not restored."""
     try:
         file.seek(0)
         head = file.read(12)
         if head[:2] == b"\xff\xd8":
-            return _jpeg_has_c2pa(file)
+            return _jpeg_c2pa(file)
         if head[:8] == b"\x89PNG\r\n\x1a\n":
-            return _png_has_c2pa(file)
+            return _png_c2pa(file)
         if head[:4] == b"RIFF":
-            return _riff_has_c2pa(file)
+            return _riff_c2pa(file)
         if head[4:8] == b"ftyp":
-            return _isobmff_has_c2pa(file)
+            return _isobmff_c2pa(file)
         if head[:6] in (b"GIF87a", b"GIF89a"):
-            return _gif_has_c2pa(file)
+            return _gif_c2pa(file)
     except (EOFError, OSError, ValueError, struct.error):
         # Best effort: malformed or unreadable files are treated as having no
         # detectable content credentials.
-        return False
-    return False
+        return None
+    return None
+
+
+def detect_content_credentials(file):
+    """Return ``True`` if the file embeds a C2PA manifest store, see
+    ``read_content_credentials()``."""
+    return read_content_credentials(file) is not None
+
+
+def _c2pa_text_value(store, position):
+    """Return the text value following a key that ends at ``position``."""
+    head = store[position:position + 3]
+    if head and 0x60 <= head[0] <= 0x77:  # CBOR text string of up to 23 bytes
+        length, start = head[0] - 0x60, position + 1
+    elif len(head) >= 2 and head[0] == 0x78:  # ... with a one byte length
+        length, start = head[1], position + 2
+    elif len(head) == 3 and head[0] == 0x79:  # ... with a two byte length
+        length, start = struct.unpack(">H", head[1:])[0], position + 3
+    else:
+        match = _C2PA_JSON_VALUE.match(store, position)
+        return match.group(1).decode("utf-8", errors="ignore") if match else ""
+    return store[start:start + length].decode("utf-8", errors="ignore")
+
+
+def get_c2pa_digital_source_type(store):
+    """Return the IPTC digital source type URI stated in a C2PA manifest store,
+    as returned by ``read_content_credentials()``, or an empty string.
+
+    The store is searched for the ``digitalSourceType`` its actions state; it
+    is neither parsed completely nor validated. A manifest store records the
+    history of an image and may hence state several digital source types: one
+    denoting generative AI takes precedence, otherwise the last one is used,
+    since the active manifest is the last of the store."""
+    found = ""
+    position = 0
+    while store and (position := store.find(C2PA_DIGITAL_SOURCE_TYPE_KEY, position)) >= 0:
+        position += len(C2PA_DIGITAL_SOURCE_TYPE_KEY)
+        value = normalize_digital_source_type(_c2pa_text_value(store, position))
+        if value and (is_ai_digital_source_type(value) or not is_ai_digital_source_type(found)):
+            found = value
+    return found
 
 
 def detect_provenance(file, pil_image):
     """Detect provenance information of an image. ``file`` is the raw file
     object, ``pil_image`` the image opened from it by Pillow."""
+    store = read_content_credentials(file)
     return Provenance(
-        digital_source_type=detect_digital_source_type(pil_image, file),
-        has_content_credentials=detect_content_credentials(file),
+        # The XMP packet takes precedence over the signed, but unverified manifest
+        digital_source_type=(
+            detect_digital_source_type(pil_image, file) or get_c2pa_digital_source_type(store)
+        ),
+        has_content_credentials=store is not None,
     )
 
 

@@ -69,3 +69,45 @@ describe('Filer dropdown menu keyboard handling', function () {
         expect(toggle.getAttribute('aria-expanded')).toBe('false');
     });
 });
+
+describe('Filer dropdown menu with form controls', function () {
+    var container;
+    var toggle;
+
+    beforeEach(function () {
+        fixture.setBase('frontend/fixtures');
+        fixture.load('dropdown-menu.html');
+
+        // the menu of the search options follows its container
+        container = document.getElementById('search-container');
+        toggle = document.getElementById('search-toggle');
+        toggle.click();
+    });
+
+    afterEach(function () {
+        container = null;
+        toggle = null;
+        fixture.cleanup();
+    });
+
+    it('stays open when a form control of the menu is clicked', function () {
+        ['search-select', 'search-checkbox', 'search-label'].forEach(function (id) {
+            document.getElementById(id).click();
+            expect(container.classList.contains('open')).toBe(true);
+        });
+    });
+
+    it('closes when another element of the menu is clicked', function () {
+        document.getElementById('search-close').click();
+        expect(container.classList.contains('open')).toBe(false);
+    });
+
+    it('closes when a form control outside the menu is clicked', function () {
+        var input = document.createElement('input');
+
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+        expect(container.classList.contains('open')).toBe(false);
+    });
+});

@@ -19,13 +19,15 @@ Detecting provenance of existing images
 
 When an image is uploaded, **django-filer** reads the IPTC digital source type
 from its XMP metadata, e.g. stating that it was created using generative AI, and
-detects embedded C2PA Content Credentials. To detect them for images uploaded
+detects embedded C2PA Content Credentials, which state the digital source type
+for images without XMP metadata. To detect them for images uploaded
 before, use::
 
     ./manage.py filer_detect_provenance
 
 The command only adds missing information and never clears it: an upload
-validator such as ``strip_exif`` may have removed it from the stored file. Use
+validator such as ``strip_exif`` may have removed it from the stored file. A
+digital source type set or removed by a user is kept. Use
 ``--dry-run`` to report the images that would be updated and ``-v 2`` to list
 them. See :ref:`provenance`.
 
