@@ -8,7 +8,7 @@
         <li><a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a></li>
         <li><a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to' %} {% translate 'Filer' %}">{% translate "Filer" %}</a></li>
         <li><a href="{% url 'admin:filer-directory_listing-root' %}" title="{% translate 'Go back to' %} '{% translate 'root'|title %}' {% translate 'folder' %}">{% translate "root"|title %}</a></li>
-        {% for ancestor_folder in original.logical_path %}
+        {% for ancestor_folder in original.logical_path|readable_folders:request %}
             <li><a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktranslate with folder_name=ancestor_folder.name %}Go back to '{{ folder_name }}' folder{% endblocktranslate %}">{{ ancestor_folder.name }}</a></li>
         {% endfor %}
         <li aria-current="page">{{ original.name }}</li>
@@ -18,7 +18,7 @@
         <a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a>
         &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to' %} {% translate 'Filer' %}"> {% translate "Filer" %}</a>
         &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% translate 'Go back to' %} '{% translate 'root'|title %}' {% translate 'folder' %}">{% translate "root"|title %}</a>
-        {% for ancestor_folder in original.logical_path %}
+        {% for ancestor_folder in original.logical_path|readable_folders:request %}
             &rsaquo; <a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
         {% endfor %}
         &rsaquo; {{ original.name }}

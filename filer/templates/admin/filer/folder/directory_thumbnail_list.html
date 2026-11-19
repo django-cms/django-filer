@@ -50,7 +50,7 @@
                             <a class="insertlink insertlinkButton js-dismiss-popup js-dismiss-folder"
                                 href="#"
                                 data-file-id="{{ subfolder.pk|safe }}"
-                                data-label="{{ subfolder.pretty_logical_path }}"
+                                data-label="{{ subfolder|readable_folder_path:request }}"
                                 role="button" title="{% translate 'Select this folder' %}"
                                 aria-label="{% blocktrans with subfolder.name as item_label %}Select folder '{{ item_label }}'{% endblocktrans %}">
                                 &nbsp;

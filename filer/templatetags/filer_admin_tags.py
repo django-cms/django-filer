@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.template import Library
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.html import format_html_join
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -33,6 +33,20 @@ logger = logging.getLogger(__name__)
 register = Library()
 
 assignment_tag = getattr(register, 'assignment_tag', register.simple_tag)
+
+
+@register.filter
+def readable_folders(folders, request):
+    """Do not disclose unreadable ancestors in admin navigation."""
+    if not folders or request is None:
+        return []
+    return [folder for folder in folders if folder.is_root or folder.has_read_permission(request)]
+
+
+@register.filter
+def readable_folder_path(folder, request):
+    folders = readable_folders(folder.logical_path + [folder], request)
+    return format_html('/{}', format_html_join('/', '{}', ((item.name,) for item in folders)))
 
 
 def filer_actions(context):
