@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filer', '0018_alter_file_options'),
+        ('filer', '0019_unique_root_folder_name'),
     ]
 
     operations = [
