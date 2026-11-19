@@ -32,7 +32,7 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
             else:
                 return False
         else:
-            return True
+            return super().has_change_permission(request, obj)
 
     def has_view_permission(self, request, obj=None):
         # Django's implementation only consults the global "view"/"change"

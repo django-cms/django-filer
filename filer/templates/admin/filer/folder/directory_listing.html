@@ -42,8 +42,8 @@
         <div class="breadcrumbs-container-wrapper">
             <div class="breadcrumbs-container">
                 <div class="breadcrumbs-container-inner">
-                    {% for ancestor_folder in instance.logical_path %}
-                        {{ ancestor_folder }}
+                    {% for ancestor_folder in instance.logical_path|readable_folders:request %}
+                        {{ ancestor_folder.name }}
                     {% endfor %}
 
                     <div class="navigator-breadcrumbs">
@@ -53,7 +53,7 @@
                                 <img src="{% static 'filer/icons/folder-dropdown.svg' %}" alt="" width="28" height="28">
                             </a>
                             <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
-                                {% for folder in folder.logical_path reversed %}
+                                {% for folder in folder.logical_path|readable_folders:request reversed %}
                                     <li>
                                         <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
                                             title="{% trans 'Go back to the parent folder' %}">
