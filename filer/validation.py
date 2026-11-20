@@ -155,14 +155,18 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
     """Remove EXIF and other metadata (XMP, IPTC, PNG text chunks, ...) from an
     uploaded image by re-encoding it with Pillow. Pillow only writes such
     metadata when explicitly passed to ``save()``, so a plain re-save drops it.
-    The ICC color profile is preserved so colors are not altered.
+    The ICC color profile is preserved so colors are not altered. Images with
+    detected C2PA Content Credentials are left byte for byte unchanged unless
+    ``FILER_STRIP_EXIF_KEEP_C2PA`` is ``False``. This also retains all their other
+    metadata. Credential signatures are not verified.
 
     The IPTC digital source type, which e.g. marks images created using
     generative AI, is written back in a minimal XMP packet unless
     ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE`` is set to ``False``. Embedded
-    C2PA Content Credentials cannot survive re-encoding: their signature covers
-    the original bytes. If the image has no XMP digital source type, the one
-    stated in its Content Credentials is written instead."""
+    C2PA Content Credentials are removed when preservation is disabled because
+    re-encoding can invalidate their binding to the file. If the image has no
+    XMP digital source type, the one stated in its Content Credentials is
+    written instead."""
     from PIL import Image, UnidentifiedImageError
 
     from . import settings as filer_settings
@@ -185,6 +189,12 @@ def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> 
             _('File "{file_name}": Rejected due to incompatible format')
             .format(file_name=file_name)
         )
+
+    if content_credentials is not None and filer_settings.FILER_STRIP_EXIF_KEEP_C2PA:
+        # Re-encoding or removing metadata can invalidate the signed binding.
+        # Preserve every byte, including EXIF, without asserting validity.
+        file.seek(0)
+        return
 
     has_metadata = (
         bool(image.getexif())

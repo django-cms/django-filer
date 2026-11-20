@@ -216,12 +216,23 @@ See :ref:`validation`.
 List of default file validators to be ignored.
 See :ref:`validation`.
 
+``FILER_STRIP_EXIF_KEEP_C2PA``
+-----------------------------
+
+Defaults to ``True``: ``strip_exif`` leaves images with detected embedded C2PA
+Content Credentials byte for byte unchanged. This preserves the credentials
+and **all other metadata**, including locations and author names. Signatures
+are not verified. Set to ``False`` to sanitize these images too, removing the
+credentials. See :ref:`validation` and :ref:`provenance`.
+
+
 ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE``
 ---------------------------------------------
 
 Defaults to ``True``: the ``strip_exif`` upload sanitizer writes the IPTC digital
 source type of an image, which e.g. marks images created using generative AI, back
-into the sanitized file. Set it to ``False`` to strip it, too.
+into the sanitized file. Set it to ``False`` to strip it, too. This does not
+affect originals left unchanged by ``FILER_STRIP_EXIF_KEEP_C2PA``.
 See :ref:`validation`.
 
 

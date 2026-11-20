@@ -861,7 +861,7 @@ class StripExifProvenanceTests(TestCase):
         self.assertNotIn(b"Camera maker", stripped)
 
     def test_gif_keeps_digital_source_type(self):
-        data = gif_bytes(xmp_packet(form="element") + b"<!-- Creator: Jane Doe -->", c2pa=True, comment=b"Jane")
+        data = gif_bytes(xmp_packet(form="element") + b"<!-- Creator: Jane Doe -->", comment=b"Jane")
         stripped = self.strip(data, "ai.gif", "image/gif")
         file = io.BytesIO(stripped)
         result = PILImage.open(file)
@@ -923,14 +923,39 @@ class StripExifProvenanceTests(TestCase):
         self.assertNotIn(b"Camera maker", stripped)
         self.assertEqual(self.frames(stripped), self.frames(buffer.getvalue()))
 
-    def test_c2pa_is_removed(self):
-        stripped = self.strip(jpeg_bytes(xmp_packet(), c2pa=True), "ai.jpg", "image/jpeg")
+    def test_c2pa_originals_are_preserved_byte_for_byte(self):
+        webp = io.BytesIO()
+        create_image(size=(40, 30)).save(webp, 'WEBP', exif=exif_bytes(), xmp=xmp_packet())
+        chunks = webp.getvalue()[12:] + riff_chunk(b'C2PA', jumbf_c2pa_box())
+        webp_data = b'RIFF' + struct.pack('<I', len(chunks) + 4) + b'WEBP' + chunks
+        cases = (
+            (jpeg_bytes(xmp_packet() + b'<!-- Creator: Jane Doe -->', c2pa=True), 'ai.jpg', 'image/jpeg'),
+            (png_bytes(xmp_packet(), c2pa=True), 'ai.png', 'image/png'),
+            (gif_bytes(xmp_packet(), c2pa=True, comment=b'Jane'), 'ai.gif', 'image/gif'),
+            (webp_data, 'ai.webp', 'image/webp'),
+        )
+        for data, name, mime_type in cases:
+            with self.subTest(mime_type=mime_type):
+                buffer = io.BytesIO(data)
+                buffer.seek(5)
+                # Keeping the signed original takes precedence over stripping
+                # its unsigned XMP or other potentially sensitive metadata.
+                with mock.patch.object(filer_settings, 'FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE', False):
+                    strip_exif(name, buffer, None, mime_type)
+                self.assertEqual(buffer.tell(), 0)
+                self.assertEqual(buffer.read(), data)
+                self.assertTrue(detect_content_credentials(io.BytesIO(data)))
+
+    def test_c2pa_can_be_removed_explicitly(self):
+        with mock.patch.object(filer_settings, 'FILER_STRIP_EXIF_KEEP_C2PA', False):
+            stripped = self.strip(jpeg_bytes(xmp_packet(), c2pa=True), "ai.jpg", "image/jpeg")
         self.assertFalse(detect_content_credentials(io.BytesIO(stripped)))
         self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stripped))), AI_GENERATED)
 
     def test_digital_source_type_of_content_credentials_is_kept(self):
         # Without XMP, the removed Content Credentials are the only statement
-        stripped = self.strip(jpeg_bytes(c2pa=AI_GENERATED), "ai.jpg", "image/jpeg")
+        with mock.patch.object(filer_settings, 'FILER_STRIP_EXIF_KEEP_C2PA', False):
+            stripped = self.strip(jpeg_bytes(c2pa=AI_GENERATED), "ai.jpg", "image/jpeg")
         self.assertFalse(detect_content_credentials(io.BytesIO(stripped)))
         self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stripped))), AI_GENERATED)
 
@@ -970,8 +995,23 @@ class StripExifUploadTests(TestCase):
         self.assertTrue(image.has_content_credentials)
         with image.file.open("rb") as fh:
             stored = fh.read()
+        self.assertEqual(stored, data)
+        self.assertTrue(detect_content_credentials(io.BytesIO(stored)))
+
+    def test_clipboard_upload_can_strip_c2pa_explicitly(self):
+        url = reverse("admin:filer-ajax_upload", kwargs={"folder_id": self.folder.pk})
+        data = jpeg_bytes(c2pa=AI_GENERATED)
+        with mock.patch.object(filer_settings, 'FILER_STRIP_EXIF_KEEP_C2PA', False):
+            response = self.client.post(url, {"file": SimpleUploadedFile("ai.jpg", data, content_type="image/jpeg")})
+        self.assertEqual(response.status_code, 200, response.content)
+        image = Image.objects.get()
+        self.assertEqual(image.digital_source_type, AI_GENERATED)
+        self.assertTrue(image.has_content_credentials)
+        with image.file.open('rb') as fh:
+            stored = fh.read()
         self.assertNotEqual(stored, data)
         self.assertFalse(detect_content_credentials(io.BytesIO(stored)))
+        self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stored))), AI_GENERATED)
 
     def test_change_form_upload(self):
         image = Image.objects.create(
@@ -981,12 +1021,13 @@ class StripExifUploadTests(TestCase):
             file=DjangoFile(io.BytesIO(jpeg_bytes()), name="plain.jpg"),
         )
         url = reverse(f"admin:{Image._meta.app_label}_{Image._meta.model_name}_change", args=(image.pk,))
+        data = jpeg_bytes(xmp_packet(), c2pa=True)
         response = self.client.post(url, {
             "name": "AI image",
             "owner": self.superuser.pk,
             "description": "",
             "subject_location": "",
-            "file": SimpleUploadedFile("ai.jpg", jpeg_bytes(xmp_packet(), c2pa=True), content_type="image/jpeg"),
+            "file": SimpleUploadedFile("ai.jpg", data, content_type="image/jpeg"),
             "_continue": "1",
         })
         self.assertEqual(response.status_code, 302, response.content[-2000:])
@@ -996,7 +1037,7 @@ class StripExifUploadTests(TestCase):
         self.assertEqual(image.digital_source_type, AI_GENERATED)
         self.assertTrue(image.has_content_credentials)
         with image.file.open("rb") as fh:
-            self.assertFalse(detect_content_credentials(fh))
+            self.assertEqual(fh.read(), data)
 
 
 class ThumbnailProvenanceTests(TestCase):

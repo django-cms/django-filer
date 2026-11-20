@@ -83,6 +83,9 @@ unreleased
   image's IPTC digital source type in a minimal XMP packet, so that files filer
   generates stay marked, e.g., as created using generative AI. Thumbnails
   generated before upgrading keep no metadata until they are regenerated.
+* feat: ``strip_exif`` preserves uploads containing C2PA Content Credentials
+  byte for byte by default, including all other metadata. Set
+  ``FILER_STRIP_EXIF_KEEP_C2PA = False`` to sanitize these images too.
 * fix: ``strip_exif`` left a JPEG's XMP, IPTC and C2PA segments in place with
   Pillow < 11 if the image had no EXIF data.
 * fix: ``strip_exif`` reduced animated GIFs and WebPs to their first frame. It now

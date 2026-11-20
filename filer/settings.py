@@ -289,6 +289,9 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
+# Preserve C2PA-bearing originals byte for byte, including all other metadata.
+FILER_STRIP_EXIF_KEEP_C2PA = getattr(settings, 'FILER_STRIP_EXIF_KEEP_C2PA', True)
+
 # ``filer.validation.strip_exif`` keeps the IPTC digital source type of an image,
 # e.g., stating it was created using generative AI, unless this is set to False
 FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = getattr(

@@ -244,15 +244,22 @@ To activate it, register it for the image mime types you want sanitized:
 
 Animated GIFs and WebPs keep all their frames, durations and loop count.
 
-``strip_exif`` keeps an image's `IPTC digital source type
+By default, ``strip_exif`` leaves images with detected embedded C2PA Content
+Credentials **entirely unchanged**. This preserves their binding to the file
+and retains all other metadata, including EXIF locations and author names.
+The credentials' signatures are not verified. Set
+``FILER_STRIP_EXIF_KEEP_C2PA = False`` to sanitize these images too, removing
+their credentials.
+
+For images it sanitizes, ``strip_exif`` keeps the `IPTC digital source type
 <https://cv.iptc.org/newscodes/digitalsourcetype/>`_, which states e.g. that the
 image was created using generative AI (``trainedAlgorithmicMedia``). It writes it
 back in a minimal XMP packet holding nothing else. If the image states it in
 its Content Credentials only, it is taken from there. Set
 ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to remove it, too.
 
-Embedded C2PA Content Credentials are removed: their signature covers the
-original file, so they cannot survive re-encoding. django-filer detects both
+When C2PA preservation is disabled, embedded Content Credentials are removed:
+re-encoding or metadata removal can invalidate their binding. django-filer detects both
 before the sanitizer runs and stores them with the image
 (``digital_source_type``, ``has_content_credentials``), so the admin still shows
 them. See :ref:`provenance` for the details.

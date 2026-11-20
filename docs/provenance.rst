@@ -177,7 +177,7 @@ What happens to the metadata in files
      - kept
    * - Original, sanitized by ``strip_exif``
      - kept (unless disabled)
-     - removed
+     - kept (unless disabled; original stays unchanged)
    * - Original, resized by the admin's resize action
      - kept
      - removed
@@ -195,13 +195,19 @@ Originals
 
 ``strip_exif``
     The optional ``strip_exif`` upload sanitizer removes metadata to protect
-    privacy. It keeps the digital source type: it writes a minimal XMP packet
+    privacy. By default, if it detects embedded C2PA Content Credentials, it
+    leaves the entire original unchanged to preserve their binding to the file.
+    This retains **all metadata**, including EXIF locations, author names and
+    other XMP properties. Detection does not verify the credential signatures.
+
+    For images without C2PA, it keeps the digital source type: it writes a minimal XMP packet
     back into the file that holds this one property and nothing else, so no
     other XMP information, such as creator names or locations, survives. Set
     ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to remove it, too.
 
-    C2PA manifests are always removed: their signature covers the original
-    bytes, so a re-encoded file cannot carry them. Since detection runs before
+    Set ``FILER_STRIP_EXIF_KEEP_C2PA = False`` to sanitize C2PA-bearing images
+    too. This removes their C2PA manifests: re-encoding or metadata removal can
+    invalidate their binding to the original file. Since detection runs before
     the sanitizer, ``has_content_credentials`` still records that the upload
     had them; the admin says "found on upload". If the image has no XMP
     digital source type, the one stated by the removed Content Credentials is
@@ -318,9 +324,15 @@ from their files, and the command cannot recover them.
 Settings
 --------
 
+``FILER_STRIP_EXIF_KEEP_C2PA``
+    Defaults to ``True``. ``strip_exif`` leaves images with detected embedded
+    C2PA Content Credentials byte for byte unchanged, retaining all metadata.
+    Set to ``False`` to strip them too, removing the credentials.
+
 ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE``
     Defaults to ``True``. Whether ``strip_exif`` writes the digital source type
-    back into sanitized images.
+    back into sanitized images. It does not affect C2PA-bearing originals
+    preserved by ``FILER_STRIP_EXIF_KEEP_C2PA``.
 
 ``FILER_AI_DIGITAL_SOURCE_TYPES``
     The digital source types, as IPTC terms or URIs, that mark an image as
