@@ -215,3 +215,49 @@ See :ref:`validation`.
 
 List of default file validators to be ignored.
 See :ref:`validation`.
+
+``FILER_STRIP_EXIF_KEEP_C2PA``
+------------------------------
+
+Defaults to ``True``: ``strip_exif`` leaves images with detected embedded C2PA
+Content Credentials byte for byte unchanged. This preserves the credentials
+and **all other metadata**, including locations and author names. Signatures
+are not verified. Set to ``False`` to sanitize these images too, removing the
+credentials. See :ref:`validation` and :ref:`provenance`.
+
+
+``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE``
+---------------------------------------------
+
+Defaults to ``True``: the ``strip_exif`` upload sanitizer writes the IPTC digital
+source type of an image, which e.g. marks images created using generative AI, back
+into the sanitized file. Set it to ``False`` to strip it, too. This does not
+affect originals left unchanged by ``FILER_STRIP_EXIF_KEEP_C2PA``.
+See :ref:`validation`.
+
+
+``FILER_AI_DIGITAL_SOURCE_TYPES``
+---------------------------------
+
+The IPTC digital source types, as terms or URIs, that mark an image as created or
+edited using generative AI. They decide on ``Image.is_ai_generated``, the "AI"
+label in the directory listing and its generative AI filter. Defaults to::
+
+    FILER_AI_DIGITAL_SOURCE_TYPES = (
+        "trainedAlgorithmicMedia",
+        "compositeWithTrainedAlgorithmicMedia",
+    )
+
+To also count composites with generative AI elements, add ``"compositeSynthetic"``.
+See :ref:`provenance`.
+
+
+``FILER_DIGITAL_SOURCE_TYPE_CHOICES``
+-------------------------------------
+
+The IPTC digital source types, as terms or URIs, that the admin offers to set for
+an image and to filter the directory listing by. Defaults to
+``FILER_AI_DIGITAL_SOURCE_TYPES``.
+
+The setting does not restrict what is detected: images keep any other digital
+source type stated in their metadata. See :ref:`provenance`.

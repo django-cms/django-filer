@@ -16,6 +16,13 @@ from ..utils import svg
 from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
+from ..utils.provenance import (
+    Provenance,
+    detect_provenance,
+    get_digital_source_type_label,
+    is_ai_digital_source_type,
+    normalize_digital_source_type,
+)
 from .filemodels import File
 
 
@@ -95,6 +102,31 @@ class BaseImage(File):
         default='',
     )
 
+    digital_source_type = models.CharField(
+        _("digital source type"),
+        max_length=255,
+        blank=True,
+        default='',
+        help_text=_("IPTC digital source type, e.g., stating that the image was created using "
+                    "generative AI. Detected in the image's metadata on upload."),
+    )
+
+    digital_source_type_edited = models.BooleanField(
+        _("digital source type edited"),
+        default=False,
+        editable=False,
+        help_text=_("The digital source type was set by a user. "
+                    "It is not replaced by the one detected in the image's metadata."),
+    )
+
+    has_content_credentials = models.BooleanField(
+        _("has content credentials"),
+        default=False,
+        editable=False,
+        help_text=_("The uploaded image embeds C2PA Content Credentials. "
+                    "Their signature is not verified."),
+    )
+
     file_ptr = models.OneToOneField(
         to='filer.File',
         parent_link=True,
@@ -108,6 +140,14 @@ class BaseImage(File):
         verbose_name_plural = _("images")
         abstract = True
         default_manager_name = 'objects'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._remember_digital_source_type()
+
+    def _remember_digital_source_type(self):
+        # Not for a deferred field: reading it would query the database
+        self._old_digital_source_type = self.__dict__.get('digital_source_type')
 
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
@@ -131,16 +171,19 @@ class BaseImage(File):
                 if self.mime_type == 'image/svg+xml':
                     self._width, self._height = svg.get_dimensions(imgfile)
                     self._transparent = True
+                    self._set_provenance(Provenance())
                 else:
                     pil_image = PILImage.open(imgfile)
                     self._width, self._height = pil_image.size
                     self._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                    self._set_provenance(detect_provenance(imgfile, pil_image))
             except Exception:
                 if post_init is False:
                     # in case `imgfile` could not be found, unset dimensions
                     # but only if not initialized by loading a fixture file
                     self._width, self._height = None, None
                     self._transparent = False
+                    self._set_provenance(Provenance())
             finally:
                 if imgfile is not None:
                     # The upload validators read from the same file object, so
@@ -154,6 +197,28 @@ class BaseImage(File):
                             exc_info=exc,
                         )
         return attrs_updated
+
+    def _set_provenance(self, provenance, edited=False):
+        self.digital_source_type = provenance.digital_source_type
+        self.digital_source_type_edited = edited
+        self.has_content_credentials = provenance.has_content_credentials
+
+    def set_digital_source_type(self, digital_source_type):
+        """Set the digital source type on behalf of a user, e.g., to mark an
+        image as created using generative AI or to remove that mark. Pass an
+        IPTC term, a URI or an empty string. The image's file is not changed,
+        but the thumbnails generated from it carry the new value."""
+        self.digital_source_type = normalize_digital_source_type(digital_source_type)
+        self.digital_source_type_edited = True
+
+    @property
+    def digital_source_type_label(self):
+        return get_digital_source_type_label(self.digital_source_type)
+
+    @property
+    def is_ai_generated(self):
+        """True if the image's metadata states it was created or edited using generative AI."""
+        return is_ai_digital_source_type(self.digital_source_type)
 
     def clean(self):
         # We check the Image size and calculate the pixel before
@@ -198,6 +263,16 @@ class BaseImage(File):
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
         super().save(*args, **kwargs)
+        old_digital_source_type = self._old_digital_source_type
+        self._remember_digital_source_type()
+        if old_digital_source_type not in (None, self.digital_source_type):
+            # Thumbnails carry the digital source type: have them generated again
+            try:
+                self.file.delete_thumbnails()
+            except Exception as exc:
+                logger.warning(
+                    "Failed to delete the thumbnails of image %s after its digital "
+                    "source type changed.", self.pk, exc_info=exc)
 
     def _check_validity(self):
         if not self.name:
@@ -298,5 +373,6 @@ class BaseImage(File):
             file=self.file, name=self.file.name,
             source_storage=self.file.source_storage,
             thumbnail_storage=self.file.thumbnail_storage,
-            thumbnail_basedir=self.file.thumbnail_basedir)
+            thumbnail_basedir=self.file.thumbnail_basedir,
+            digital_source_type=self.digital_source_type)
         return tn

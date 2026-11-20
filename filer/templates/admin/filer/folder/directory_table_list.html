@@ -143,6 +143,7 @@
                                             </a>
                                         {% endif %}
                                     </strong>
+                                    {% if file.is_ai_generated %} <img class="filer-ai-label" src="{% static 'filer/icons/ai-label.svg' %}" alt="{% translate 'AI' %}" title="{{ file.digital_source_type_label }}" width="20" height="20">{% endif %}
                                 </div>
                                 {% if enable_permissions %}
                                     <div>{% translate "Permissions" %}: {% if file.is_public %}{% translate "disabled" %}{% else %}{% translate "enabled" %}{% endif %}</div>
@@ -229,7 +230,7 @@
 
     <div class="nav-pages paginator">
         {% if paginated_items.has_previous %}
-            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% if provenance_filter %}&amp;provenance={{ provenance_filter }}{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "previous" %}
             </a>
         {% endif %}
@@ -239,7 +240,7 @@
         </span>
 
         {% if paginated_items.has_next %}
-            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% if provenance_filter %}&amp;provenance={{ provenance_filter }}{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "next" %}
             </a>
         {% endif %}

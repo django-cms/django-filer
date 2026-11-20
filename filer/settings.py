@@ -289,6 +289,26 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
+# Preserve C2PA-bearing originals byte for byte, including all other metadata.
+FILER_STRIP_EXIF_KEEP_C2PA = getattr(settings, 'FILER_STRIP_EXIF_KEEP_C2PA', True)
+
+# ``filer.validation.strip_exif`` keeps the IPTC digital source type of an image,
+# e.g., stating it was created using generative AI, unless this is set to False
+FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = getattr(
+    settings, 'FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE', True)
+
+# The IPTC digital source types (terms or URIs) that mark an image as created
+# or edited using generative AI
+FILER_AI_DIGITAL_SOURCE_TYPES = getattr(
+    settings, 'FILER_AI_DIGITAL_SOURCE_TYPES',
+    ('trainedAlgorithmicMedia', 'compositeWithTrainedAlgorithmicMedia'))
+
+# The IPTC digital source types (terms or URIs) the admin offers to set for an
+# image and to filter by: by default those denoting generative AI. Images keep
+# any other digital source type detected in their metadata.
+FILER_DIGITAL_SOURCE_TYPE_CHOICES = getattr(
+    settings, 'FILER_DIGITAL_SOURCE_TYPE_CHOICES', FILER_AI_DIGITAL_SOURCE_TYPES)
+
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
     # Other browser-rendered document formats that can execute JavaScript in the
