@@ -217,7 +217,7 @@ List of default file validators to be ignored.
 See :ref:`validation`.
 
 ``FILER_STRIP_EXIF_KEEP_C2PA``
------------------------------
+------------------------------
 
 Defaults to ``True``: ``strip_exif`` leaves images with detected embedded C2PA
 Content Credentials byte for byte unchanged. This preserves the credentials

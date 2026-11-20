@@ -175,8 +175,8 @@ What happens to the metadata in files
    * - Original, stored as uploaded
      - kept
      - kept
-   * - Original, sanitized by ``strip_exif``
-     - kept (unless disabled)
+   * - Original, processed by ``strip_exif``
+     - kept (unchanged with C2PA; otherwise configurable)
      - kept (unless disabled; original stays unchanged)
    * - Original, resized by the admin's resize action
      - kept
@@ -200,7 +200,8 @@ Originals
     This retains **all metadata**, including EXIF locations, author names and
     other XMP properties. Detection does not verify the credential signatures.
 
-    For images without C2PA, it keeps the digital source type: it writes a minimal XMP packet
+    For images without C2PA, it keeps the digital source type: it writes a
+    minimal XMP packet
     back into the file that holds this one property and nothing else, so no
     other XMP information, such as creator names or locations, survives. Set
     ``FILER_STRIP_EXIF_KEEP_DIGITAL_SOURCE_TYPE = False`` to remove it, too.
