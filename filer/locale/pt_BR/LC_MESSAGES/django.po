@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:03+0200\n"
+"POT-Creation-Date: 2026-11-01 12:02+0100\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Julio Lucchese <juliorieger@gmail.com>, 2018\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/divio/django-"
@@ -129,12 +129,12 @@ msgstr "Remover arquivo(s) e/ou pasta(s)"
 msgid "Delete selected files and/or folders"
 msgstr "Remover arquivo(s) e/ou pasta(s) selecionados"
 
-#: admin/folderadmin.py:1050
+#: admin/folderadmin.py:1053 admin/folderadmin.py:1064
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Pastas com os nomes %s s já existem no local selecionado"
 
-#: admin/folderadmin.py:1054
+#: admin/folderadmin.py:1067
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
@@ -143,25 +143,25 @@ msgstr ""
 "%(count)d arquivo(s) e/ou pasta(s) foram movidos para a pasta "
 "'%(destination)s' com sucesso."
 
-#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
+#: admin/folderadmin.py:1075 admin/folderadmin.py:1077
 msgid "Move files and/or folders"
 msgstr "Mover arquivo(s) e/ou pasta(s)"
 
-#: admin/folderadmin.py:1079
+#: admin/folderadmin.py:1092
 msgid "Move selected files and/or folders"
 msgstr "Mover arquivo(s) e/ou pasta(s) selecionados"
 
-#: admin/folderadmin.py:1138
+#: admin/folderadmin.py:1151
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d arquivo(s) foram renomeados com sucesso."
 
-#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
-#: admin/folderadmin.py:1164
+#: admin/folderadmin.py:1160 admin/folderadmin.py:1162
+#: admin/folderadmin.py:1177
 msgid "Rename files"
 msgstr "Renomear arquivos"
 
-#: admin/folderadmin.py:1261
+#: admin/folderadmin.py:1281
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
@@ -170,24 +170,24 @@ msgstr ""
 "%(count)d arquivo(s) e/ou pasta(s) foram copiados para o pasta "
 "'%(destination)s' com sucesso."
 
-#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
+#: admin/folderadmin.py:1299 admin/folderadmin.py:1301
 msgid "Copy files and/or folders"
 msgstr "Copiar arquivo(s) e/ou pasta(s)"
 
-#: admin/folderadmin.py:1298
+#: admin/folderadmin.py:1318
 msgid "Copy selected files and/or folders"
 msgstr "Copiar arquivo(s) e/ou pasta(s) selecionados"
 
-#: admin/folderadmin.py:1412
+#: admin/folderadmin.py:1432
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "%(count)d imagem(ens) tiveram seu tamanho alterado com sucesso."
 
-#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
+#: admin/folderadmin.py:1439 admin/folderadmin.py:1441
 msgid "Resize images"
 msgstr "Redimensionar imagens"
 
-#: admin/folderadmin.py:1436
+#: admin/folderadmin.py:1456
 msgid "Resize selected images"
 msgstr "Redimensionar imagens selecionadas"
 
@@ -262,15 +262,15 @@ msgstr "A localização do assunto está fora da imagem."
 msgid "Your input: \"{subject_location}\". "
 msgstr "Sua entrada: \"{subject_location}\". "
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:411
+#: admin/permissionadmin.py:13 models/foldermodels.py:416
 msgid "Who"
 msgstr "Quem"
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:432
+#: admin/permissionadmin.py:14 models/foldermodels.py:437
 msgid "What"
 msgstr "O quê"
 
-#: admin/views.py:54
+#: admin/views.py:57 admin/views.py:68
 msgid "Folder with this name already exists."
 msgstr "Já existe uma pasta com esse nome."
 
@@ -330,7 +330,7 @@ msgstr ""
 "%(max_pixels)d milhões de pixels. Antes de enviar novamente, redimensione a "
 "imagem para a resolução %(width)d x %(height)d ou inferior."
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:320
+#: models/clipboardmodels.py:11 models/foldermodels.py:325
 msgid "user"
 msgstr "usuário"
 
@@ -426,124 +426,124 @@ msgstr "pai"
 msgid "created at"
 msgstr "criado em"
 
-#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
+#: models/foldermodels.py:162 templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:25
 #: templates/admin/filer/folder/listing_breadcrumbs.html:8
 #: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Folder"
 msgstr "Pasta"
 
-#: models/foldermodels.py:158
+#: models/foldermodels.py:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Pastas"
 
-#: models/foldermodels.py:291
+#: models/foldermodels.py:296
 msgid "all items"
 msgstr "todos os itens"
 
-#: models/foldermodels.py:292
+#: models/foldermodels.py:297
 msgid "this item only"
 msgstr "este item somente"
 
-#: models/foldermodels.py:293
+#: models/foldermodels.py:298
 msgid "this item and all children"
 msgstr "este item e todos subjacentes"
 
-#: models/foldermodels.py:297
+#: models/foldermodels.py:302
 msgid "inherit"
 msgstr "herdar"
 
-#: models/foldermodels.py:298
+#: models/foldermodels.py:303
 msgid "allow"
 msgstr "permitir"
 
-#: models/foldermodels.py:299
+#: models/foldermodels.py:304
 msgid "deny"
 msgstr "negar"
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:316
 msgid "type"
 msgstr "tipo"
 
-#: models/foldermodels.py:328
+#: models/foldermodels.py:333
 msgid "group"
 msgstr "grupo"
 
-#: models/foldermodels.py:335
+#: models/foldermodels.py:340
 msgid "everybody"
 msgstr "todos"
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:345
 msgid "can read"
 msgstr "pode ler"
 
-#: models/foldermodels.py:348
+#: models/foldermodels.py:353
 msgid "can edit"
 msgstr "pode editar"
 
-#: models/foldermodels.py:356
+#: models/foldermodels.py:361
 msgid "can add children"
 msgstr "pode adicionar filhos"
 
-#: models/foldermodels.py:364
+#: models/foldermodels.py:369
 msgid "folder permission"
 msgstr "permissão de pasta"
 
-#: models/foldermodels.py:365
+#: models/foldermodels.py:370
 msgid "folder permissions"
 msgstr "permissões de pasta"
 
-#: models/foldermodels.py:379
+#: models/foldermodels.py:384
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr "A pasta não pode ser selecionada com o tipo \"todos os itens\"."
 
-#: models/foldermodels.py:381
+#: models/foldermodels.py:386
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr ""
 "A pasta precisa ser selecionada quando o tipo não é \"todos os itens\"."
 
-#: models/foldermodels.py:383
+#: models/foldermodels.py:388
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr "Usuário ou grupo não pode ser selecionado junto com \"todos\"."
 
-#: models/foldermodels.py:385
+#: models/foldermodels.py:390
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 "Pelo menos um entre usuário, grupo ou \"todos\" precisa ser selecionado."
 
-#: models/foldermodels.py:391
+#: models/foldermodels.py:396
 msgid "All Folders"
 msgstr "Todas as pastas"
 
-#: models/foldermodels.py:393
+#: models/foldermodels.py:398
 msgid "Logical Path"
 msgstr "Caminho lógico"
 
-#: models/foldermodels.py:402
+#: models/foldermodels.py:407
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Usuário: {user}"
 
-#: models/foldermodels.py:404
+#: models/foldermodels.py:409
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Grupo: {group}"
 
-#: models/foldermodels.py:406
+#: models/foldermodels.py:411
 msgid "Everybody"
 msgstr "Todos"
 
-#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
+#: models/foldermodels.py:424 templates/admin/filer/widgets/admin_file.html:48
 #: templates/admin/filer/widgets/admin_file.html:49
 msgid "Edit"
 msgstr "Editar"
 
-#: models/foldermodels.py:420
+#: models/foldermodels.py:425
 msgid "Read"
 msgstr "Ler"
 
-#: models/foldermodels.py:421
+#: models/foldermodels.py:426
 msgid "Add children"
 msgstr "Adicionar filhos"
 

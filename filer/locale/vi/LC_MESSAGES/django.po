@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:03+0200\n"
+"POT-Creation-Date: 2026-11-01 12:02+0100\n"
 "PO-Revision-Date: 2026-06-27 08:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese (http://app.transifex.com/divio/django-filer/"
@@ -118,12 +118,12 @@ msgstr "Xóa các tệp và/hoặc các thư mục"
 msgid "Delete selected files and/or folders"
 msgstr "Xóa các tệp và/hoặc các thư mục dã chọn"
 
-#: admin/folderadmin.py:1050
+#: admin/folderadmin.py:1053 admin/folderadmin.py:1064
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Các thư mục với tên %s đã tồn tại ở vị trí đã chọn"
 
-#: admin/folderadmin.py:1054
+#: admin/folderadmin.py:1067
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
@@ -131,25 +131,25 @@ msgid ""
 msgstr ""
 "Đã di chuyển %(count)d tệp và/hoặc thư mục tới thư mục '%(destination)s'."
 
-#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
+#: admin/folderadmin.py:1075 admin/folderadmin.py:1077
 msgid "Move files and/or folders"
 msgstr "Di chuyển tệp và/hoặc thư mục"
 
-#: admin/folderadmin.py:1079
+#: admin/folderadmin.py:1092
 msgid "Move selected files and/or folders"
 msgstr "Đã di chuyển tệp và/hoặc thư mục đã chọn"
 
-#: admin/folderadmin.py:1138
+#: admin/folderadmin.py:1151
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Đã thành công đổi tên %(count)d tệp."
 
-#: admin/folderadmin.py:1147 admin/folderadmin.py:1149
-#: admin/folderadmin.py:1164
+#: admin/folderadmin.py:1160 admin/folderadmin.py:1162
+#: admin/folderadmin.py:1177
 msgid "Rename files"
 msgstr "Đổi tên tệp"
 
-#: admin/folderadmin.py:1261
+#: admin/folderadmin.py:1281
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
@@ -158,24 +158,24 @@ msgstr ""
 "Đã thành công sao chép %(count)d tệp và/hoặc thư mục tới thư mục "
 "'%(destination)s'."
 
-#: admin/folderadmin.py:1279 admin/folderadmin.py:1281
+#: admin/folderadmin.py:1299 admin/folderadmin.py:1301
 msgid "Copy files and/or folders"
 msgstr "Sao chép tệp và/hoặc thư mục"
 
-#: admin/folderadmin.py:1298
+#: admin/folderadmin.py:1318
 msgid "Copy selected files and/or folders"
 msgstr "Sao chép tệp và/hoặc thư mục đã chọn"
 
-#: admin/folderadmin.py:1412
+#: admin/folderadmin.py:1432
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Đã thành công thay đổi kích thước %(count)d ảnh."
 
-#: admin/folderadmin.py:1419 admin/folderadmin.py:1421
+#: admin/folderadmin.py:1439 admin/folderadmin.py:1441
 msgid "Resize images"
 msgstr "Thay đổi kích thước ảnh"
 
-#: admin/folderadmin.py:1436
+#: admin/folderadmin.py:1456
 msgid "Resize selected images"
 msgstr "Thay dổi kích thước ảnh đã chọn"
 
@@ -247,15 +247,15 @@ msgstr "Vị trí chủ đề ở bên ngoài hình ảnh."
 msgid "Your input: \"{subject_location}\". "
 msgstr "Đầu vào của bạn: \"{subject_location}\"."
 
-#: admin/permissionadmin.py:13 models/foldermodels.py:411
+#: admin/permissionadmin.py:13 models/foldermodels.py:416
 msgid "Who"
 msgstr "Ai"
 
-#: admin/permissionadmin.py:14 models/foldermodels.py:432
+#: admin/permissionadmin.py:14 models/foldermodels.py:437
 msgid "What"
 msgstr "Cái gì"
 
-#: admin/views.py:54
+#: admin/views.py:57 admin/views.py:68
 msgid "Folder with this name already exists."
 msgstr "Thư mục với tên này đã tồn tại."
 
@@ -315,7 +315,7 @@ msgstr ""
 "triệu pixel. Trước khi tải lên lại, hãy thay đổi kích thước ảnh về độ phân "
 "giải %(width)d x %(height)d hoặc thấp hơn."
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:320
+#: models/clipboardmodels.py:11 models/foldermodels.py:325
 msgid "user"
 msgstr "người dùng"
 
@@ -411,123 +411,123 @@ msgstr "cha"
 msgid "created at"
 msgstr "đã tạo tại"
 
-#: models/foldermodels.py:157 templates/admin/filer/breadcrumbs.html:8
+#: models/foldermodels.py:162 templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:25
 #: templates/admin/filer/folder/listing_breadcrumbs.html:8
 #: templates/admin/filer/folder/listing_breadcrumbs.html:32
 msgid "Folder"
 msgstr "Thư mục"
 
-#: models/foldermodels.py:158
+#: models/foldermodels.py:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Những thư mục"
 
-#: models/foldermodels.py:291
+#: models/foldermodels.py:296
 msgid "all items"
 msgstr "tất cả đồ"
 
-#: models/foldermodels.py:292
+#: models/foldermodels.py:297
 msgid "this item only"
 msgstr "chỉ đồ này"
 
-#: models/foldermodels.py:293
+#: models/foldermodels.py:298
 msgid "this item and all children"
 msgstr "đồ này và tất cả các con"
 
-#: models/foldermodels.py:297
+#: models/foldermodels.py:302
 msgid "inherit"
 msgstr "kế thừa"
 
-#: models/foldermodels.py:298
+#: models/foldermodels.py:303
 msgid "allow"
 msgstr "cho phép"
 
-#: models/foldermodels.py:299
+#: models/foldermodels.py:304
 msgid "deny"
 msgstr "không cho phép"
 
-#: models/foldermodels.py:311
+#: models/foldermodels.py:316
 msgid "type"
 msgstr "kiểu"
 
-#: models/foldermodels.py:328
+#: models/foldermodels.py:333
 msgid "group"
 msgstr "nhóm"
 
-#: models/foldermodels.py:335
+#: models/foldermodels.py:340
 msgid "everybody"
 msgstr "tất cả mọi người"
 
-#: models/foldermodels.py:340
+#: models/foldermodels.py:345
 msgid "can read"
 msgstr "có thể đọc"
 
-#: models/foldermodels.py:348
+#: models/foldermodels.py:353
 msgid "can edit"
 msgstr "có thể chỉnh sửa"
 
-#: models/foldermodels.py:356
+#: models/foldermodels.py:361
 msgid "can add children"
 msgstr "có thể thêm con"
 
-#: models/foldermodels.py:364
+#: models/foldermodels.py:369
 msgid "folder permission"
 msgstr "quyền thư mục"
 
-#: models/foldermodels.py:365
+#: models/foldermodels.py:370
 msgid "folder permissions"
 msgstr "những quyền thư mục"
 
-#: models/foldermodels.py:379
+#: models/foldermodels.py:384
 msgid "Folder cannot be selected with type \"all items\"."
 msgstr "Không thể chọn thư mục với kiểu \"tất cả đồ\"."
 
-#: models/foldermodels.py:381
+#: models/foldermodels.py:386
 msgid "Folder has to be selected when type is not \"all items\"."
 msgstr "Phải chọn thư mục khi kiểu không phải là \"tất cả đồ\"."
 
-#: models/foldermodels.py:383
+#: models/foldermodels.py:388
 msgid "User or group cannot be selected together with \"everybody\"."
 msgstr "Không thể chọn người dùng hoặc nhóm cùng với \"tất cả mọi người\"."
 
-#: models/foldermodels.py:385
+#: models/foldermodels.py:390
 msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 "Phải chọn ít nhất một trong người dùng, nhóm, hoặc \"tất cả mọi người\"."
 
-#: models/foldermodels.py:391
+#: models/foldermodels.py:396
 msgid "All Folders"
 msgstr "Tất cả thư mục"
 
-#: models/foldermodels.py:393
+#: models/foldermodels.py:398
 msgid "Logical Path"
 msgstr "Đường dẫn logic"
 
-#: models/foldermodels.py:402
+#: models/foldermodels.py:407
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Người dùng: {user}"
 
-#: models/foldermodels.py:404
+#: models/foldermodels.py:409
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Nhóm: {group}"
 
-#: models/foldermodels.py:406
+#: models/foldermodels.py:411
 msgid "Everybody"
 msgstr "Tất cả mọi người"
 
-#: models/foldermodels.py:419 templates/admin/filer/widgets/admin_file.html:48
+#: models/foldermodels.py:424 templates/admin/filer/widgets/admin_file.html:48
 #: templates/admin/filer/widgets/admin_file.html:49
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
-#: models/foldermodels.py:420
+#: models/foldermodels.py:425
 msgid "Read"
 msgstr "Đọc"
 
-#: models/foldermodels.py:421
+#: models/foldermodels.py:426
 msgid "Add children"
 msgstr "Thêm con"
 
