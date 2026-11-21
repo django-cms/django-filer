@@ -191,6 +191,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        # Folder.__str__ includes every ancestor, including unreadable ones.
+        context['subtitle'] = obj.name if obj else None
         info = self.model._meta.app_label, self.model._meta.model_name
         extra_context = {'show_delete': True,
                          'history_url': 'admin:%s_%s_history' % info,
@@ -299,8 +301,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
-                self.get_queryset(request).get(id=last_folder_id)
+                last_folder = self.get_queryset(request).get(id=last_folder_id)
             except self.model.DoesNotExist:
+                last_folder = None
+            if last_folder is None or not last_folder.has_read_permission(request):
                 url = reverse('admin:filer-directory_listing-root')
                 url = f"{url}{admin_url_params_encoded(request)}"
             else:
@@ -311,6 +315,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder = FolderRoot()
         else:
             folder = get_object_or_404(self.get_queryset(request), id=folder_id)
+            if not folder.has_read_permission(request):
+                raise PermissionDenied()
         request.session['filer_last_folder_id'] = folder_id
 
         list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE

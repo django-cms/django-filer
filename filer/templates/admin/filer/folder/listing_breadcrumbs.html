@@ -6,7 +6,7 @@
     <li><a href="{% url 'admin:index' %}" title="{% translate 'Go back to admin homepage' %}">{% translate "Home" %}</a></li>
     <li><a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to Filer app' %}">{% translate "Filer" %}</a></li>
     <li><a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "Folder" %}</a></li>
-    {% for ancestor_folder in folder.logical_path %}
+    {% for ancestor_folder in folder.logical_path|readable_folders:request %}
         <li><a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}" title="{% blocktranslate with folder_name=ancestor_folder.name %}Go back to '{{ folder_name }}' folder{% endblocktranslate %}">{% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}</a></li>
     {% endfor %}
     {% if breadcrumbs_action %}
@@ -30,7 +30,7 @@
         {% translate "Filer" %}
     </a>
     &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "Folder" %}</a>
-    {% for ancestor_folder in folder.logical_path %}
+    {% for ancestor_folder in folder.logical_path|readable_folders:request %}
         &rsaquo;
         <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
             title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">

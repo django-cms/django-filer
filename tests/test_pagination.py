@@ -125,6 +125,9 @@ class DirectoryPaginationTests(TestCase):
     def test_permission_page_counts(self):
         user = get_user_model().objects.create(username='reader', is_staff=True)
         user.user_permissions.add(Permission.objects.get(codename='can_use_directory_listing'))
+        # The listing itself requires read access; ownership grants access to
+        # the parent while the child/file querysets still apply their filters.
+        Folder.objects.filter(pk=self.parent.pk).update(owner=user)
         clear_folder_permission_cache(user)
         self.addCleanup(clear_folder_permission_cache, user)
         FolderPermission.objects.create(

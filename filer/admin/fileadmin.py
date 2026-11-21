@@ -3,7 +3,9 @@ import mimetypes
 from django import forms
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import unquote
+from django.contrib.admin.views.main import ChangeList
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -19,7 +21,7 @@ from easy_thumbnails.models import Thumbnail as EasyThumbnail
 from easy_thumbnails.options import ThumbnailOptions
 
 from .. import settings
-from ..models import BaseImage, File
+from ..models import BaseImage, File, FolderPermission
 from ..settings import DEFERRED_THUMBNAIL_SIZES
 from ..utils.loader import load_model
 from .permissions import PrimitivePermissionAwareModelAdmin
@@ -27,6 +29,19 @@ from .tools import AdminContext, admin_url_params_encoded, has_admin_read_permis
 
 
 Image = load_model(settings.FILER_IMAGE_MODEL)
+
+
+class FileChangeList(ChangeList):
+    def get_queryset(self, request, *args, **kwargs):
+        # Scope the root queryset too: Django counts it separately from search
+        # results. Keep ModelAdmin.get_queryset() intact so object views can
+        # still distinguish a forbidden object from a missing one.
+        perms = FolderPermission.objects.get_read_id_list(request.user)
+        if perms != 'All':
+            self.root_queryset = self.root_queryset.filter(
+                Q(folder_id__in=perms) | Q(folder_id__isnull=True) | Q(owner=request.user)
+            )
+        return super().get_queryset(request, *args, **kwargs)
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -65,6 +80,9 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     readonly_fields = ('sha1', 'display_canonical')
 
     form = FileAdminChangeFrom
+
+    def get_changelist(self, request, **kwargs):
+        return FileChangeList
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(),

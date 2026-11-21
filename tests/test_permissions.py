@@ -11,6 +11,7 @@ from django.urls import reverse
 
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
+from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
@@ -491,8 +492,7 @@ class FolderPermissionsTestCase(TestCase):
 
 class AdminReadPermissionsTestCase(TestCase):
     """
-    Regression tests for read permission checks on the admin views that serve
-    or display a single file: FileAdmin.icon_view() and the change view.
+    Regression tests for read permission checks on admin listings and views.
     """
 
     def setUp(self):
@@ -650,3 +650,184 @@ class AdminReadPermissionsTestCase(TestCase):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
             cache.clear()
             self.assertFalse(model_admin.has_view_permission(request, self.readable_file))
+
+    def _changelist_url(self, model):
+        opts = model._meta
+        return reverse(f'admin:{opts.app_label}_{opts.model_name}_changelist')
+
+    def test_changelists_filter_results_and_counts(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            File.objects.create(name='secret-document', folder=self.secret_folder, owner=self.owner)
+            readable = File.objects.create(name='readable-document', folder=self.readable_folder, owner=self.owner)
+            for model in (File, Image):
+                for params in ({}, {'_popup': '1'}):
+                    with self.subTest(model=model, params=params):
+                        response = self.client.get(self._changelist_url(model), params)
+                        self.assertEqual(response.status_code, 200)
+                        expected = {self.readable_file.pk, self.unfiled_file.pk}
+                        if model is File:
+                            expected.add(readable.pk)
+                        cl = response.context['cl']
+                        self.assertEqual({obj.pk for obj in cl.result_list}, expected)
+                        self.assertEqual(cl.result_count, len(expected))
+                        self.assertEqual(cl.full_result_count, len(expected))
+                        self.assertNotContains(response, 'secret-document')
+
+    def test_changelist_search_cannot_probe_unreadable_files(self):
+        Image.objects.filter(pk=self.secret_file.pk).update(
+            name='secret-payroll', original_filename='confidential-original.jpg',
+            description='confidential-description', sha1='a' * 40,
+        )
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                for term in ('secret-payroll', 'confidential-original', 'confidential-description', 'a' * 40):
+                    with self.subTest(model=model, term=term):
+                        response = self.client.get(self._changelist_url(model), {'q': term, '_popup': '1'})
+                        self.assertEqual(response.status_code, 200)
+                        cl = response.context['cl']
+                        self.assertEqual(list(cl.result_list), [])
+                        self.assertEqual(cl.result_count, 0)
+                        self.assertEqual(cl.full_result_count, 2)
+
+    def test_changelist_allows_owned_files_and_readable_descendants(self):
+        child = Folder.objects.create(name='readable-child', parent=self.readable_folder, owner=self.owner)
+        child_file = self._create_image(child)
+        Image.objects.filter(pk=self.secret_file.pk).update(owner=self.staff)
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                with self.subTest(model=model):
+                    response = self.client.get(self._changelist_url(model))
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(
+                        {obj.pk for obj in response.context['cl'].result_list},
+                        {self.secret_file.pk, self.readable_file.pk, self.unfiled_file.pk, child_file.pk},
+                    )
+
+    def test_changelist_explicit_deny_overrides_read_grant(self):
+        FolderPermission.objects.create(
+            folder=self.readable_folder, everybody=True,
+            type=FolderPermission.THIS, can_read=FolderPermission.DENY,
+        )
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                with self.subTest(model=model):
+                    response = self.client.get(self._changelist_url(model))
+                    self.assertEqual(response.status_code, 200)
+                    cl = response.context['cl']
+                    self.assertEqual({obj.pk for obj in cl.result_list}, {self.unfiled_file.pk})
+                    self.assertEqual(cl.full_result_count, 1)
+
+    def test_changelist_requires_global_model_permission(self):
+        self.staff.user_permissions.clear()
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                for params in ({}, {'_popup': '1'}):
+                    with self.subTest(model=model, params=params):
+                        response = self.client.get(self._changelist_url(model), params)
+                        self.assertEqual(response.status_code, 403)
+
+    def test_unreadable_object_views_keep_returning_forbidden(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                opts = model._meta
+                for view in ('change', 'history', 'delete'):
+                    with self.subTest(model=model, view=view):
+                        url = reverse(f'admin:{opts.app_label}_{opts.model_name}_{view}', args=[self.secret_file.pk])
+                        self.assertEqual(self.client.get(url).status_code, 403)
+
+    def test_changelist_with_view_only_permission(self):
+        self.staff.user_permissions.set(Permission.objects.filter(codename__in=('view_file', 'view_image')))
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            for model in (File, Image):
+                with self.subTest(model=model):
+                    response = self.client.get(self._changelist_url(model))
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(
+                        {obj.pk for obj in response.context['cl'].result_list},
+                        {self.readable_file.pk, self.unfiled_file.pk},
+                    )
+
+    def test_changelist_unrestricted_for_superuser_or_disabled_permissions(self):
+        for enabled, user in ((True, self.owner), (False, self.staff)):
+            with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=enabled):
+                self.client.force_login(user)
+                for model in (File, Image):
+                    with self.subTest(enabled=enabled, model=model):
+                        response = self.client.get(self._changelist_url(model))
+                        self.assertEqual(response.status_code, 200)
+                        cl = response.context['cl']
+                        self.assertEqual({obj.pk for obj in cl.result_list}, {
+                            self.secret_file.pk, self.readable_file.pk, self.unfiled_file.pk,
+                        })
+                        self.assertEqual(cl.full_result_count, 3)
+
+    def test_unreadable_directory_does_not_disclose_names(self):
+        parent = Folder.objects.create(name='secret-parent', owner=self.owner)
+        self.secret_folder.parent = parent
+        self.secret_folder.save()
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            url = reverse('admin:filer-directory_listing', args=[self.secret_folder.pk])
+            for params in ({}, {'_popup': '1'}, {'q': 'secret'}):
+                with self.subTest(params=params):
+                    response = self.client.get(url, params)
+                    self.assertEqual(response.status_code, 403)
+                    self.assertNotContains(response, 'secret-parent', status_code=403)
+                    self.assertNotContains(response, 'Directory listing for secret', status_code=403)
+
+    def test_last_directory_falls_back_when_read_permission_revoked(self):
+        session = self.client.session
+        session['filer_last_folder_id'] = self.secret_folder.pk
+        session.save()
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            response = self.client.get(reverse('admin:filer-directory_listing-last'))
+            self.assertRedirects(response, reverse('admin:filer-directory_listing-root'))
+
+    def test_readable_directory_hides_unreadable_ancestors(self):
+        self.secret_folder.name = 'unreadable-ancestor-name'
+        self.secret_folder.save()
+        self.readable_folder.parent = self.secret_folder
+        self.readable_folder.save()
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            url = reverse('admin:filer-directory_listing', args=[self.readable_folder.pk])
+            response = self.client.get(url)
+            self.assertContains(response, 'Directory listing for readable')
+            self.assertNotContains(response, self.secret_folder.name)
+            self.assertNotContains(response, f'/folder/{self.secret_folder.pk}/list/')
+            for url in (self._change_url(self.readable_file), reverse(
+                'admin:filer_folder_change', args=[self.readable_folder.pk],
+            )):
+                with self.subTest(url=url):
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, 200)
+                    self.assertNotContains(response, self.secret_folder.name)
+            for list_type in ('tb', 'th'):
+                with self.subTest(list_type=list_type):
+                    response = self.client.get(reverse('admin:filer-directory_listing-root'), {
+                        '_popup': '1', '_pick': 'folder', '_list_type': list_type,
+                    })
+                    self.assertContains(response, 'readable')
+                    self.assertContains(response, 'data-label="/readable"')
+                    self.assertNotContains(response, self.secret_folder.name)
+
+    def test_directory_access_for_owner_superuser_and_disabled_permissions(self):
+        url = reverse('admin:filer-directory_listing', args=[self.secret_folder.pk])
+        for enabled, user in ((True, self.owner), (False, self.staff)):
+            with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=enabled):
+                self.client.force_login(user)
+                response = self.client.get(url)
+                self.assertContains(response, 'Directory listing for secret')
+        self.secret_folder.owner = self.staff
+        self.secret_folder.save()
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            self.client.force_login(self.staff)
+            self.assertContains(self.client.get(url), 'Directory listing for secret')

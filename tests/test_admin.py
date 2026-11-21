@@ -1728,9 +1728,10 @@ class FolderListingTest(TestCase):
 
     def test_folder_ownership(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            # Owned descendants remain reachable from the root without
+            # disclosing the name of their unreadable parent.
             response = self.client.get(
-                reverse('admin:filer-directory_listing',
-                        kwargs={'folder_id': self.parent.id}))
+                reverse('admin:filer-directory_listing-root'))
             item_list = response.context['paginated_items'].object_list
             # user sees only 1 folder : FOO
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
@@ -1750,8 +1751,7 @@ class FolderListingTest(TestCase):
                 can_read=FolderPermission.ALLOW,
                 can_add_children=FolderPermission.ALLOW)
             response = self.client.get(
-                reverse('admin:filer-directory_listing',
-                        kwargs={'folder_id': self.parent.id}))
+                reverse('admin:filer-directory_listing-root'))
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             self.assertEqual(
