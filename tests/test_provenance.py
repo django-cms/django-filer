@@ -1,3 +1,4 @@
+import hashlib
 import io
 import struct
 import zlib
@@ -1012,6 +1013,8 @@ class StripExifUploadTests(TestCase):
         self.assertNotEqual(stored, data)
         self.assertFalse(detect_content_credentials(io.BytesIO(stored)))
         self.assertEqual(detect_digital_source_type(PILImage.open(io.BytesIO(stored))), AI_GENERATED)
+        self.assertEqual(image.size, len(stored))
+        self.assertEqual(image.sha1, hashlib.sha1(stored).hexdigest())
 
     def test_change_form_upload(self):
         image = Image.objects.create(

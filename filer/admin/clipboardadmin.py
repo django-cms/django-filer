@@ -8,10 +8,11 @@ from django.urls import NoReverseMatch, path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
-from ..models import Clipboard, ClipboardItem, Folder
+from ..models import BaseImage, Clipboard, ClipboardItem, Folder
 from ..settings import FILER_THUMBNAIL_ICON_SIZE
 from ..utils.files import UploadException, handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
+from ..utils.provenance import detect_file_provenance
 from ..validation import validate_upload
 from . import views
 
@@ -136,14 +137,30 @@ def ajax_upload(request, folder_id=None):
                 fields=('original_filename', 'owner', 'file')
             )
             break
+    # Validators may remove the upload's credentials or XMP. Keep provenance
+    # from the original while calculating file metadata from the sanitized file.
+    upload_provenance = detect_file_provenance(upload) if issubclass(FileSubClass, BaseImage) else None
+    try:
+        validate_upload(filename, upload, request.user, mime_type)
+    except ValidationError as error:
+        # ValidationError carries a message written for the uploading user
+        # (e.g. "HTML upload denied by site security policy"), so it is safe
+        # - and useful - to pass on.
+        return _upload_error(request, '; '.join(error.messages), status=400)
+    # Validators may rewrite the upload. Refresh UploadedFile.size before the
+    # form assigns it to the model and calculates the file metadata.
+    upload.seek(0, 2)
+    upload.size = upload.tell()
+    upload.seek(0)
     uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                           {'file': upload})
     uploadform.request = request
     uploadform.instance.mime_type = mime_type
     if uploadform.is_valid():
         try:
-            validate_upload(filename, upload, request.user, mime_type)
             file_obj = uploadform.save(commit=False)
+            if upload_provenance is not None:
+                file_obj._set_provenance(upload_provenance)
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
         except ValidationError as error:
