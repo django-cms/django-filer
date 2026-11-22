@@ -111,7 +111,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         parent_id = request.GET.get('parent_id', None)
         if not parent_id:
             parent_id = request.POST.get('parent_id', None)
-        if parent_id:
+        if parent_id and obj is None:
             return AddFolderPopupForm
         else:
             folder_form = super().get_form(
@@ -146,8 +146,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         parent_id = request.GET.get('parent_id', None)
         if not parent_id:
             parent_id = request.POST.get('parent_id', None)
-        if parent_id:
-            parent = self.get_queryset(request).get(id=parent_id)
+        # ``parent_id`` only places new folders. Existing folders are moved by
+        # the move action, which checks the destination and rejects cycles.
+        if parent_id and not change:
+            try:
+                parent = self.get_queryset(request).get(id=parent_id)
+            except (self.model.DoesNotExist, ValueError):
+                raise PermissionDenied
+            if not parent.has_add_children_permission(request):
+                raise PermissionDenied
             r.parent = parent
         return r
 
