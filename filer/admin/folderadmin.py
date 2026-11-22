@@ -1324,9 +1324,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
     def _check_resize_perms(self, request, files_queryset, folders_queryset, tree=None):
-        # ``tree`` is the selection's _tree_labels() built with _READ_CHECKS.
+        # Resizing overwrites the originals in place, so it needs edit permission.
+        # ``tree`` is the selection's _tree_labels() built with _EDIT_CHECKS.
         if tree is None:
-            tree = self._tree_labels(request, list(folders_queryset), Image, self._READ_CHECKS)
+            tree = self._tree_labels(request, list(folders_queryset), Image, self._EDIT_CHECKS)
         try:
             check_files_read_permissions(request, files_queryset)
             check_files_edit_permissions(request, files_queryset)
@@ -1418,7 +1419,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         selected = list(folders_queryset)
-        tree = self._tree_labels(request, selected, Image, self._READ_CHECKS)
+        tree = self._tree_labels(request, selected, Image, self._EDIT_CHECKS)
         perms_needed = self._check_resize_perms(request, files_queryset, selected, tree)
         to_resize = self._list_all_to_resize(request, files_queryset, selected, tree)
 

@@ -29,6 +29,7 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings as filer_settings
 from filer.admin import tools
 from filer.admin.folderadmin import FolderAdmin
+from filer.cache import clear_folder_permission_cache
 from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
@@ -1659,6 +1660,55 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
                     expected_width=40, expected_height=300,
                     expected_subj_x=20, expected_subj_y=150,  # at the center
                 )
+
+    def _resize_as_read_only_user(self, url, selection):
+        """Post the resize action as a staff user who may read but not edit Src."""
+        staff_user = User.objects.create_user(username='joe', password='x', is_staff=True)
+        staff_user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label='filer',
+        ))
+        FolderPermission.objects.create(
+            folder=self.src_folder,
+            user=staff_user,
+            type=FolderPermission.ALL,
+            can_read=FolderPermission.ALLOW,
+            can_edit=FolderPermission.DENY,
+            can_add_children=FolderPermission.DENY,
+        )
+        # Folder permissions are cached by user pk, which the next test reuses.
+        clear_folder_permission_cache(staff_user)
+        self.addCleanup(clear_folder_permission_cache, staff_user)
+        self.client.logout()
+        self.client.login(username='joe', password='x')
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            return self.client.post(url, {
+                'action': 'resize_images',
+                'post': 'yes',
+                'width': 50,
+                'height': 50,
+                'crop': False,
+                'upscale': False,
+                helpers.ACTION_CHECKBOX_NAME: selection,
+            })
+
+    def test_resize_selected_file_requires_edit_permission(self):
+        url = reverse('admin:filer-directory_listing', kwargs={'folder_id': self.src_folder.pk})
+        response = self._resize_as_read_only_user(url, 'file-%d' % self.image_obj.pk)
+        self.assertEqual(response.status_code, 403)
+        self.image_obj.refresh_from_db()
+        self.assertEqual((self.image_obj.width, self.image_obj.height), (800, 600))
+
+    def test_resize_selected_folder_requires_edit_permission(self):
+        # Images inside a selected folder are overwritten in place, so read
+        # permission on the folder tree is not enough.
+        nested = Folder.objects.create(name='nested', parent=self.src_folder)
+        nested_image = self.create_image(nested)
+        url = reverse('admin:filer-directory_listing-root')
+        response = self._resize_as_read_only_user(url, 'folder-%d' % self.src_folder.pk)
+        self.assertEqual(response.status_code, 403)
+        for image in (self.image_obj, nested_image):
+            image.refresh_from_db()
+            self.assertEqual((image.width, image.height), (800, 600))
 
 
 class PermissionAdminTest(TestCase):
