@@ -175,20 +175,15 @@ The new user interface is based on the [React](https://reactjs.org/) framework w
 
 ## Installation
 
-The new version of **django-filer** is not yet available on PyPI. Therefore, you have to install it
-from GitHub:
+The install from PyPI. 
 
 ```shell
-git clone https://github.com/django-cms/django-filer.git
-cd django-filer
-git switch finder
-pip install --no-deps -e .
+pip install django-finder
 ```
 
-The new version of **django-filer** requires Django-5.2 or later.
+**django-filer** requires Django-5.2 or later.
 
-The new version of **django-filer** currently has only been tested with SQLite and Postgres, but
-should also work on MariaDB and MySQL.
+**django-filer** currently has only been tested with SQLite and Postgres, but should also work on MariaDB and MySQL.
 
 In `settings.py` of your project, add these extra dependencies or those you really need:
 
