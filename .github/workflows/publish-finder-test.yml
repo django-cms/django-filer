@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - finder
+  pull_request:
+    branches:
+      - finder
 
 permissions:
   contents: read
