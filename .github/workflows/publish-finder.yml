@@ -1,16 +1,37 @@
 name: Publish django-finder to PyPI
 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - '*'
 
 permissions:
   contents: read
 
 jobs:
+  check-finder:
+    name: Check tag belongs to finder
+    runs-on: ubuntu-latest
+    outputs:
+      on-finder: ${{ steps.branch.outputs.on-finder }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check tagged commit is on finder
+        id: branch
+        run: |
+          if git merge-base --is-ancestor HEAD origin/finder; then
+            echo "on-finder=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "on-finder=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping publication: tagged commit is not on finder."
+          fi
+
   build-and-publish:
     name: Build and publish django-finder
+    needs: check-finder
+    if: needs.check-finder.outputs.on-finder == 'true'
     runs-on: ubuntu-latest
     environment:
       name: finder
