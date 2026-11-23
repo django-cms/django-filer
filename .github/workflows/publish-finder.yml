@@ -1,0 +1,32 @@
+name: Publish django-finder to PyPI
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    name: Build and publish django-finder
+    runs-on: ubuntu-latest
+    environment:
+      name: finder
+      url: https://pypi.org/p/django-finder
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build tools
+        run: python -m pip install build
+      - name: Build wheel and source distribution
+        run: python -m build --sdist --wheel --outdir dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
