@@ -92,7 +92,7 @@ uploading new images.
 
 * Clicking on the magnifying glass will display the file selction popup.
 
-* The red X will de-select the currently selected file (usefull if the field
+* The red X will de-select the currently selected file (useful if the field
   can be ``null``).
 
 .. WARNING::
