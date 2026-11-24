@@ -42,3 +42,5 @@ share/
 .python-version
 data
 local.sqlite
+
+/workdir

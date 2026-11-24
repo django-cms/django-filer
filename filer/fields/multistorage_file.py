@@ -10,7 +10,7 @@ from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
 
 from .. import settings as filer_settings
-from ..utils.filer_easy_thumbnails import ThumbnailerNameMixin
+from ..utils.filer_easy_thumbnails import ProvenanceThumbnailerMixin, ThumbnailerNameMixin
 
 
 STORAGES = {
@@ -65,7 +65,8 @@ class MultiStorageFileDescriptor(FileDescriptor):
                 getattr(instance, callback_attr)()
 
 
-class MultiStorageFieldFile(ThumbnailerNameMixin,
+class MultiStorageFieldFile(ProvenanceThumbnailerMixin,
+                            ThumbnailerNameMixin,
                             easy_thumbnails_files.ThumbnailerFieldFile):
     def __init__(self, instance, field, name):
         """
@@ -114,6 +115,10 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
             return self.thumbnail_options['public'].get('base_dir', '')
         else:
             return self.thumbnail_options['private'].get('base_dir', '')
+
+    def get_digital_source_type(self):
+        # Only images have a digital source type
+        return getattr(self.instance, 'digital_source_type', '')
 
     def save(self, name, content, save=True):
         content.seek(0)  # Ensure we upload the whole file

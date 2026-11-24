@@ -126,6 +126,15 @@
                                             {% trans "Limit the search to current folder" %}
                                         </label>
                                     </li>
+                                    <li>
+                                        <p><label for="provenance_filter">{% trans "Filter by digital source type" %}</label></p>
+                                        <select name="provenance" id="provenance_filter">
+                                            <option value="">{% trans "All files" %}</option>
+                                            {% for value, label in provenance_filters %}
+                                                <option value="{{ value }}"{% if provenance_filter == value %} selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

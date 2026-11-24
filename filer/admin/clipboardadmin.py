@@ -8,10 +8,11 @@ from django.urls import NoReverseMatch, path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
-from ..models import Clipboard, ClipboardItem, Folder
+from ..models import BaseImage, Clipboard, ClipboardItem, Folder
 from ..settings import FILER_THUMBNAIL_ICON_SIZE
 from ..utils.files import UploadException, handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
+from ..utils.provenance import detect_file_provenance
 from ..validation import validate_upload
 from . import views
 
@@ -136,6 +137,9 @@ def ajax_upload(request, folder_id=None):
                 fields=('original_filename', 'owner', 'file')
             )
             break
+    # Validators may remove the upload's credentials or XMP. Keep provenance
+    # from the original while calculating file metadata from the sanitized file.
+    upload_provenance = detect_file_provenance(upload) if issubclass(FileSubClass, BaseImage) else None
     try:
         validate_upload(filename, upload, request.user, mime_type)
     except ValidationError as error:
@@ -155,6 +159,8 @@ def ajax_upload(request, folder_id=None):
     if uploadform.is_valid():
         try:
             file_obj = uploadform.save(commit=False)
+            if upload_provenance is not None:
+                file_obj._set_provenance(upload_provenance)
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
         except ValidationError as error:
