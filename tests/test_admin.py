@@ -29,6 +29,7 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings as filer_settings
 from filer.admin import tools
 from filer.admin.folderadmin import FolderAdmin
+from filer.cache import clear_folder_permission_cache
 from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
@@ -1659,6 +1660,49 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
                     expected_width=40, expected_height=300,
                     expected_subj_x=20, expected_subj_y=150,  # at the center
                 )
+
+
+class FolderChangeViewParentTests(TestCase):
+    """The folder change view must not move the folder to a posted ``parent_id``."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='joe', password='x', is_staff=True)
+        self.user.user_permissions.add(*Permission.objects.filter(content_type__app_label='filer'))
+        other = User.objects.create_user(username='other', password='x')
+        self.folder = Folder.objects.create(name='mine', owner=self.user)
+        self.child = Folder.objects.create(name='child', owner=self.user, parent=self.folder)
+        self.secret = Folder.objects.create(name='secret', owner=other)
+        Folder.objects.create(name='mine', owner=other, parent=self.secret)
+        clear_folder_permission_cache(self.user)
+        self.addCleanup(clear_folder_permission_cache, self.user)
+        self.client.login(username='joe', password='x')
+
+    def _change(self, parent, in_query, name='mine'):
+        url = reverse('admin:filer_folder_change', args=(self.folder.pk,))
+        data = {'name': name, 'owner': self.user.pk}
+        if in_query:
+            url += '?parent_id=%d' % parent.pk
+        else:
+            data['parent_id'] = parent.pk
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            return self.client.post(url, data)
+
+    def test_parent_id_does_not_move_folder(self):
+        for parent in (self.secret, self.child):
+            for in_query in (True, False):
+                with self.subTest(parent=parent.name, in_query=in_query):
+                    response = self._change(parent, in_query, name='renamed')
+                    self.assertEqual(response.status_code, 302)
+                    self.folder.refresh_from_db()
+                    self.assertIsNone(self.folder.parent_id)
+                    self.assertEqual(self.folder.name, 'renamed')
+
+    def test_parent_id_does_not_skip_name_validation(self):
+        Folder.objects.create(name='taken')
+        response = self._change(self.secret, in_query=True, name='taken')
+        self.assertContains(response, 'Folder with this name already exists.')
+        self.folder.refresh_from_db()
+        self.assertEqual(self.folder.name, 'mine')
 
 
 class PermissionAdminTest(TestCase):
