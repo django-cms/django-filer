@@ -74,6 +74,7 @@ def test_unified_query(ambit):
     assert len(ambit.root_folder.listdir(mime_types=['*/*'])) == 4
     assert len(ambit.root_folder.listdir(mime_types=['application/*'])) == 2
     assert len(ambit.root_folder.listdir(mime_types=['inode/directory'])) == 1
+    assert len(ambit.root_folder.listdir(mime_types=['inode/directory', 'application/*'])) == 3
     assert len(ambit.root_folder.listdir(mime_types=['application/vnd.oasis.opendocument.spreadsheet'])) == 1
     assert len(ambit.root_folder.listdir(mime_types=['application/pdf'])) == 0
     assert len(ambit.root_folder.listdir(mime_types=['application/vnd.oasis.opendocument.spreadsheet', 'text/x-python'])) == 2

@@ -1,5 +1,6 @@
 import re
 import uuid
+from collections.abc import Iterable
 from functools import reduce
 from operator import and_, or_
 
@@ -128,18 +129,23 @@ class InodeManager(Manager):
             query &= Q(can_change=True)
 
         # query to filter by mime types
-        if mime_types and 'mime_type' in model_field_names:
-            queries = []
-            for mime_type in mime_types:
-                main_type, sub_type = mime_type.split('/', 1)
-                if main_type == '*':
-                    queries.clear()
-                    break
-                if sub_type == '*':
-                    queries.append(Q(mime_type__startswith=f'{main_type}/'))
-                else:
-                    queries.append(Q(mime_type=mime_type))
-            query &= reduce(or_, queries, Q())
+        if isinstance(mime_types, Iterable):
+            if model.is_folder:
+                if any(mime_type in [FOLDER_MIME_TYPE, '*/*'] for mime_type in mime_types):
+                    return query
+                return Q(pk__in=[])
+            if 'mime_type' in model_field_names:
+                queries = []
+                for mime_type in mime_types:
+                    main_type, sub_type = mime_type.split('/', 1)
+                    if main_type == '*':
+                        queries.clear()
+                        break
+                    if sub_type == '*':
+                        queries.append(Q(mime_type__startswith=f'{main_type}/'))
+                    else:
+                        queries.append(Q(mime_type=mime_type))
+                query &= reduce(or_, queries, Q())
 
         # query to filter by tags
         if tags_included and 'tags' in model_field_names:
