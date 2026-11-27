@@ -1,7 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase
-from filer.cache import get_folder_perm_cache_key, get_folder_permission_cache, clear_folder_permission_cache, update_folder_permission_cache
+
+from filer.cache import (
+    clear_folder_permission_cache,
+    get_folder_perm_cache_key,
+    get_folder_permission_cache,
+    update_folder_permission_cache,
+)
 
 
 User = get_user_model()

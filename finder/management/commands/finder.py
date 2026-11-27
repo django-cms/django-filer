@@ -8,7 +8,8 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFileModel
-from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_NAME
+from finder.models.folder import ROOT_FOLDER_NAME
+from finder.models.folder import FolderModel as FinderFolderModel
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 from finder.storages import UUID4_PATTERN

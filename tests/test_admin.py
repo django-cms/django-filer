@@ -1,8 +1,10 @@
 import json
 import os
+import unittest
 
 import django
 import django.core.files
+from django import VERSION as DJANGO_VERSION
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -13,6 +15,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
+from django.template import Context, Template
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -26,9 +29,14 @@ from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
-from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
-from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
+from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL, FILER_THUMBNAIL_ICON_SIZE
+from filer.templatetags.filer_admin_tags import (
+    django_version_gte,
+    file_icon_url,
+    get_aspect_ratio_and_download_url,
+)
 from filer.thumbnail_processors import normalize_subject_location
+from filer.utils.compatibility import PILImage
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 from tests.utils.extended_app.models import ExtImage, Video
@@ -120,12 +128,14 @@ class FilerFolderAdminUrlsTests(TestCase):
                 thumbnail_urls.append(thumbnailer.get_thumbnail(thumbnail_options).url)
 
         self.assertEqual(Image.objects.count(), images)
-        with self.assertNumQueries(7):
+        # Polymorphic resolves content types once per process: warm that cache so
+        # that the query count does not depend on which tests ran before
+        self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
+        with self.assertNumQueries(3):
             # Expected queries:
             # 1. Authentication check
-            # 2.-5. Loading the user clipboard
-            # 6. Loading directory data and thumbnails (1 query)
-            # 7. Selecting file and owner data
+            # 2. Loading directory data and thumbnails (1 query)
+            # 3. Selecting file and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
         self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
@@ -288,6 +298,26 @@ class FilerImageAdminUrlsTests(TestCase):
                 # Does not redirect to a static file
                 self.assertNotIn("/static/", response["Location"])
 
+    def test_focal_point_only_where_it_can_be_saved(self):
+        """The preview doubles as focal point widget only if the form has the field"""
+        # The image admin offers the subject location, so the preview is a focal point
+        response = self.client.get(reverse(admin_urlname(Image._meta, 'change'),
+                                           kwargs={'object_id': self.file_object.pk}))
+
+        self.assertContains(response, 'id="id_subject_location"')
+        self.assertContains(response, 'js-focal-point')
+        self.assertContains(response, 'data-location-selector="#id_subject_location"')
+
+        # The file admin shows the same image but has no subject location field:
+        # a focal point there would silently drop what the user does (#1579)
+        response = self.client.get(reverse(admin_urlname(File._meta, 'change'),
+                                           kwargs={'object_id': self.file_object.pk}))
+
+        self.assertNotContains(response, 'id="id_subject_location"')
+        self.assertNotContains(response, 'js-focal-point')
+        # ... the preview itself is still shown
+        self.assertContains(response, 'width="210"')
+
     def test_missing_file(self):
         """Directory shows static icon for missing files"""
         image = Image.objects.create(
@@ -303,6 +333,65 @@ class FilerImageAdminUrlsTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("icons/file-missing.svg", response["Location"])
+
+    def test_icon_view_palette_gif(self):
+        """A palette-mode GIF generates a JPEG thumbnail with ``colorspace`` (#1601)
+
+        The ``colorspace`` processor converts the palette ("P") image to RGB, so
+        the JPEG thumbnail can be written and a real thumbnail is returned.
+        """
+        gif_name = 'palette.gif'
+        gif_path = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, gif_name)
+        create_image(mode='P', size=(200, 150)).save(gif_path, 'GIF')
+        try:
+            with open(gif_path, 'rb') as upload:
+                image = Image.objects.create(
+                    file=django.core.files.File(upload, name=gif_name),
+                )
+            url = reverse('admin:filer_file_fileicon', kwargs={
+                'file_id': image.pk,
+                'size': 80,
+            })
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 302)
+            # A real (media) thumbnail is generated, not the missing-file icon.
+            self.assertIn("/media/", response["Location"])
+            self.assertNotIn("icons/file-missing.svg", response["Location"])
+        finally:
+            os.remove(gif_path)
+
+    def test_icon_view_unencodable_image(self):
+        """Icon generation degrades gracefully when a thumbnail can't be encoded (#1601)
+
+        If ``colorspace`` is not part of ``THUMBNAIL_PROCESSORS``, a palette-mode
+        ("P") GIF reaches the JPEG encoder unchanged and raises
+        ``OSError: cannot write mode P as JPEG``. The icon view must fall back to
+        the missing-file icon instead of returning a 500.
+        """
+        gif_name = 'palette.gif'
+        gif_path = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, gif_name)
+        create_image(mode='P', size=(200, 150)).save(gif_path, 'GIF')
+        try:
+            with open(gif_path, 'rb') as upload:
+                image = Image.objects.create(
+                    file=django.core.files.File(upload, name=gif_name),
+                )
+            url = reverse('admin:filer_file_fileicon', kwargs={
+                'file_id': image.pk,
+                'size': 80,
+            })
+            with SettingsOverride(settings, THUMBNAIL_PROCESSORS=(
+                'easy_thumbnails.processors.autocrop',
+                'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+                'easy_thumbnails.processors.filters',
+            )):
+                response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 302)
+            self.assertIn("icons/file-missing.svg", response["Location"])
+        finally:
+            os.remove(gif_path)
 
     def test_icon_view_non_image(self):
         """Getting an icon for a non-image results in a 404"""
@@ -342,19 +431,22 @@ class FilerImageAdminUrlsTests(TestCase):
 
     def test_image_expand_link_in_change_view(self):
         files = [
-            # Files can use the same contents for this test - it's the mime type that counts
+            # Files can use the same contents for this test - it's the MIME type that counts
             File.objects.create(owner=self.superuser, original_filename='some-file.txt', file=self.file_object.file),
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg'),  # missing file
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg', file=self.file_object.file),
             Image.objects.create(owner=self.superuser, original_filename='some-image.svg', file=self.file_object.file),
+            # SVGs are not necessarily stored as Image, see #1590
+            File.objects.create(owner=self.superuser, original_filename='some-file.svg', file=self.file_object.file),
         ]
         test_set = [
-            (files[0], 'text/plain', None),
-            (files[1], 'image/jpeg', None),
-            (files[2], 'image/jpeg', files[2].file.url),
-            (files[3], 'image/svg+xml', reverse(admin_urlname(Image._meta, 'expand'), args=(files[3].pk,))),
+            (files[0], 'text/plain', False),
+            (files[1], 'image/jpeg', False),
+            (files[2], 'image/jpeg', True),
+            (files[3], 'image/svg+xml', True),
+            (files[4], 'image/svg+xml', True),
         ]
-        for file, mime_type, expected_url in test_set:
+        for file, mime_type, has_expand_link in test_set:
             file.mime_type = mime_type
             file.save()
             models = [File]
@@ -363,10 +455,15 @@ class FilerImageAdminUrlsTests(TestCase):
             for model in models:
                 response = self.client.get(reverse(admin_urlname(model._meta, 'change'),
                                                    kwargs={'object_id': file.pk}))
-                if expected_url:
+                if not has_expand_link:
+                    self.assertNotContains(response, 'filer-icon-expand')
+                elif 'svg' in mime_type:
+                    # Each admin links to its own expand view, so that the file can be
+                    # looked up by the model the admin is registered for
+                    expected_url = reverse(admin_urlname(model._meta, 'expand'), args=(file.pk,))
                     self.assertContains(response, f'href="{expected_url}"')
                 else:
-                    self.assertNotContains(response, 'filer-icon-expand')
+                    self.assertContains(response, f'href="{file.file.url}"')
 
     def test_image_expand_view(self):
         url = reverse(admin_urlname(Image._meta, 'expand'), kwargs={
@@ -380,6 +477,62 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(
             response,
             f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
+        )
+
+    def test_file_expand_view(self):
+        """SVGs stored as File (not Image) have an expand view, too, see #1590"""
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            mime_type='image/svg+xml',
+        )
+        url = reverse(admin_urlname(File._meta, 'expand'), kwargs={'file_id': file.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(url, file.get_admin_expand_view_url())
+        self.assertContains(
+            response,
+            f"""<img id="img" src="{file.url}" onclick="this.classList.toggle('zoom')"/>"""
+        )
+
+    def test_expand_view_requires_read_permission(self):
+        """The expand view does not disclose files the user may not read"""
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            mime_type='image/svg+xml',
+            folder=Folder.objects.create(name='svgs', owner=self.superuser),
+        )
+        url = reverse(admin_urlname(File._meta, 'expand'), kwargs={'file_id': file.pk})
+
+        with unittest.mock.patch.object(File, 'has_read_permission', return_value=False):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_directory_listing_with_svg_file(self):
+        """A folder containing an SVG stored as File can be listed, see #1590"""
+        folder = Folder.objects.create(name='svgs', owner=self.superuser)
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename='some-file.svg',
+            file=self.file_object.file,
+            folder=folder,
+        )
+        # The MIME type is what counts, it is reset when the file contents change
+        file.mime_type = 'image/svg+xml'
+        file.save()
+
+        response = self.client.get(reverse('admin:filer-directory_listing',
+                                           kwargs={'folder_id': folder.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse(admin_urlname(File._meta, 'expand'), args=(file.pk,)),
         )
 
 
@@ -407,6 +560,28 @@ class FilerClipboardAdminUrlsTests(TestCase):
         os.remove(self.video_filename)
         super().tearDown()
 
+    def test_filer_ajax_upload_malformed_request(self):
+        """
+        A request the upload handlers cannot parse is answered with 400 and a
+        generic message: the exception text describes an internal protocol
+        violation and must not be echoed back to the client.
+        """
+        from filer.admin.clipboardadmin import UPLOAD_ERROR
+
+        url = reverse('admin:filer-ajax_upload')
+        with self.assertLogs('filer.admin.clipboardadmin', level='WARNING') as logs:
+            response = self.client.post(url, data={})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {'error': str(UPLOAD_ERROR)},
+        )
+        # The internal reason is logged, not returned
+        self.assertNotIn('Bad Upload', response.content.decode('utf-8'))
+        self.assertIn('Bad Upload', '\n'.join(logs.output))
+        self.assertEqual(File.objects.count(), 0)
+
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
@@ -423,6 +598,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+
+    def test_filer_upload_response(self):
+        """The upload response carries what the file widget needs to show the new file"""
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            response = self.client.post(url, {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key,
+            })
+
+        image = Image.objects.get()
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {
+                'thumbnail': None,
+                'alt_text': '',
+                'label': str(image),
+                'file_id': image.pk,
+                'change_url': image.get_admin_change_url(),
+                'thumbnail_180': reverse('admin:filer_image_fileicon',
+                                         args=(image.pk, FILER_THUMBNAIL_ICON_SIZE)),
+                'original_image': image.url,
+            },
+        )
 
     def test_filer_upload_video(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
@@ -542,50 +744,89 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
+    @unittest.skipUnless(
+        ".avif" in PILImage.registered_extensions(),
+        "Pillow does not support AVIF",
+    )
+    def test_filer_ajax_upload_avif_file(self):
+        """AVIF uploads are recognized as images (and thumbnailed) if Pillow can
+        decode them, see https://github.com/django-cms/django-filer/issues/1560"""
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        avif_name = 'test_file.avif'
+        avif_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, avif_name)
+        self.img.save(avif_filename, 'AVIF')
+        try:
+            with open(avif_filename, 'rb') as fh:
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % avif_name
+                self.client.post(
+                    url,
+                    data=fh.read(),
+                    content_type='image/avif',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+        finally:
+            os.remove(avif_filename)
+
+        self.assertEqual(Image.objects.count(), 1)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, avif_name)
+        self.assertEqual(stored_image.mime_type, 'image/avif')
+        self.assertEqual((stored_image.width, stored_image.height), self.img.size)
+        # Thumbnails are generated from the avif original
+        self.assertTrue(stored_image.icons)
+
     def test_filer_ajax_decompression_bomb(self):
         DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
-        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
-        self.assertEqual(Image.objects.count(), 0)
-        folder = Folder.objects.create(name='foo')
-        with open(self.filename, 'rb') as fh:
-            file_obj = django.core.files.File(fh)
-            url = reverse(
-                'admin:filer-ajax_upload',
-                kwargs={'folder_id': folder.pk}
-            ) + '?filename=%s' % self.image_name
-            response = self.client.post(
-                url,
-                data=file_obj.read(),
-                content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-            )
-        self.assertEqual(Image.objects.count(), 0)
-        self.assertIn("error", json.loads(response.content.decode("utf-8")))
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level, ERROR)
+        try:
+            abstract.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
+            self.assertEqual(Image.objects.count(), 0)
+            folder = Folder.objects.create(name='foo')
+            with open(self.filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % self.image_name
+                response = self.client.post(
+                    url,
+                    data=file_obj.read(),
+                    content_type='image/jpeg',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Image.objects.count(), 0)
+            self.assertIn("error", json.loads(response.content.decode("utf-8")))
+            messages = list(get_messages(response.wsgi_request))
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].level, ERROR)
 
-        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
-        folder = Folder.objects.create(name='foo')
-        with open(self.filename, 'rb') as fh:
-            file_obj = django.core.files.File(fh)
-            url = reverse(
-                'admin:filer-ajax_upload',
-                kwargs={'folder_id': folder.pk}
-            ) + '?filename=%s' % self.image_name
-            response = self.client.post(
-                url,
-                data=file_obj.read(),
-                content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-            )
-        self.assertEqual(response.status_code, 200)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)  # One more message
-        self.assertEqual(messages[1].level, ERROR)
-        self.assertEqual(Image.objects.count(), 0)
-
-        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+            abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
+            folder = Folder.objects.create(name='foo')
+            with open(self.filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % self.image_name
+                response = self.client.post(
+                    url,
+                    data=file_obj.read(),
+                    content_type='image/jpeg',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+            self.assertEqual(response.status_code, 400)
+            messages = list(get_messages(response.wsgi_request))
+            self.assertEqual(len(messages), 2)  # One more message
+            self.assertEqual(messages[1].level, ERROR)
+            self.assertEqual(Image.objects.count(), 0)
+        finally:
+            # Restore in a finally: FILER_MAX_IMAGE_PIXELS is a module global, so a
+            # failing assertion would otherwise leak it into every later test.
+            abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
     def test_filer_max_pixel_deactivation(self):
         from django.core.checks import Warning
@@ -667,7 +908,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             }
             response = self.client.post(url, post_data, **extra_headers)
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
-        self.assertContains(response, NO_FOLDER_ERROR)
+        self.assertContains(response, NO_FOLDER_ERROR, status_code=400)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_ajax_upload_file_error(self):
@@ -687,7 +928,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
             )
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
-        self.assertContains(response, NO_FOLDER_ERROR)
+        self.assertContains(response, NO_FOLDER_ERROR, status_code=400)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_upload_permissions_error(self, extra_headers={}):
@@ -723,7 +964,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 response = self.client.post(url, post_data, **extra_headers)
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
-        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
+        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_ajax_upload_without_permissions_error(self, extra_headers={}):
@@ -753,7 +994,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS
 
-        self.assertContains(response, NO_PERMISSIONS)
+        self.assertContains(response, NO_PERMISSIONS, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_add_file_permissions(self, extra_headers={}):
@@ -777,7 +1018,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )
         file.save()
         request = HttpRequest()
-        setattr(request, "user", staff_user)
+        request.user = staff_user
 
         self.assertEqual(folder.has_add_children_permission(request), False)
         self.assertEqual(file.has_add_children_permission(request), False)
@@ -818,7 +1059,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 )
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
-        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
+        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_templatetag_file_icon_url(self):
@@ -830,7 +1071,23 @@ class FilerClipboardAdminUrlsTests(TestCase):
             image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
             image_obj.save()
         url = file_icon_url(image_obj)
-        self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
+        self.assertEqual(url, '/static/filer/icons/file-unknown.svg')
+
+    def test_templatetag_file_icon_url_is_html_escaped_only(self):
+        # The URL ends up in a data attribute read via ``dataset``, so it must be
+        # HTML-escaped, not JS-escaped (#1645)
+        file_obj = File.objects.create(name='test.pdf')
+        icon_url = 'https://cdn.example-test.de/a1621890-6d4b.svg?a=1&b="2"'
+        template = Template('{% load filer_admin_tags %}<img data-icon-url="{% file_icon_url file %}">')
+        with unittest.mock.patch(
+            'filer.templatetags.filer_admin_tags.file_icon_context',
+            return_value={'icon_url': icon_url},
+        ):
+            html = template.render(Context({'file': file_obj}))
+        self.assertEqual(
+            html,
+            '<img data-icon-url="https://cdn.example-test.de/a1621890-6d4b.svg?a=1&amp;b=&quot;2&quot;">',
+        )
 
 
 class BulkOperationsMixin:
@@ -1995,4 +2252,67 @@ class AdditionalAdminFormsTests(TestCase):
     def test_resize_form(self):
         response = self.client.post(self.url, {"action": ["resize_images"], **self.payload})
         self.assertContains(response, 'Warning: Images will be resized in-place and originals will be lost.')
-        self.assertContains(response, '<div class="form-row field-crop field-upscale">')
+        if DJANGO_VERSION < (6, 1):
+            self.assertContains(response, '<div class="form-row field-crop field-upscale">')
+        else:
+            self.assertContains(
+                response,
+                '<div class="form-row flex-container form-multiline field-crop field-upscale">',
+            )
+
+
+class BreadcrumbsTests(TestCase):
+    """Filer's admin templates must emit the breadcrumb markup the running Django styles.
+
+    Django 6.1 replaced ``<div class="breadcrumbs">`` with ``<ol class="breadcrumbs">``
+    and its CSS selectors are element-qualified, so a ``<div>`` renders unstyled (#1615).
+    """
+
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.folder = Folder.objects.create(name="Breadcrumb Folder")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def assertBreadcrumbs(self, response):
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        if DJANGO_VERSION < (6, 1):
+            self.assertIn('<div class="breadcrumbs">', content)
+            self.assertNotIn('<ol class="breadcrumbs">', content)
+        else:
+            self.assertIn('<ol class="breadcrumbs">', content)
+            self.assertNotIn('<div class="breadcrumbs">', content)
+            # Django 6.1 generates the separators from ``li::after``; emitting
+            # them as well would show doubled chevrons.
+            breadcrumbs = content.split('<ol class="breadcrumbs">')[1].split('</ol>')[0]
+            self.assertNotIn('&rsaquo;', breadcrumbs)
+            self.assertIn('aria-current="page"', breadcrumbs)
+
+    def test_directory_listing_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer-directory_listing", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_folder_change_form_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer_folder_change", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_file_change_form_breadcrumbs(self):
+        file_object = File.objects.create(
+            original_filename="breadcrumb.txt",
+            file=django.core.files.base.ContentFile(b"content", name="breadcrumb.txt"),
+            folder=self.folder,
+        )
+        response = self.client.get(reverse("admin:filer_file_change", args=[file_object.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_delete_confirmation_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer_folder_delete", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_django_version_gte(self):
+        self.assertTrue(django_version_gte(*DJANGO_VERSION[:2]))
+        self.assertTrue(django_version_gte(DJANGO_VERSION[0] - 1))
+        self.assertFalse(django_version_gte(DJANGO_VERSION[0] + 1))

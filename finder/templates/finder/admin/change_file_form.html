@@ -1,4 +1,4 @@
-{% extends "./base_site.html" %}
+{% extends base_site_template %}
 {% load i18n admin_modify %}
 
 {% block content_title %}{# {{ title }} must be rendered after id="content-react" #}{% endblock %}
@@ -6,7 +6,7 @@
 
 {% block content %}
 {% if title %}<h1>{{ title }}</h1>{% endif %}
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+<form{% if has_file_field %} enctype="multipart/form-data"{% endif %}{% if form_url %} action="{{ form_url }}"{% endif %} method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 <div id="content-react" class="file"></div>
 
 <div id="content-main">

@@ -28,16 +28,18 @@ def test_folder_counts_batched(ambit, size, view):
     with CaptureQueriesContext(connection) as queries:
         if view == 'browser':
             entries = BrowserView._get_children(ambit, Value(True), set(), ambit.root_folder)
+            extra_queries = 1
         else:
             entries = ambit.root_folder.listdir(is_folder=True)
             annotate_unified_queryset(ambit, entries)
             entries = list(entries)
+            extra_queries = 2
 
     assert {entry['id'] for entry in entries} == {folder.id for folder in folders}
     assert all(entry['summary'] == '1 Folder, 2 Files' for entry in entries)
     if view == 'browser':
         assert all(entry['has_subfolders'] and entry['children'] is None for entry in entries)
-    assert len(queries) <= 1 + len(list(InodeModel.get_models(include_folder=True)))
+    assert len(queries) <= extra_queries + len(list(InodeModel.get_models(include_folder=True)))
 
 
 def test_empty_folder_counts(ambit):

@@ -1,12 +1,23 @@
 import mimetypes
 import os
+from unittest.mock import MagicMock
 from zipfile import ZipFile
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
-from django.test.testcases import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import RequestFactory, TestCase
 
-from filer.settings import IMAGE_EXTENSIONS
+from filer.settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
+from filer.utils.compatibility import PILImage
+from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
+from filer.utils.files import (
+    UploadException,
+    get_valid_filename,
+    handle_request_files_upload,
+    handle_upload,
+    slugify,
+)
 from filer.utils.loader import load_object
 from filer.utils.zip import unzip
 from tests.helpers import create_image
@@ -27,7 +38,7 @@ class ClassLoaderTestCase(TestCase):
 
     def test_loader_loads_strings_properly(self):
         target = 'tests.test_utils.TestTargetClass'
-        result = load_object(target)  # Should return an instance
+        result = load_object(target)
         self.assertEqual(result, TestTargetClass)
 
     def test_loader_loads_class(self):
@@ -57,9 +68,10 @@ class ZippingTestCase(TestCase):
         self.zip.close()
 
     def tearDown(self):
-        # Clean up the created zip file
-        os.remove(self.zipfilename)
-        os.remove(self.filename)
+        if os.path.exists(self.zipfilename):
+            os.remove(self.zipfilename)
+        if os.path.exists(self.filename):
+            os.remove(self.filename)
 
     def test_unzipping_works(self):
         result = unzip(self.zipfilename)
@@ -68,7 +80,194 @@ class ZippingTestCase(TestCase):
 
 class MimeTypesTestCase(TestCase):
     def test_mime_types_known(self):
-        """Ensure that for all IMAGE_EXTENSIONS the mime types can be identified"""
+        """Ensure that for all IMAGE_EXTENSIONS the MIME types can be identified"""
         for ext in IMAGE_EXTENSIONS:
             self.assertIsNotNone(mimetypes.guess_type(f"file{ext}")[0],
                                  f"Mime type for extension {ext} unknown")
+
+
+class AvifSupportTestCase(TestCase):
+    def test_avif_is_an_image_type_if_pillow_supports_it(self):
+        """avif is registered as an image type if, and only if, Pillow can decode it
+        (natively since Pillow 11.3, or through the pillow-avif-plugin package)"""
+        supported = ".avif" in PILImage.registered_extensions()
+
+        self.assertEqual(supported, ".avif" in IMAGE_EXTENSIONS)
+        self.assertEqual(supported, ".avifs" in IMAGE_EXTENSIONS)
+        self.assertEqual(supported, "avif" in IMAGE_MIME_TYPES)
+
+    def test_avif_mime_type_known(self):
+        self.assertEqual(mimetypes.guess_type("file.avif")[0], "image/avif")
+
+
+class ThumbnailToOriginalFilenameTestCase(TestCase):
+    def test_no_separator_returns_none(self):
+        self.assertIsNone(thumbnail_to_original_filename("foo.jpg"))
+
+    def test_normal_thumbnail_name(self):
+        self.assertEqual(
+            thumbnail_to_original_filename("foo.jpg__200x200_q85.jpg"),
+            "foo.jpg",
+        )
+
+    def test_multiple_separators_returns_part_before_last(self):
+        self.assertEqual(
+            thumbnail_to_original_filename("a__b.jpg__200x200.jpg"),
+            "a__b.jpg",
+        )
+
+    def test_leading_separator_returns_empty_string(self):
+        self.assertEqual(
+            thumbnail_to_original_filename("__opts.jpg"),
+            "",
+        )
+
+
+# ---- New tests for filer.utils.files utilities ----
+
+
+class GetValidFilenameTests(TestCase):
+    """Tests for get_valid_filename."""
+
+    def test_simple_filename(self):
+        result = get_valid_filename('hello world.txt')
+        self.assertNotIn(' ', result)
+        self.assertTrue(result.endswith('.txt'))
+
+    def test_umlauts_slugified(self):
+        result = get_valid_filename('über file.txt')
+        self.assertIn('uber', result)
+        self.assertNotIn('ü', result)
+
+    def test_no_extension(self):
+        result = get_valid_filename('hello_world')
+        self.assertNotIn('.', result)
+
+    def test_special_characters(self):
+        result = get_valid_filename('my (file) #1.txt')
+        self.assertNotIn('(', result)
+        self.assertNotIn(')', result)
+        self.assertNotIn('#', result)
+
+    def test_long_filename_truncated(self):
+        long_name = 'a' * 200 + '.txt'
+        result = get_valid_filename(long_name)
+        # Truncation may drop the extension; just verify length is safe
+        self.assertLessEqual(len(result), 155)
+
+
+class SlugifyTests(TestCase):
+    """Tests for slugify."""
+
+    def test_slugify_basic(self):
+        result = slugify('Hello World')
+        self.assertEqual(result, 'hello-world')
+
+    def test_slugify_umlaut(self):
+        result = slugify('über cool')
+        self.assertIn('uber', result)
+
+
+class HandleRequestFilesUploadTests(TestCase):
+    """Tests for handle_request_files_upload."""
+
+    def test_single_file(self):
+        upload = SimpleUploadedFile('test.txt', b'hello', content_type='text/plain')
+
+        # Simulate request.FILES as a dict-like with a single entry
+        class FakeFiles(dict):
+            pass
+
+        request = MagicMock()
+        fake_files = FakeFiles({'file': upload})
+        request.FILES = fake_files
+
+        result = handle_request_files_upload(request)
+        self.assertEqual(result[1], 'test.txt')
+        self.assertEqual(result[3], 'text/plain')
+        self.assertFalse(result[2])  # is_raw is False
+
+    def test_declared_content_type_is_ignored(self):
+        """The MIME type is derived from the file name, not from the client."""
+        upload = SimpleUploadedFile('test.txt', b'<html>content</html>', content_type='text/html')
+
+        class FakeFiles(dict):
+            pass
+
+        request = MagicMock()
+        request.FILES = FakeFiles({'file': upload})
+
+        result = handle_request_files_upload(request)
+        self.assertEqual(result[3], 'text/plain')
+
+    def test_unknown_extension_falls_back_to_octet_stream(self):
+        """An unguessable file name must not inherit the client's MIME type."""
+        upload = SimpleUploadedFile('test.unknown-ext', b'data', content_type='image/x-made-up')
+
+        class FakeFiles(dict):
+            pass
+
+        request = MagicMock()
+        request.FILES = FakeFiles({'file': upload})
+
+        result = handle_request_files_upload(request)
+        self.assertEqual(result[3], 'application/octet-stream')
+
+
+class HandleUploadTests(TestCase):
+    """Malformed raw (XMLHttpRequest) uploads raise UploadException, not a 500."""
+
+    def _request(self, **headers):
+        request = RequestFactory().post('/upload/', data=b'', content_type='application/octet-stream')
+        request.META.pop('CONTENT_LENGTH', None)
+        request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        request.META.update(headers)
+        return request
+
+    def test_missing_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request())
+
+    def test_malformed_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request(CONTENT_LENGTH='not a number'))
+
+    def test_negative_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request(CONTENT_LENGTH='-1'))
+
+    def test_no_handler_accepts_the_upload(self):
+        """No upload handler returning a file used to raise UnboundLocalError."""
+
+        class NoFileUploadHandler:
+            chunk_size = 64 * 1024
+
+            def handle_raw_input(self, *args, **kwargs):
+                pass
+
+            def new_file(self, *args, **kwargs):
+                pass
+
+            def receive_data_chunk(self, raw_data, start):
+                return raw_data
+
+            def file_complete(self, file_size):
+                return None
+
+            def upload_complete(self):
+                pass
+
+        request = self._request(CONTENT_LENGTH='0')
+        request.upload_handlers = [NoFileUploadHandler()]
+
+        with self.assertRaises(UploadException):
+            handle_upload(request)
+
+
+class UploadExceptionTests(TestCase):
+    """Tests for UploadException."""
+
+    def test_upload_exception(self):
+        exc = UploadException('test error')
+        self.assertEqual(str(exc), 'test error')
+        self.assertIsInstance(exc, Exception)

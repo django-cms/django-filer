@@ -1,5 +1,5 @@
-from types import MethodType
 import re
+from types import MethodType
 
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, site, sites

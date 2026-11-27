@@ -22,10 +22,11 @@ def handle_upload(request):
 
         try:
             content_length = int(request.headers['content-length'])
-        except (IndexError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError):
+            # A missing header raises KeyError, a malformed one ValueError
             content_length = None
 
-        if content_length < 0:
+        if content_length is None or content_length < 0:
             # This means we shouldn't continue...raise an error.
             raise UploadException("Invalid content length: %r" % content_length)
 
@@ -38,7 +39,6 @@ def handle_upload(request):
                                      content_length,
                                      None,
                                      None)
-            pass
 
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
@@ -82,11 +82,15 @@ def handle_upload(request):
             if retval:
                 break
 
+        upload = None
         for i, handler in enumerate(upload_handlers):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 upload = file_obj
                 break
+        if upload is None:
+            # No upload handler took responsibility for the request body
+            raise UploadException("XMLHttpRequest request not valid: Bad Upload")
     else:
         if len(request.FILES) == 1:
             upload, filename, is_raw, mime_type = handle_request_files_upload(request)
@@ -109,12 +113,15 @@ def handle_request_files_upload(request):
     is_raw = False
     upload = list(request.FILES.values())[0]
     filename = upload.name
-    _, iext = os.path.splitext(filename)
-    mime_type = upload.content_type.lower()
-    extensions = mimetypes.guess_all_extensions(mime_type)
-    if mime_type != 'application/octet-stream' and extensions and iext.lower() not in extensions:
-        msg = "MIME-Type '{mimetype}' does not correspond to file extension of {filename}."
-        raise UploadException(msg.format(mimetype=mime_type, filename=filename))
+    # The MIME type is derived from the file name and never taken from the
+    # client-supplied Content-Type of the multipart part: the type stored on the
+    # File object (and used by web servers when serving it) is derived from the
+    # file name, too. Trusting the client here would allow an upload to be
+    # validated as one type and then stored and served as another, bypassing
+    # FILER_MIME_TYPE_WHITELIST and the FILE_VALIDATORS (e.g. deny_html or
+    # sanitize_svg). File names with an unknown extension fall back to
+    # "application/octet-stream", which is denied by default.
+    mime_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
     return upload, filename, is_raw, mime_type
 
 

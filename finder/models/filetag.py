@@ -11,6 +11,9 @@ class FileTag(models.Model):
         related_name='tags',
         editable=False,
     )
+
+
+class LabelTag(FileTag):
     label = models.CharField(
         _("Label"),
         max_length=255,
@@ -22,8 +25,8 @@ class FileTag(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Tag")
-        verbose_name_plural = _("Tags")
+        verbose_name = _("Label Tag")
+        verbose_name_plural = _("Label Tags")
 
     def __str__(self):
         return self.label

@@ -1,8 +1,8 @@
 /*global opener */
 (function () {
     'use strict';
-    var dataElement = document.getElementById('django-admin-popup-response-constants');
-    var initData;
+    const dataElement = document.getElementById('django-admin-popup-response-constants');
+    let initData;
 
     if (dataElement) {
         initData = JSON.parse(dataElement.dataset.popupResponse);

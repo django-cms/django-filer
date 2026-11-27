@@ -32,7 +32,11 @@ from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
 from ..settings import (
-    FILER_IMAGE_MODEL, FILER_PAGINATE_BY, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE, TABLE_LIST_TYPE,
+    FILER_IMAGE_MODEL,
+    FILER_PAGINATE_BY,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
+    TABLE_LIST_TYPE,
 )
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
@@ -43,8 +47,14 @@ from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext, admin_url_params_encoded, check_files_edit_permissions, check_files_read_permissions,
-    check_folder_edit_permissions, check_folder_read_permissions, get_directory_listing_type, popup_status,
+    AdminContext,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    get_directory_listing_type,
+    popup_status,
     userperms_for_request,
 )
 
@@ -252,7 +262,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def directory_listing(self, request, folder_id=None, viewtype=None):
         if not request.user.has_perm("filer.can_use_directory_listing"):
             raise PermissionDenied()
-        clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
         elif viewtype == 'unfiled_images':
@@ -755,6 +764,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Check that the user has delete permission for the actual model
         if not self.has_delete_permission(request):
             raise PermissionDenied
+
+        # Check that the user has per-folder edit permission on every selected
+        # file and folder (and their descendants). Without this, a user with
+        # only read access to a folder could delete its contents when the
+        # optional per-folder permission system is enabled.
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
 
         current_folder = self._get_current_action_folder(
             request, files_queryset, folders_queryset)
