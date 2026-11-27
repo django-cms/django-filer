@@ -17,7 +17,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/django-file-finder/
+      url: https://pypi.org/p/django-finder/
 
     permissions:
       id-token: write
@@ -50,4 +50,4 @@ jobs:
       if: startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/releases')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        password: ${{ secrets.PYPI_TOKEN_FINDER }}
+        password: ${{ secrets.PYPI_TOKEN_DJANGO_FINDER }}
