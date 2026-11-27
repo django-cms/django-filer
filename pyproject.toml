@@ -12,7 +12,7 @@ maintainers = [
     {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
 ]
 description = "A media asset management application for Django."
-readme = "README-finder.md"
+readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 dependencies = [
@@ -57,7 +57,7 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["filer*", "finder*", "LICENSE"]
+include = ["finder*"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -75,14 +75,11 @@ version = {attr = "finder.__version__"}
 branch = true
 source = [
     "finder",
-    "unittests",
 ]
 omit = [
     "demoapp/*",
     "docs/*",
     "filer/*",
-    "finder/migrations/*",
-    "tests/*",
 ]
 
 [tool.coverage.report]
@@ -111,8 +108,6 @@ exclude = [
     "data",
     "dist",
     "docs",
-    "finder/migrations",
-    "*migrations*",
     "tmp",
     "node_modules",
 ]
@@ -121,9 +116,6 @@ ignore = ["E251", "E128", "E501", "W503"]
 [tool.isort]
 line_length = 119
 skip = [
-    "manage.py",
-    "finder/migrations",
-    "*migrations*",
     ".env",
     ".venv",
 ]

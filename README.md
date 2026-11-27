@@ -1,4 +1,4 @@
-# Django-Filer ("Finder" branch)
+# django-finder ("django-filer's "Finder" branch)
 
 The "Finder" branch of django-filer is a complete rewrite of the original **django-filer** project.
 
@@ -175,7 +175,7 @@ The new user interface is based on the [React](https://reactjs.org/) framework w
 
 ## Installation
 
-The install from PyPI. 
+The install from PyPI.
 
 ```shell
 pip install django-finder
