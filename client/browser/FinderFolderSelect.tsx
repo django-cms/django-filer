@@ -155,6 +155,7 @@ export default function FinderFolderSelect(props) {
 			inputElement.value = '';
 			inputElement.dataset.selected_file = null;
 			inputElement.checkValidity();
+			inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 		}
 	}
 
@@ -166,6 +167,7 @@ export default function FinderFolderSelect(props) {
 				inputElement.value = folder.id;
 				inputElement.dataset.selected_folder = JSON.stringify(parseDataset(folder));
 				inputElement.checkValidity();
+				inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 			}
 		}
 	}

@@ -174,6 +174,7 @@ export default function FinderFileSelect(props) {
 			inputElement.value = '';
 			inputElement.dataset.selected_file = null;
 			inputElement.checkValidity();
+			inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 		}
 	}
 
@@ -185,6 +186,7 @@ export default function FinderFileSelect(props) {
 				inputElement.value = file.id;
 				inputElement.dataset.selected_file = JSON.stringify(parseDataset(file));
 				inputElement.checkValidity();
+				inputElement.dispatchEvent(new Event('blur', {bubbles: true}));
 			}
 		}
 	}
