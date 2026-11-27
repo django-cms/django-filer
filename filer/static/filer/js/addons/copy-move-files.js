@@ -1,28 +1,32 @@
 'use strict';
-/* global django, Cl */
+/* global Cl */
 
 /*
     This functionality is used in folder/choose_copy_destination.html template
     to disable submit if there is only one folder to copy
 */
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
-
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
-
-djQuery(function ($) {
-    var destinationOptions = $('#destination').find('option');
-    var destinationOptionLength = destinationOptions.length;
-    var submit = $('.js-submit-copy-move');
-    var tooltip = $('.js-disabled-btn-tooltip');
-
-    if (destinationOptionLength === 1 && destinationOptions.prop('disabled')) {
-        submit.hide();
-        tooltip.show().css('display', 'inline-block');
+document.addEventListener('DOMContentLoaded', () => {
+    const destination = document.getElementById('destination');
+    if (!destination) {
+        return;
     }
 
-    Cl.filerTooltip($);
+    const destinationOptions = destination.querySelectorAll('option');
+    const destinationOptionLength = destinationOptions.length;
+    const submit = document.querySelector('.js-submit-copy-move');
+    const tooltip = document.querySelector('.js-disabled-btn-tooltip');
+
+    if (destinationOptionLength === 1 && destinationOptions[0].disabled) {
+        if (submit) {
+            submit.style.display = 'none';
+        }
+        if (tooltip) {
+            tooltip.style.display = 'inline-block';
+        }
+    }
+
+    if (Cl.filerTooltip) {
+        Cl.filerTooltip();
+    }
 });

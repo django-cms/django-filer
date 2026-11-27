@@ -1,5 +1,4 @@
-from . import ambit
-from . import file
-from . import folder
+from . import ambit, file, folder
+
 
 __all__ = ['ambit', 'file', 'folder']

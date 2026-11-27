@@ -5,10 +5,10 @@ from tempfile import mkstemp
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+import ffmpeg
+
 from finder.models.file import FileModel
 from finder.storages import copy_to_local
-
-import ffmpeg
 
 
 SAMPLE_DURATION = 5
@@ -45,7 +45,7 @@ class AudioFileModel(FileModel):
                 with open(outpath, 'rb') as outfile:
                     ambit.sample_storage.save(sample_path, outfile)
             except Exception as exc:
-                logger.warning(f"Sample generation failed for audio file {self.pk}: {exc}")
+                logger.warning(f"Sample generation failed for audio file {self.id}: {exc}")
                 return
             finally:
                 unlink(outpath)

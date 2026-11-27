@@ -3,13 +3,13 @@ import {useMultipleSelection, useSelect} from 'downshift';
 
 
 type Tag = {
-	value: string,
+	id: string,
 	label: string,
 	color: string,
 };
 
 
-export default function SelectTags(props) {
+export default function SelectLabelTags(props) {
 	const {tags, initial, original} = props as {tags: Tag[]; initial: Tag[]; original: HTMLSelectElement};
 	const {
 		getSelectedItemProps,
@@ -18,7 +18,7 @@ export default function SelectTags(props) {
 		removeSelectedItem,
 		selectedItems,
 	} = useMultipleSelection({initialSelectedItems: initial});
-	const items = tags.filter(label => !selectedItems.find((selectedItem: any) => selectedItem.value === label.value));
+	const items = tags.filter(label => !selectedItems.find((selectedItem: any) => selectedItem.id === label.id));
 	const {
 		isOpen,
 		getToggleButtonProps,
@@ -48,7 +48,7 @@ export default function SelectTags(props) {
 				case useSelect.stateChangeTypes.ItemClick:
 				case useSelect.stateChangeTypes.ToggleButtonBlur:
 					if (newSelectedItem) {
-						const option = Array.from(original.options).find(o => o.value == newSelectedItem.value);
+						const option = Array.from(original.options).find(o => o.value == newSelectedItem.id);
 						if (option) {
 							option.selected = true;
 						}
@@ -63,7 +63,7 @@ export default function SelectTags(props) {
 
 	function removeLabel(event: React.MouseEvent, tag: Tag) {
 		event.stopPropagation();
-		const option = Array.from(original.options).find(o => o.value == tag.value);
+		const option = Array.from(original.options).find(o => o.value == tag.id);
 		if (option) {
 			option.selected = false;
 		}

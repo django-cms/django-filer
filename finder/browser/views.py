@@ -1,21 +1,22 @@
 import logging
 
-from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.db.models import BooleanField, QuerySet, Subquery, Value
 from django.forms.renderers import DjangoTemplates
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_attribute
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
+from finder.models.filetag import LabelTag
 from finder.models.folder import FolderModel
-from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -175,10 +176,7 @@ class BrowserView(View):
                 'is_open': is_open,
                 'children': children,
             },
-            'tags': [
-                {'value': id, 'label': label, 'color': color}
-                for id, label, color in FileTag.objects.values_list('id', 'label', 'color')
-            ],
+            'label_tags': list(LabelTag.objects.filter(ambit=ambit).values('id', 'label', 'color')),
             'last_folder': last_folder_id,
             **self.list(request, last_folder_id),
         }
@@ -262,9 +260,7 @@ class BrowserView(View):
             next_offset = None
 
         ambit = current_folder.get_ambit()
-        unified_queryset = sort_by_attribute(request, unified_queryset)
-        # Bound serialization work to the requested page.
-        unified_queryset = unified_queryset[offset:offset + self.limit]
+        unified_queryset = sort_by_attribute(request, unified_queryset)[offset:offset + self.limit]
         annotate_unified_queryset(ambit, unified_queryset)
         return {
             'files': list(unified_queryset),

@@ -34,7 +34,7 @@ export default function Archive(props) {
 	return (<>
 		{children}
 		<FileDetails {...props} controlButtons={controlButtons}>
-			<img src={props.settings.thumbnail_url} />
+			<img src={props.settings.thumbnail_url} draggable={false} />
 		</FileDetails>
 	</>);
 }
